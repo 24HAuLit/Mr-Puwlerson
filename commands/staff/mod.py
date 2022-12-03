@@ -40,7 +40,7 @@ class Mod(interactions.Extension):
 
         await ctx.send(embeds=em, ephemeral=True)
 
-        logs_clear = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["clear"])
+        logs_clear = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["clear"])
 
         em2 = Embed(
             title="🧹 Nouveau clear",
@@ -83,7 +83,7 @@ class Mod(interactions.Extension):
 
         # Partie Logs
 
-        logs_timeout = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["timeout"])
+        logs_timeout = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["timeout"])
         guild = await ctx.get_guild()
 
         em = Embed(
@@ -114,7 +114,7 @@ class Mod(interactions.Extension):
         await user.modify(communication_disabled_until=None, guild_id=DATA["principal"]["guild"], reason=reason)
         await ctx.send(f"L'exclusion de {user.mention} a été annulé pour **{reason}**.", ephemeral=True)
 
-        logs_untimeout = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["timeout"])
+        logs_untimeout = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["timeout"])
         guild = await ctx.get_guild()
 
         # Partie Logs
