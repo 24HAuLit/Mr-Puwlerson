@@ -20,9 +20,7 @@ class Mod(interactions.Extension):
 
     @mod.subcommand()
     @interactions.option(
-        name="number",
         description="Nombre de message à supprimer. Par défaut : 5",
-        type=interactions.OptionType.INTEGER,
         required=False
     )
     async def clear(self, ctx: CommandContext, number: int = 5):
@@ -56,22 +54,10 @@ class Mod(interactions.Extension):
         await logs_clear.send(embeds=em2)
 
     @mod.subcommand()
+    @interactions.option("Utilisateur à exclure.")
+    @interactions.option("Temps de l'exclusion (en secondes).")
     @interactions.option(
-        name="user",
-        description="Utilisateur à exclure.",
-        type=interactions.OptionType.USER,
-        required=True
-    )
-    @interactions.option(
-        name="duration",
-        description="Temps de l'exclusion (en secondes).",
-        type=interactions.OptionType.INTEGER,
-        required=True
-    )
-    @interactions.option(
-        name="reason",
         description="Raison de l'exclusion.",
-        type=interactions.OptionType.STRING,
         required=False
     )
     async def timeout(self, ctx: interactions.CommandContext, user: interactions.User, duration: int, reason: str = "Aucune raison"):

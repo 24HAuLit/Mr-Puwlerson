@@ -2,41 +2,44 @@ import asyncio
 import io
 import sqlite3
 import interactions
-from interactions.ext.checks import has_role
 from interactions.ext.transcript import get_transcript
 from datetime import datetime
+from const import DATA
 
 
 class CmdCloseReason(interactions.Extension):
     def __init__(self, bot):
         self.bot: interactions.Client = bot
 
-    @interactions.extension_command(
-        name="close_reason",
-        description="Pour pouvoir fermer le ticket avec une raison."
-    )
-    @has_role(1018602650566139984, 419532166888816640)
-    async def cmd_close_reason(self, ctx: interactions.CommandContext):
-        guild = await interactions.get(self.bot, interactions.Guild, object_id=419529681885331456)
+    @interactions.extension_command()
+    async def close_reason(self, ctx: interactions.CommandContext):
+        """Pour pouvoir fermer le ticket avec une raison."""
+
+        guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["principal"]["guild"])
         channels = interactions.search_iterable(await guild.get_all_channels(),
                                                 lambda c: c.parent_id == 1027647411495129109)
-        if ctx.channel in channels:
-            modal = interactions.Modal(
-                title="Raison",
-                custom_id="cmd_close_reason",
-                components=[
-                    interactions.TextInput(
-                        style=interactions.TextStyleType.SHORT,
-                        label="Pourquoi fermer ce ticket ?",
-                        custom_id="text_input_question_response",
-                        min_length=1,
-                        max_length=500
-                    )
-                ]
-            )
-            await ctx.popup(modal)
+
+        if DATA["roles"]["Staff"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
+            if ctx.channel in channels:
+                modal = interactions.Modal(
+                    title="Raison",
+                    custom_id="cmd_close_reason",
+                    components=[
+                        interactions.TextInput(
+                            style=interactions.TextStyleType.SHORT,
+                            label="Pourquoi fermer ce ticket ?",
+                            custom_id="text_input_question_response",
+                            min_length=1,
+                            max_length=500
+                        )
+                    ]
+                )
+                await ctx.popup(modal)
+            else:
+                await ctx.send("Vous ne pouvez pas utiliser cette commande dans ce salon.", ephemeral=True)
         else:
-            await ctx.send("Vous ne pouvez pas utiliser cette commande dans ce salon.", ephemeral=True)
+            await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
+            interactions.StopCommand()
 
     @interactions.extension_modal("cmd_close_reason")
     async def on_modal_finishes(self, _ctx, reason: str):

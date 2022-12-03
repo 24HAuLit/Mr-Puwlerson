@@ -11,20 +11,11 @@ class Suggestion(interactions.Extension):
 
     counter = 0
 
-    @interactions.extension_command(
-        name="suggest",
-        description="Pour pouvoir proposer une suggestion.",
-        dm_permission=False,
-        options=[
-            interactions.Option(
-                name="suggestion",
-                description="Ecris ta suggestion ici.",
-                type=interactions.OptionType.STRING,
-                required=True
-            )
-        ]
-    )
-    async def _suggest(self, ctx: interactions.CommandContext, suggestion: str):
+    @interactions.extension_command()
+    @interactions.option("Ecris ta suggestion ici.")
+    async def suggest(self, ctx: interactions.CommandContext, suggestion: str):
+        """Pour pouvoir proposer une suggestion."""
+
         channel = await interactions.get(self.bot, interactions.Channel, object_id=1011704888679477369)
         self.counter += 1
         em = interactions.Embed(
