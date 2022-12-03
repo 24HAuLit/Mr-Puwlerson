@@ -44,7 +44,7 @@ class AddMember(interactions.Extension):
             else:
                 await ctx.send("Vous ne pouvez pas utiliser cette commande dans ce salon.", ephemeral=True)
         else:
-            await ctx.send(":x: You are not a staff.", ephemeral=True)
+            await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
             interactions.StopCommand()
 
 

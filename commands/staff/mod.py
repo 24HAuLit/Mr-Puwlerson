@@ -1,6 +1,7 @@
 import interactions
 from interactions import CommandContext, Embed
 from datetime import datetime, timedelta
+from const import DATA
 
 
 class Mod(interactions.Extension):
@@ -11,21 +12,21 @@ class Mod(interactions.Extension):
     async def mod(self, ctx):
         if await ctx.author.has_permissions(interactions.Permissions.ALL):
             pass
-        elif 1018602650566139984 in ctx.author.roles:
+        elif DATA["roles"]["Staff"] in ctx.author.roles:
             pass
         else:
-            await ctx.send(":x: You are not a staff.", ephemeral=True)
+            await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
             return interactions.StopCommand()
 
     @mod.subcommand()
     @interactions.option(
         name="number",
-        description="Amount of message to delete. Default : 5",
+        description="Nombre de message à supprimer. Par défaut : 5",
         type=interactions.OptionType.INTEGER,
         required=False
     )
     async def clear(self, ctx: CommandContext, number: int = 5):
-        """Delete X message(s) from chat."""
+        """Supprime X message(x) du chat."""
 
         channel = ctx.channel
         await channel.purge(amount=number)
@@ -39,7 +40,7 @@ class Mod(interactions.Extension):
 
         await ctx.send(embeds=em, ephemeral=True)
 
-        logs_clear = await interactions.get(self.bot, interactions.Channel, object_id=1025703890513035284)
+        logs_clear = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["clear"])
 
         em2 = Embed(
             title="🧹 Nouveau clear",
@@ -57,32 +58,32 @@ class Mod(interactions.Extension):
     @mod.subcommand()
     @interactions.option(
         name="user",
-        description="User to timeout.",
+        description="Utilisateur à exclure.",
         type=interactions.OptionType.USER,
         required=True
     )
     @interactions.option(
         name="duration",
-        description="Timeout duration (in seconds).",
+        description="Temps de l'exclusion (en secondes).",
         type=interactions.OptionType.INTEGER,
         required=True
     )
     @interactions.option(
         name="reason",
-        description="Reason for this timeout.",
+        description="Raison de l'exclusion.",
         type=interactions.OptionType.STRING,
         required=False
     )
     async def timeout(self, ctx: interactions.CommandContext, user: interactions.User, duration: int, reason: str = "Aucune raison"):
-        """To timeout someone for a moment. If you think this guy need to chill-out a moment."""
+        """Pour exclure temporairement un membre. Si vous pensez qu'il mérite une pause."""
 
         tempo = datetime.utcnow() + timedelta(seconds=duration)
-        await user.modify(communication_disabled_until=tempo.isoformat(), guild_id=419529681885331456, reason=reason)
+        await user.modify(communication_disabled_until=tempo.isoformat(), guild_id=DATA["principal"]["guild"], reason=reason)
         await ctx.send(f"{user.mention} a été exclu pendant **{duration} secondes** pour **{reason}**.", ephemeral=True)
 
         # Partie Logs
 
-        logs_timeout = await interactions.get(self.bot, interactions.Channel, object_id=1025705989745422377)
+        logs_timeout = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["timeout"])
         guild = await ctx.get_guild()
 
         em = Embed(
@@ -103,17 +104,17 @@ class Mod(interactions.Extension):
     @interactions.option("User to untimeout.")
     @interactions.option(
         name="reason",
-        description="Reason for this untimeout.",
+        description="Raison pour retirer l'exclusion.",
         type=interactions.OptionType.STRING,
         required=False
     )
     async def untimeout(self, ctx: interactions.CommandContext, user: interactions.User, reason: str = "Aucune raison"):
-        """To cancel timeout of user."""
+        """Pour annuler l'exclusion temporaire d'un membre."""
 
-        await user.modify(communication_disabled_until=None, guild_id=419529681885331456, reason=reason)
+        await user.modify(communication_disabled_until=None, guild_id=DATA["principal"]["guild"], reason=reason)
         await ctx.send(f"L'exclusion de {user.mention} a été annulé pour **{reason}**.", ephemeral=True)
 
-        logs_untimeout = await interactions.get(self.bot, interactions.Channel, object_id=1025705989745422377)
+        logs_untimeout = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["timeout"])
         guild = await ctx.get_guild()
 
         # Partie Logs
