@@ -46,7 +46,6 @@ class Main:
         self.bot.load("commands.help")
         self.bot.load("commands.ping")
         self.bot.load("commands.suggest")
-        self.bot.load("commands.embed")
         self.bot.load("commands.userinfo")
 
         # Commande staff
