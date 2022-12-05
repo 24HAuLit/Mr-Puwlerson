@@ -2,9 +2,9 @@ import asyncio
 import io
 import sqlite3
 import interactions
-from interactions.ext.checks import has_role
 from interactions.ext.transcript import get_transcript
 from datetime import datetime
+from const import DATA
 
 
 class CloseReasonTicket(interactions.Extension):
@@ -12,22 +12,24 @@ class CloseReasonTicket(interactions.Extension):
         self.bot: interactions.Client = bot
 
     @interactions.extension_component("close_reason_ticket")
-    @has_role(1018602650566139984, 419532166888816640)
     async def button_close_reason(self, ctx):
-        modal = interactions.Modal(
-            title="Raison",
-            custom_id="close_reason",
-            components=[
-                interactions.TextInput(
-                    style=interactions.TextStyleType.SHORT,
-                    label="Pourquoi fermer ce ticket ?",
-                    custom_id="text_input_question_response",
-                    min_length=1,
-                    max_length=500
-                )
-            ]
-        )
-        await ctx.popup(modal)
+        if DATA["roles"]["Staff"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
+            modal = interactions.Modal(
+                title="Raison",
+                custom_id="close_reason",
+                components=[
+                    interactions.TextInput(
+                        style=interactions.TextStyleType.SHORT,
+                        label="Pourquoi fermer ce ticket ?",
+                        custom_id="text_input_question_response",
+                        min_length=1,
+                        max_length=500
+                    )
+                ]
+            )
+            await ctx.popup(modal)
+        else:
+            await ctx.send(":x: Vous n'avez pas la permission de faire ceci.", ephemeral=True)
 
     @interactions.extension_modal("close_reason")
     async def on_modal_finish(self, _ctx, reason: str):
@@ -55,6 +57,7 @@ class CloseReasonTicket(interactions.Extension):
         conn = sqlite3.connect('./Database/ticket.db')
         c = conn.cursor()
         logs = await interactions.get(self.bot, interactions.Channel, object_id=1030764601295519845)
+        c.execute(f"UPDATE table_name SET column_name = 1 WHERE channel_id = {int(channel.id)}")
         c.execute(f'SELECT * FROM table_name WHERE channel_id = {int(channel.id)}')
         row = c.fetchone()
         em3 = interactions.Embed(

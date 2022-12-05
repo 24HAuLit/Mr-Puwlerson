@@ -2,7 +2,6 @@ import sqlite3
 import io
 import asyncio
 import interactions
-from interactions.ext.checks import has_role
 from interactions.ext.transcript import get_transcript
 from datetime import datetime
 
@@ -12,7 +11,6 @@ class ConfirmClose(interactions.Extension):
         self.bot: interactions.Client = bot
 
     @interactions.extension_component("confirm_close")
-    @has_role(1018602650566139984, 419532166888816640)
     async def confirm_close_button(self, ctx):
         # Partie Database
         conn = sqlite3.connect('./Database/ticket.db')
@@ -41,6 +39,7 @@ class ConfirmClose(interactions.Extension):
         # Partie Logs
 
         logs = await interactions.get(self.bot, interactions.Channel, object_id=1030764601295519845)
+        c.execute(f"UPDATE table_name SET column_name = 1 WHERE channel_id = {int(channel.id)}")
         c.execute(f'SELECT * from table_name WHERE channel_id = {int(channel.id)}')
         row = c.fetchone()
         em3 = interactions.Embed(
