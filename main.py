@@ -47,6 +47,8 @@ class Main:
         self.bot.load("commands.ping")
         self.bot.load("commands.suggest")
         self.bot.load("commands.userinfo")
+        # self.bot.load("commands.embed")
+        self.bot.load("commands.pileface")
 
         # Commande staff
         self.bot.load("commands.staff.nuke")
