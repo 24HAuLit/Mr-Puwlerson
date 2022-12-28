@@ -1,4 +1,5 @@
 import interactions
+from interactions.ext.voice import VoiceClient
 from interactions.ext.wait_for import setup
 from dotenv import load_dotenv
 
@@ -11,7 +12,8 @@ class Main:
     def __init__(self):
         self.bot = interactions.Client(token=TOKEN, intents=interactions.Intents.ALL)
 
-        setup(self.bot)
+        interactions.ext.wait_for.setup(self.bot)
+        interactions.ext.voice.setup(self.bot)
         self.setup_listeners()
         self.setup_cmd()
 
