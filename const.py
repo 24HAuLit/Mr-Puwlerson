@@ -6,7 +6,8 @@ DATA = {
     "principal": {
         "guild": 419529681885331456,
         "suggestion": 1011704888679477369,
-        "suggest_result": 1011705768002727987
+        "suggest_result": 1011705768002727987,
+        "bda_waiting": 1046381499143950356
     },
     "logs": {
         "guild": 1025129313546285056,
