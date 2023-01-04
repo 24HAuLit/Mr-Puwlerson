@@ -84,10 +84,11 @@ class Message(interactions.Extension):
         user = message.author
         channel = await message.get_channel()
         content = message.content
-        guild = await message.get_guild()
+        if message.guild_id is not None:
+            guild = await message.get_guild()
         logs_delete = await interactions.get(self.bot, interactions.Channel, object_id=1025703875061219358)
 
-        if user.bot:
+        if message.author.bot:
             return
         else:
             if (channel.id in self.banned_channels) or (channel.type == interactions.ChannelType.DM):
