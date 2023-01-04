@@ -27,7 +27,7 @@ class BesoinAide(interactions.Extension):
 
             guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["principal"]["guild"])
             channel = await guild.create_channel(
-                name=f"🚧 {current_time}", type=interactions.ChannelType.GUILD_VOICE,
+                name=f"🚧・{current_time}", type=interactions.ChannelType.GUILD_VOICE,
                 parent_id=1057341701674520656,
                 permission_overwrites=[
                     interactions.Overwrite(id=419529681885331456, type=0, deny=2199023255551),
@@ -38,6 +38,7 @@ class BesoinAide(interactions.Extension):
                 ]
             )
             await vs.move_member(channel_id=int(channel.id), reason="None")
+
 
 
 def setup(bot):
