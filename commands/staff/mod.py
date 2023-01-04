@@ -78,8 +78,8 @@ class Mod(interactions.Extension):
             color=0xFF5A5A,
             timestamp=datetime.utcnow()
         )
-        em.add_field(name="__Staff :__", value=ctx.author.name, inline=True)
-        em.add_field(name="__Membre :__", value=user.name, inline=True)
+        em.add_field(name="__Staff :__", value=f"{ctx.author.username}#{ctx.author.discriminator}", inline=True)
+        em.add_field(name="__Membre :__", value=f"{user.username}#{user.discriminator}", inline=True)
         em.add_field(name="__Durée de l'exclusion :__", value=f"{duration} secondes", inline=True)
         em.add_field(name="__Raison :__", value=reason)
         em.set_footer(text=f"Staff ID : {ctx.author.id} | Member ID : {user.id}")
