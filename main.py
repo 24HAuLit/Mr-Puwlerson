@@ -59,6 +59,8 @@ class Main:
         # Commande staff
         self.bot.load("commands.staff.nuke")
         self.bot.load("commands.staff.mod")
+        self.bot.load("commands.staff.blacklist")
+        self.bot.load("commands.staff.unblacklist")
 
         # Commande ticket
         self.bot.load("commands.ticket.add")
