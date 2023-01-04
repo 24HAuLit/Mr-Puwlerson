@@ -24,7 +24,7 @@ class Help(interactions.Extension):
             )
             em.add_field(
                 name="**Staff**",
-                value="```\n• mod clear\n• mod timeout\n• mod untimemout\n• nuke (Admin only)\n```",
+                value="```\n• mod clear\n• mod timeout\n• mod untimemout\n• nuke (Admin only)\n• blacklist (Admin only)\n• unblacklist (Admin only)\n```",
                 inline=True
             )
             em.add_field(
