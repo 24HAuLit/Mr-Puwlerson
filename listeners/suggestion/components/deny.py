@@ -19,7 +19,7 @@ def modal_deny():
                 label="Pour quelle raison avez-vous refusé ?",
                 custom_id="text_input_accept_response",
                 min_length=1,
-                max_length=15
+                max_length=100
             )
         ]
     )
