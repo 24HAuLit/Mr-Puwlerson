@@ -23,7 +23,11 @@ class Main:
         # Listeners globaux
         self.bot.load("listeners.auto-role")
         self.bot.load("listeners.presence")
-        self.bot.load("listeners.bda.besoin-aide")
+        # self.bot.load("listeners.bda.besoin-aide") # Faut faire le delete de channel quand personne
+
+        # Listerners report
+        self.bot.load("listeners.report.report")
+        self.bot.load("listeners.report.cancel")
 
         # Listeners logs
         self.bot.load("listeners.logs.message")
@@ -49,8 +53,8 @@ class Main:
         self.bot.load("commands.ping")
         self.bot.load("commands.suggest")
         self.bot.load("commands.userinfo")
-        # self.bot.load("commands.embed")
         self.bot.load("commands.pileface")
+        # self.bot.load("commands.embed") # Useless
 
         # Commande staff
         self.bot.load("commands.staff.nuke")
