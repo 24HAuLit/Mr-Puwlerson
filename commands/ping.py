@@ -13,7 +13,6 @@ class Ping(interactions.Extension):
     )
     async def command(self, ctx: interactions.CommandContext):
         await ctx.send(f"Pong!\nLa latence du bot est de **{abs(round(self.bot.latency))}ms**.", ephemeral=True)
-        print(self.bot.latency)
 
 
 def setup(bot):
