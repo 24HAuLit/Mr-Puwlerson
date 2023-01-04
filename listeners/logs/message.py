@@ -20,7 +20,7 @@ class Message(interactions.Extension):
         if message.author.bot:
             return
         else:
-            if channel.id in self.banned_channels:
+            if (channel.id in self.banned_channels) or (channel.type == interactions.ChannelType.DM):
                 return
             else:
                 em = interactions.Embed(
@@ -46,13 +46,14 @@ class Message(interactions.Extension):
         old_content = before.content
         new_content = after.content
         channel = await after.get_channel()
-        guild = await after.get_guild()
+        if after.guild_id is not None:
+            guild = await after.get_guild()
         logs_edit = await interactions.get(self.bot, interactions.Channel, object_id=1025703859689103392)
 
         if before.author.bot:
             return
         else:
-            if channel.id in self.banned_channels:
+            if (channel.id in self.banned_channels) or (channel.type == interactions.ChannelType.DM):
                 return
             else:
                 em2 = interactions.Embed(
@@ -89,7 +90,7 @@ class Message(interactions.Extension):
         if user.bot:
             return
         else:
-            if channel.id in self.banned_channels:
+            if (channel.id in self.banned_channels) or (channel.type == interactions.ChannelType.DM):
                 return
             else:
                 em = interactions.Embed(
