@@ -19,14 +19,14 @@ class UnClaimCommand(interactions.Extension):
         if DATA["roles"]["Staff"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
 
             # Partie Database
-            conn = sqlite3.connect('./Database/ticket.db')
+            conn = sqlite3.connect('./Database/puwlerson.db')
             cur = conn.cursor()
-            cur.execute(f'SELECT * from table_name WHERE channel_id = {int(channel.id)}')
+            cur.execute(f'SELECT * from ticket WHERE channel_id = {int(channel.id)}')
             row = cur.fetchone()
 
             if channel in channels:
                 if int(ctx.author.id) == row[2]:
-                    cur.execute(f"UPDATE table_name SET staff_id = 'None' WHERE channel_id = {int(channel.id)}")
+                    cur.execute(f"UPDATE ticket SET staff_id = 'None' WHERE channel_id = {int(channel.id)}")
                     conn.commit()
                     em = interactions.Embed(
                         description=f"Le ticket n'est plus pris en charge par {ctx.author.mention}.",

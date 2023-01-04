@@ -15,9 +15,9 @@ class ClaimTicket(interactions.Extension):
 
         if DATA["roles"]["Staff"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
             # Partie database
-            conn = sqlite3.connect('./Database/ticket.db')
+            conn = sqlite3.connect('./Database/puwlerson.db')
             c = conn.cursor()
-            c.execute(f"UPDATE table_name SET staff_id = {id_staff} WHERE channel_id = {int(channel.id)}")
+            c.execute(f"UPDATE ticket SET staff_id = {id_staff} WHERE channel_id = {int(channel.id)}")
             conn.commit()
             conn.close()
 

@@ -13,7 +13,7 @@ class ConfirmClose(interactions.Extension):
     @interactions.extension_component("confirm_close")
     async def confirm_close_button(self, ctx):
         # Partie Database
-        conn = sqlite3.connect('./Database/ticket.db')
+        conn = sqlite3.connect('./Database/puwlerson.db')
         c = conn.cursor()
 
         # Partie transcript
@@ -39,8 +39,7 @@ class ConfirmClose(interactions.Extension):
         # Partie Logs
 
         logs = await interactions.get(self.bot, interactions.Channel, object_id=1030764601295519845)
-        c.execute(f"UPDATE table_name SET column_name = 1 WHERE channel_id = {int(channel.id)}")
-        c.execute(f'SELECT * from table_name WHERE channel_id = {int(channel.id)}')
+        c.execute(f'SELECT * from ticket WHERE channel_id = {int(channel.id)}')
         row = c.fetchone()
         em3 = interactions.Embed(
             title="Fermeture de ticket",

@@ -12,9 +12,9 @@ class OpenTicket(interactions.Extension):
 
     @interactions.extension_component("open_ticket")
     async def button_open(self, ctx):
-        conn = sqlite3.connect('./Database/ticket.db')
+        conn = sqlite3.connect('./Database/puwlerson.db')
         c = conn.cursor()
-        # if
+
         # Partie création ticket
         guild = await interactions.get(self.bot, interactions.Guild, object_id=419529681885331456)
         channel = await guild.create_channel(
@@ -41,7 +41,7 @@ class OpenTicket(interactions.Extension):
         # Partie Database
         author_id = ctx.author.id
 
-        c.execute("INSERT INTO table_name VALUES (NULL, '{}', '{}', '{}', '{}')".format(author_id, None, channel.id, 0))
+        c.execute("INSERT INTO ticket VALUES (NULL, '{}', '{}', '{}', '{}')".format(author_id, None, channel.id, 0))
         conn.commit()
         conn.close()
 
