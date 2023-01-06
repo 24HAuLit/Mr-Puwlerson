@@ -23,9 +23,9 @@ class Main:
         # Listeners globaux
         self.bot.load("listeners.auto-role")
         self.bot.load("listeners.presence")
-        # self.bot.load("listeners.bda.besoin-aide") # Faut faire le delete de channel quand personne
+        # self.bot.load("listeners.bda.besoin-aide") # Il faut faire le delete de channel quand personne
 
-        # Listerners report
+        # Listeners report
         self.bot.load("listeners.report.report")
         self.bot.load("listeners.report.cancel")
 
