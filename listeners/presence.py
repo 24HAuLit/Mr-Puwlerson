@@ -5,8 +5,8 @@ class Presence(interactions.Extension):
     def __init__(self, bot):
         self.bot: interactions.Client = bot
 
-    @interactions.extension_listener(name="on_start")
-    async def event(self):
+    @interactions.extension_listener()
+    async def on_start(self):
         await self.bot.change_presence(
             interactions.ClientPresence(
                 status=interactions.StatusType.DND,
