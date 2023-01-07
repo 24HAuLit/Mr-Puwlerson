@@ -17,7 +17,7 @@ class CmdCloseReason(interactions.Extension):
 
         guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["principal"]["guild"])
         channels = interactions.search_iterable(await guild.get_all_channels(),
-                                                lambda c: c.parent_id == 1027647411495129109)
+                                                lambda c: c.parent_id == DATA["main"]["ticket"])
 
         if DATA["roles"]["Staff"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
             if ctx.channel in channels:
@@ -65,7 +65,7 @@ class CmdCloseReason(interactions.Extension):
         # Partie Logs
         conn = sqlite3.connect('./Database/puwlerson.db')
         c = conn.cursor()
-        logs = await interactions.get(self.bot, interactions.Channel, object_id=1030764601295519845)
+        logs = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["ticket"]["close"])
         c.execute(f'SELECT * FROM ticket WHERE channel_id = {int(channel.id)}')
         row = c.fetchone()
         em3 = interactions.Embed(

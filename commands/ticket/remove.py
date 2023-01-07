@@ -19,9 +19,9 @@ class RemoveMember(interactions.Extension):
                    role: interactions.Role = None):
         """Pour pouvoir retirer quelqu'un ou un role au ticket."""
 
-        guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["principal"]["guild"])
+        guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["main"]["guild"])
         channels = interactions.search_iterable(await guild.get_all_channels(),
-                                                lambda c: c.parent_id == 1027647411495129109)
+                                                lambda c: c.parent_id == DATA["main"]["ticket"])
 
         if DATA["roles"]["Staff"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
             if ctx.channel in channels:

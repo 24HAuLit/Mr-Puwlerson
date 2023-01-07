@@ -11,9 +11,9 @@ class UnClaimCommand(interactions.Extension):
     async def unclaim(self, ctx: interactions.CommandContext):
         """Pour pouvoir retirer sa revendication d'un ticket."""
 
-        guild = await interactions.get(self.bot, interactions.Guild, object_id=419529681885331456)
+        guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["main"]["guild"])
         channels = interactions.search_iterable(await guild.get_all_channels(),
-                                                lambda c: c.parent_id == 1027647411495129109)
+                                                lambda c: c.parent_id == DATA["main"]["ticket"])
         channel = await ctx.get_channel()
 
         if DATA["roles"]["Staff"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:

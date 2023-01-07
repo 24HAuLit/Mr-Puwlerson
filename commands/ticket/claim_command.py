@@ -12,9 +12,9 @@ class ClaimCommand(interactions.Extension):
         """Pour pouvoir revendiquer un ticket."""
 
         if DATA["roles"]["Staff"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
-            guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["principal"]["guild"])
+            guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["main"]["guild"])
             channels = interactions.search_iterable(await guild.get_all_channels(),
-                                                    lambda c: c.parent_id == 1027647411495129109)
+                                                    lambda c: c.parent_id == DATA["main"]["ticket"])
             channel = await ctx.get_channel()
             id_staff = ctx.author.id
 

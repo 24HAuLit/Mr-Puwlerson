@@ -23,9 +23,9 @@ class AddMember(interactions.Extension):
         """Pour pouvoir ajouter quelqu'un ou un role au ticket."""
 
         if DATA["roles"]["Staff"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
-            guild = await interactions.get(self.bot, interactions.Guild, object_id=419529681885331456)
+            guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["main"]["guild"])
             channels = interactions.search_iterable(await guild.get_all_channels(),
-                                                    lambda c: c.parent_id == 1027647411495129109)
+                                                    lambda c: c.parent_id == DATA["main"]["ticket"])
             if ctx.channel in channels:
                 if user is not None:
                     new_perms = [interactions.Overwrite(id=int(user.id), type=1,
