@@ -64,7 +64,7 @@ class Mod(interactions.Extension):
         """Pour exclure temporairement un membre. Si vous pensez qu'il mérite une pause."""
 
         tempo = datetime.utcnow() + timedelta(seconds=duration)
-        await user.modify(communication_disabled_until=tempo.isoformat(), guild_id=DATA["principal"]["guild"], reason=reason)
+        await user.modify(communication_disabled_until=tempo.isoformat(), guild_id=DATA["main"]["guild"], reason=reason)
         await ctx.send(f"{user.mention} a été exclu pendant **{duration} secondes** pour **{reason}**.", ephemeral=True)
 
         # Partie Logs
@@ -97,7 +97,7 @@ class Mod(interactions.Extension):
     async def untimeout(self, ctx: interactions.CommandContext, user: interactions.User, reason: str = "Aucune raison"):
         """Pour annuler l'exclusion temporaire d'un membre."""
 
-        await user.modify(communication_disabled_until=None, guild_id=DATA["principal"]["guild"], reason=reason)
+        await user.modify(communication_disabled_until=None, guild_id=DATA["main"]["guild"], reason=reason)
         await ctx.send(f"L'exclusion de {user.mention} a été annulé pour **{reason}**.", ephemeral=True)
 
         logs_untimeout = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["timeout"])

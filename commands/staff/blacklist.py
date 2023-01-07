@@ -16,7 +16,7 @@ class Blacklist(interactions.Extension):
 
         if DATA["roles"]["Admin"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
             user_id = user.id
-            channel = await interactions.get(self.bot, interactions.Channel, object_id=1060273879018381405)
+            channel = await interactions.get(self.bot, interactions.Channel, object_id=DATA["main"]["staff_logs"])
             dm = user_id
 
             conn = sqlite3.connect('./Database/puwlerson.db')

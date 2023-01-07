@@ -1,5 +1,6 @@
 import interactions
 from datetime import datetime
+from const import DATA
 
 
 class ModalDeny(interactions.Extension):
@@ -8,7 +9,7 @@ class ModalDeny(interactions.Extension):
 
     @interactions.extension_modal("refuse_reason")
     async def modal_refuse(self, ctx, response: str):
-        result = await interactions.get(self.bot, interactions.Channel, object_id=1011705768002727987)
+        result = await interactions.get(self.bot, interactions.Channel, object_id=DATA["main"]["suggest_result"])
         em = interactions.Embed(
             title="Suggestion refusé",
             url=ctx.message.url,

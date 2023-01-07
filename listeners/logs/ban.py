@@ -1,5 +1,6 @@
 import interactions
 from datetime import datetime
+from const import DATA
 
 
 class Ban(interactions.Extension):
@@ -9,7 +10,7 @@ class Ban(interactions.Extension):
 
     @interactions.extension_listener(name="on_guild_ban_add")
     async def ban(self, user: interactions.User):
-        logs_ban = await interactions.get(self.bot, interactions.Channel, object_id=1025706023333408878)
+        logs_ban = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["ban"])
         guild = await interactions.get(self.bot, interactions.Guild, object_id=int(user.guild_id))
         staff_audit = await guild.get_full_audit_logs(action_type=22)
         staff = staff_audit.audit_log_entries[0].user_id
@@ -33,7 +34,7 @@ class Ban(interactions.Extension):
 
     @interactions.extension_listener(name="on_guild_ban_remove")
     async def unban(self, user: interactions.User):
-        logs_ban = await interactions.get(self.bot, interactions.Channel, object_id=1025706023333408878)
+        logs_ban = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["ban"])
         guild = await interactions.get(self.bot, interactions.Guild, object_id=int(user.guild_id))
         staff_audit = await guild.get_full_audit_logs(action_type=23)
         staff = staff_audit.audit_log_entries[0].user_id

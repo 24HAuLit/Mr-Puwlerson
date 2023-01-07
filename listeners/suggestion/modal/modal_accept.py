@@ -1,5 +1,6 @@
 import interactions
 from datetime import datetime
+from const import DATA
 
 
 class ModalAccept(interactions.Extension):
@@ -8,7 +9,7 @@ class ModalAccept(interactions.Extension):
 
     @interactions.extension_modal("accept_reason")
     async def modal_accept(self, ctx, response: str):
-        result = await interactions.get(self.bot, interactions.Channel, object_id=1011705768002727987)
+        result = await interactions.get(self.bot, interactions.Channel, object_id=DATA["main"]["suggest_result"])
         em = interactions.Embed(
             title="Suggestion accepté",
             url=ctx.message.url,

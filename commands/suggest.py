@@ -3,6 +3,7 @@ import sqlite3
 import interactions
 from datetime import datetime
 from interactions.ext.enhanced import cooldown
+from const import DATA
 from listeners.suggestion.components.accept import suggest_accept
 from listeners.suggestion.components.deny import suggest_deny
 
@@ -31,7 +32,7 @@ class Suggestion(interactions.Extension):
         if row is not None:
             await ctx.send("Désolé, mais vous êtes blacklist. Vous ne pouvez donc pas envoyé de suggestion.", ephemeral=True)
         else:
-            channel = await interactions.get(self.bot, interactions.Channel, object_id=1011704888679477369)
+            channel = await interactions.get(self.bot, interactions.Channel, object_id=DATA["main"]["suggestion"])
             self.counter += 1
             em = interactions.Embed(
                 title="Nouvelle suggestion #%d" % self.counter,

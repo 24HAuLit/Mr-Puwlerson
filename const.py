@@ -3,11 +3,13 @@ import os
 TOKEN = os.getenv("TOKEN_OFFICIAL")
 
 DATA = {
-    "principal": {
+    "main": {
         "guild": 419529681885331456,
         "suggestion": 1011704888679477369,
         "suggest_result": 1011705768002727987,
-        "bda_waiting": 1046381499143950356
+        "bda_waiting": 1046381499143950356,
+        "report": 1060273879018381405,
+        "staff_logs": 1061336804659298417
     },
     "logs": {
         "guild": 1025129313546285056,
@@ -32,6 +34,7 @@ DATA = {
         }
     },
     "roles": {
+        "Default": 419556483861053448,
         "Staff": 1018602650566139984,
         "Moderator": 419532481319010314,
         "Admin": 419532345134284810,

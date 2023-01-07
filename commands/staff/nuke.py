@@ -32,7 +32,8 @@ class Nuke(interactions.Extension):
             interactions.StopCommand()
         try:
             await self.bot.wait_for_component(
-                components=[self.confirm_button, self.refused_button], check=[self.button_confirm, self.button_refuse], timeout=15
+                components=[self.confirm_button, self.refused_button], check=[self.button_confirm, self.button_refuse],
+                timeout=15
             )
             pass
         except asyncio.TimeoutError:
@@ -69,7 +70,7 @@ class Nuke(interactions.Extension):
         await new.send(embeds=embed3)
 
         # Partie Logs
-        logs_nuke = await interactions.get(self.bot, interactions.Channel, object_id=1025705944266588160)
+        logs_nuke = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["nuke"])
 
         em2 = interactions.Embed(title="**💣 Nouveau nuke**", description=f"Un channel a été nuke.",
                                  color=0xFF0000,
@@ -84,8 +85,6 @@ class Nuke(interactions.Extension):
     async def button_refuse(self, ctx):
         await ctx.edit(components=[])
         await ctx.send("Vous avez annulé la destruction de ce salon.", ephemeral=True)
-
-
 
 
 def setup(bot):

@@ -1,5 +1,6 @@
 import interactions
 from datetime import datetime
+from const import DATA
 
 
 class Message(interactions.Extension):
@@ -15,7 +16,7 @@ class Message(interactions.Extension):
         content = message.content
         if message.guild_id is not None:
             guild = await message.get_guild()
-        logs_create = await interactions.get(self.bot, interactions.Channel, object_id=1025130771456983080)
+        logs_create = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["messages"]["new"])
 
         if message.author.bot:
             return
@@ -48,7 +49,7 @@ class Message(interactions.Extension):
         channel = await after.get_channel()
         if after.guild_id is not None:
             guild = await after.get_guild()
-        logs_edit = await interactions.get(self.bot, interactions.Channel, object_id=1025703859689103392)
+        logs_edit = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["messages"]["edit"])
 
         if before.author.bot:
             return
@@ -86,7 +87,7 @@ class Message(interactions.Extension):
         content = message.content
         if message.guild_id is not None:
             guild = await message.get_guild()
-        logs_delete = await interactions.get(self.bot, interactions.Channel, object_id=1025703875061219358)
+        logs_delete = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["messages"]["delete"])
 
         if message.author.bot:
             return

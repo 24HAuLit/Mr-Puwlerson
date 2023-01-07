@@ -1,6 +1,8 @@
 import interactions
 from datetime import datetime
 
+from const import DATA
+
 
 class JoinQuit(interactions.Extension):
     def __init__(self, bot):
@@ -8,7 +10,7 @@ class JoinQuit(interactions.Extension):
 
     @interactions.extension_listener(name="on_guild_member_add")
     async def join(self, user: interactions.GuildMember):
-        join = await interactions.get(self.bot, interactions.Channel, object_id=1039280742993240125)
+        join = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["global"]["join"])
         guild = await interactions.get(self.bot, interactions.Guild, object_id=int(user.guild_id))
 
         em = interactions.Embed(
@@ -22,7 +24,7 @@ class JoinQuit(interactions.Extension):
 
     @interactions.extension_listener(name="on_guild_member_remove")
     async def quit(self, user: interactions.GuildMember):
-        quit = await interactions.get(self.bot, interactions.Channel, object_id=1039280760403787829)
+        quit = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["global"]["leave"])
         guild = await interactions.get(self.bot, interactions.Guild, object_id=int(user.guild_id))
 
         em = interactions.Embed(
