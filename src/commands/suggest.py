@@ -4,8 +4,8 @@ import interactions
 from datetime import datetime
 from interactions.ext.enhanced import cooldown
 from const import DATA
-from listeners.suggestion.components.accept import suggest_accept
-from listeners.suggestion.components.deny import suggest_deny
+from src.listeners.suggestion.components.accept import suggest_accept
+from src.listeners.suggestion.components.deny import suggest_deny
 
 
 class Suggestion(interactions.Extension):

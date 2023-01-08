@@ -1,5 +1,5 @@
 import interactions
-from listeners.suggestion.components.accept import modal_accept
+from src.listeners.suggestion.components.accept import modal_accept
 
 
 class SuggestionAccepted(interactions.Extension):

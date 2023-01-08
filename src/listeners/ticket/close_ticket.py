@@ -1,6 +1,6 @@
 import interactions
 from const import DATA
-from listeners.ticket.components.close import confirm_close
+from src.listeners.ticket.components.close import confirm_close
 
 
 class CloseTicket(interactions.Extension):

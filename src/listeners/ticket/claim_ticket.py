@@ -1,7 +1,7 @@
 import sqlite3
 import interactions
 from const import DATA
-from listeners.ticket.components.close import ticket_close, ticket_close_reason
+from src.listeners.ticket.components.close import ticket_close, ticket_close_reason
 
 
 class ClaimTicket(interactions.Extension):

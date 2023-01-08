@@ -1,5 +1,5 @@
 import interactions
-from listeners.suggestion.components.deny import modal_deny
+from src.listeners.suggestion.components.deny import modal_deny
 
 
 class SuggestionDenied(interactions.Extension):

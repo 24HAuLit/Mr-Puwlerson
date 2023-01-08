@@ -1,8 +1,8 @@
 import sqlite3
 import interactions
 from datetime import datetime
-from listeners.ticket.components.claim import ticket_claim
-from listeners.ticket.components.close import ticket_close_reason, ticket_close
+from src.listeners.ticket.components.claim import ticket_claim
+from src.listeners.ticket.components.close import ticket_close_reason, ticket_close
 
 
 class OpenTicket(interactions.Extension):
