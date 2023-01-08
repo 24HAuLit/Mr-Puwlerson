@@ -1,6 +1,5 @@
-from datetime import datetime
-
 import interactions
+from datetime import datetime
 
 
 class UserInfo(interactions.Extension):
