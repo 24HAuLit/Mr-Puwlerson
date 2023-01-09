@@ -1,4 +1,52 @@
 import os
+import pathlib
+
+src_path = pathlib.Path(__file__).parent.absolute().as_posix()
+
+# Partie Listeners
+LISTENERS = [
+    file.replace(".py", "")
+    for file in os.listdir(f"{src_path}/src/listeners")
+    if file.endswith(".py")
+]
+LISTENERS_LOGS = [
+    file.replace(".py", "")
+    for file in os.listdir(f"{src_path}/src/listeners/logs")
+    if file.endswith(".py")
+]
+LISTENERS_REPORT = [
+    file.replace(".py", "")
+    for file in os.listdir(f"{src_path}/src/listeners/report")
+    if file.endswith(".py")
+]
+LISTENERS_SUGGEST = [
+    file.replace(".py", "")
+    for file in os.listdir(f"{src_path}/src/listeners/suggestion")
+    if file.endswith(".py")
+]
+LISTENERS_TICKET = [
+    file.replace(".py", "")
+    for file in os.listdir(f"{src_path}/src/listeners/ticket")
+    if file.endswith(".py")
+]
+
+# Partie commandes
+COMMANDS = [
+    file.replace(".py", "")
+    for file in os.listdir(f"{src_path}/src/commands")
+    if file.endswith(".py")
+]
+COMMANDS_TICKET = [
+    file.replace(".py", "")
+    for file in os.listdir(f"{src_path}/src/commands/ticket")
+    if file.endswith(".py")
+]
+COMMANDS_STAFF = [
+    file.replace(".py", "")
+    for file in os.listdir(f"{src_path}/src/commands/staff")
+    if file.endswith(".py")
+]
+
 
 TOKEN = os.getenv("TOKEN_OFFICIAL")
 
