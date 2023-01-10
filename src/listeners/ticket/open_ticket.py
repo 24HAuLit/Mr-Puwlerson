@@ -42,7 +42,7 @@ class OpenTicket(interactions.Extension):
         # Partie Database
         author_id = ctx.author.id
 
-        c.execute("INSERT INTO ticket VALUES (NULL, '{}', '{}', '{}', '{}')".format(author_id, None, channel.id, 0))
+        c.execute("INSERT INTO ticket VALUES (NULL, '{}', '{}', '{}')".format(author_id, None, channel.id))
         conn.commit()
         conn.close()
 
