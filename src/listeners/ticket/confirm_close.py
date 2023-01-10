@@ -5,6 +5,8 @@ import interactions
 from interactions.ext.transcript import get_transcript
 from datetime import datetime
 
+from const import DATA
+
 
 class ConfirmClose(interactions.Extension):
     def __init__(self, bot):
@@ -38,7 +40,7 @@ class ConfirmClose(interactions.Extension):
 
         # Partie Logs
 
-        logs = await interactions.get(self.bot, interactions.Channel, object_id=1030764601295519845)
+        logs = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["ticket"]["close"])
         c.execute(f'SELECT * from ticket WHERE channel_id = {int(channel.id)}')
         row = c.fetchone()
         em3 = interactions.Embed(

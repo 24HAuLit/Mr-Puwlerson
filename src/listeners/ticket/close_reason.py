@@ -56,8 +56,7 @@ class CloseReasonTicket(interactions.Extension):
         # Partie logs
         conn = sqlite3.connect('./Database/puwlerson.db')
         c = conn.cursor()
-        logs = await interactions.get(self.bot, interactions.Channel, object_id=1030764601295519845)
-        c.execute(f"UPDATE ticket SET column_name = 1 WHERE channel_id = {int(channel.id)}")
+        logs = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["ticket"]["close"])
         c.execute(f'SELECT * FROM ticket WHERE channel_id = {int(channel.id)}')
         row = c.fetchone()
         em3 = interactions.Embed(
