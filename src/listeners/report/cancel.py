@@ -10,5 +10,6 @@ class CancelReport(interactions.Extension):
         await ctx.edit(components=[])
         await ctx.send("Vous avez annulé votre report.")
 
+
 def setup(bot):
     CancelReport(bot)

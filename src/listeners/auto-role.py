@@ -8,7 +8,7 @@ class AutoRole(interactions.Extension):
 
     @interactions.extension_listener(name="on_guild_member_add")
     async def on_guild_member_add(self, member: interactions.Member):
-        role = await interactions.get(self.bot, interactions.Role, object_id=DATA["roles"]["default"])
+        role = await interactions.get(self.bot, interactions.Role, object_id=DATA["roles"]["Default"])
         await member.add_role(role)
 
 

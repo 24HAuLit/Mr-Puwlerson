@@ -1,6 +1,5 @@
 import sqlite3
 import interactions
-
 from datetime import datetime
 from interactions.ext.voice import VoiceState
 from const import DATA
@@ -38,7 +37,6 @@ class BesoinAide(interactions.Extension):
                 ]
             )
             await vs.move_member(channel_id=int(channel.id), reason="None")
-
 
 
 def setup(bot):
