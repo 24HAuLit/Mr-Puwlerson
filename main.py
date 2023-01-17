@@ -13,7 +13,6 @@ class Main:
         self.bot = interactions.Client(token=TOKEN, intents=interactions.Intents.ALL)
 
         interactions.ext.wait_for.setup(self.bot)
-        # interactions.ext.voice.setup(self.bot)
         self.setup()
 
         self.bot.start()
