@@ -16,7 +16,10 @@ class Setup(interactions.Extension):
 
     @interactions.extension_command()
     async def setup(self, ctx: interactions.CommandContext):
-        await ctx.send("Quel type de serveur voulez-vous configurer ?", components=self.select_menu, ephemeral=True)
+        if ctx.author.id == ctx.guild.owner_id:
+            await ctx.send("Quel type de serveur voulez-vous configurer ?", components=self.select_menu, ephemeral=True)
+        else:
+            await ctx.send("Vous n'avez pas la permissions d'executer cette commande.", ephemeral=True)
 
     @interactions.extension_component("select")
     async def select(self, ctx: interactions.ComponentContext, choice: list[str]):
