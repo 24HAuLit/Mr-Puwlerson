@@ -1,4 +1,5 @@
 import interactions
+import sqlite3
 from interactions.ext.checks import is_owner
 
 
@@ -18,11 +19,42 @@ class Setup(interactions.Extension):
         await ctx.send("Quel type de serveur voulez-vous configurer ?", components=self.select_menu, ephemeral=True)
 
     @interactions.extension_component("select")
-    async def select(self, ctx: interactions.CommandContext, choice: list[str]):
+    async def select(self, ctx: interactions.ComponentContext, choice: list[str]):
+        guild = await ctx.get_guild()
         if choice[0] == "main":
-            await ctx.send("main test", ephemeral=True)
+            conn = sqlite3.connect(f"./Database/{guild.id}.db")
+            c = conn.cursor()
+
+            c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='ticket'""")
+            if c.fetchone()[0] == 1:
+                pass
+            else:
+                c.execute("""CREATE TABLE "ticket"
+                    (
+                        ticket_id  INTEGER not null
+                            primary key autoincrement,
+                        author_id  INTEGER not null,
+                        staff_id   INTEGER not null,
+                        channel_id INTEGER
+                    )""")
+
+            c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='blacklist'""")
+            if c.fetchone()[0] == 1:
+                pass
+            else:
+                c.execute("""CREATE TABLE blacklist
+                    (
+                        blacklist_id integer not null
+                            primary key autoincrement,
+                        user_id      integer not null,
+                        reason       text
+                    )""")
+
         else:
             await ctx.send("logs test", ephemeral=True)
+
+        conn.commit()
+        conn.close()
 
 
 def setup(bot):
