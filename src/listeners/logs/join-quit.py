@@ -13,7 +13,7 @@ class JoinQuit(interactions.Extension):
         guild = await interactions.get(self.bot, interactions.Guild, object_id=int(user.guild_id))
 
         em = interactions.Embed(
-            title="🛬 Un utilisateur a rejoint un serveur",
+            title="🛬・Un utilisateur a rejoint un serveur",
             description=f"**{user.username}#{user.discriminator}** a rejoint **{guild.name}**",
             color=0x4CFF4C,
             timestamp=datetime.utcnow()
@@ -27,7 +27,7 @@ class JoinQuit(interactions.Extension):
         guild = await interactions.get(self.bot, interactions.Guild, object_id=int(user.guild_id))
 
         em = interactions.Embed(
-            title="🛫 Un utilisateur a quitté un serveur",
+            title="🛫・Un utilisateur a quitté un serveur",
             description=f"**{user.username}#{user.discriminator}** a quitté **{guild}**",
             color=0xFF5A5A,
             timestamp=datetime.utcnow()
