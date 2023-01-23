@@ -20,14 +20,14 @@ class ClaimCommand(interactions.Extension):
 
             # Partie Database
             conn = sqlite3.connect('./Database/puwlerson.db')
-            cur = conn.cursor()
-            cur.execute(f'SELECT * from ticket WHERE channel_id = {int(channel.id)}')
-            row = cur.fetchone()
+            c = conn.cursor()
+            c.execute(f'SELECT * from ticket WHERE channel_id = {int(channel.id)}')
+            row = c.fetchone()
 
             # Partie commande
             if channel in channels:
                 if row[2] is None or row[2] == 'None':
-                    cur.execute(f"UPDATE ticket SET staff_id = {id_staff} WHERE channel_id = {int(channel.id)}")
+                    c.execute(f"UPDATE ticket SET staff_id = {id_staff} WHERE channel_id = {int(channel.id)}")
 
                     conn.commit()
                     em = interactions.Embed(
