@@ -30,7 +30,7 @@ class Mod(interactions.Extension):
         await channel.purge(amount=number)
 
         em = Embed(
-            description=f"🧹 **{number}** messages supprimés.",
+            description=f"🧹・**{number}** messages supprimés.",
             color=0xFF5A5A,
             timestamp=datetime.utcnow()
         )
@@ -41,7 +41,7 @@ class Mod(interactions.Extension):
         logs_clear = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["clear"])
 
         em2 = Embed(
-            title="🧹 Nouveau clear",
+            title="🧹・Nouveau clear",
             description=f"**{number}** messages supprimés sur le serveur **{ctx.guild.name}** ({ctx.guild.id}).",
             color=0xFF5A5A,
             timestamp=datetime.utcnow()
@@ -73,7 +73,7 @@ class Mod(interactions.Extension):
         guild = await ctx.get_guild()
 
         em = Embed(
-            title="Nouvelle exclusion temporaire",
+            title="🟠・Nouvelle exclusion temporaire",
             description=f"Un membre vient de se faire exclure temporairement de **{guild}**.",
             color=0xFF5A5A,
             timestamp=datetime.utcnow()
@@ -106,7 +106,7 @@ class Mod(interactions.Extension):
         # Partie Logs
 
         em = Embed(
-            title="Fin d'exclusion temporaire",
+            title="🟢・Fin d'exclusion temporaire",
             description=f"Un staff vient de retirer l'exclusion temporaire d'un membre sur **{guild}**.",
             color=0x4CFF4C,
             timestamp=datetime.utcnow()

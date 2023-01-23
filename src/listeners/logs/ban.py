@@ -20,7 +20,7 @@ class Ban(interactions.Extension):
             reason = "Aucune raison spécifié"
 
         em = interactions.Embed(
-            title="Nouveau bannissement",
+            title="🛑・Nouveau bannissement",
             description=f"Un membre vient de se faire bannir de **{guild.name}**.",
             color=0xFF2020,
             timestamp=datetime.utcnow()
@@ -40,7 +40,7 @@ class Ban(interactions.Extension):
         staff = staff_audit.audit_log_entries[0].user_id
 
         em = interactions.Embed(
-            title="Nouveau débannissement",
+            title="🟢・Nouveau débannissement",
             description=f"Un membre vient de se faire débannir de **{guild.name}**.",
             color=0x3FFF20,
             timestamp=datetime.utcnow()

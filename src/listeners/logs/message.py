@@ -25,7 +25,7 @@ class Message(interactions.Extension):
                 return
             else:
                 em = interactions.Embed(
-                    title="Nouveau message",
+                    title="🖊️・Nouveau message",
                     url=message.url,
                     description=f"**{message.author.username}#{message.author.discriminator}** vient d'envoyer un message sur **{guild}** ({guild.id}) dans le salon **{channel}** ({channel.id})",
                     color=0x4CFF4C,
@@ -58,7 +58,7 @@ class Message(interactions.Extension):
                 return
             else:
                 em2 = interactions.Embed(
-                    title="Modification de message",
+                    title="📝・Modification de message",
                     url=after.url,
                     description=f"**{after.author.username}#{after.author.discriminator}** vient de modifier un message sur **{guild}** ({guild.id}) dans le salon **{channel}** ({channel.id})",
                     color=0xFFFF00,
@@ -96,7 +96,7 @@ class Message(interactions.Extension):
                 return
             else:
                 em = interactions.Embed(
-                    title="Message supprimé",
+                    title="🗑️・Message supprimé",
                     description=f"Le message de **{user.username}#{user.discriminator}** dans le salon **{channel}** ({channel.id}) sur **{guild}** ({guild.id}) vient d'être supprimé.",
                     color=0xFF5A5A,
                     timestamp=datetime.utcnow()
