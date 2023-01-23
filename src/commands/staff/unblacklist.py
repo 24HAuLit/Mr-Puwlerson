@@ -37,7 +37,8 @@ class UnBlacklist(interactions.Extension):
 
             em_dm = interactions.Embed(
                 title="🔓・Unblacklist",
-                description=f"Vous avez été unblacklist par **{ctx.author.username}#{ctx.author.discriminator}** pour **{reason}**.\nVous avez été gentil, c'est bien, maintenant continuer sur cette voie.",
+                description=f"Vous avez été unblacklist par **{ctx.author.username}#{ctx.author.discriminator}** pour"
+                            f" **{reason}**.\nVous avez été gentil, c'est bien, maintenant continuer sur cette voie.",
                 color=0x00FF00,
                 timestamp=datetime.utcnow()
             )
