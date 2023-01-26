@@ -44,7 +44,7 @@ COMMANDS_TICKET = [
 COMMANDS_STAFF = [
     file.replace(".py", "")
     for file in os.listdir(f"{src_path}/src/commands/staff")
-    if file.endswith(".py")
+    if file.endswith(".py") and not file.endswith("setup.py")
 ]
 
 
