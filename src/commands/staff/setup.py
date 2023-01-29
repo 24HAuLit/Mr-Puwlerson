@@ -11,7 +11,8 @@ class Setup(interactions.Extension):
                 interactions.SelectOption(label="Serveur principal", description="Faites le une fois que vous avez "
                                                                                  "crée tout les channels dont vous "
                                                                                  "avez besoins", value="main"),
-                interactions.SelectOption(label="Serveur de logs", value="logs")
+                interactions.SelectOption(label="Serveur de logs", description="A faire une fois le serveur principal "
+                                                                               "configuré.", value="logs")
             ]
         )
 
@@ -32,11 +33,10 @@ class Setup(interactions.Extension):
     async def select(self, ctx: interactions.ComponentContext, choice: list[str]):
         guild = await ctx.get_guild()
         channels = await ctx.guild.get_all_channels()
+        conn = sqlite3.connect(f"./Database/{guild.id}.db")
+        c = conn.cursor()
 
         if choice[0] == "main":
-            conn = sqlite3.connect(f"./Database/{guild.id}.db")
-            c = conn.cursor()
-
             c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='ticket'""")
             if c.fetchone()[0] == 1:
                 await ctx.send("'Ticket' database already created.", ephemeral=True)
@@ -91,6 +91,7 @@ class Setup(interactions.Extension):
 
     @setup.subcommand()
     async def roles(self, ctx: interactions.CommandContext):
+        """Permet de configurer les différents roles du serveur principal."""
         guild = await ctx.get_guild()
         roles = await ctx.guild.get_all_roles()
 
@@ -124,8 +125,8 @@ class Setup(interactions.Extension):
                     c.execute(
                         """INSERT INTO roles VALUES ('{}', '{}', NULL)""".format(roles[x].name, roles[x].id))
 
-        roles_menu = interactions.SelectMenu(
-            custom_id="roles_menu",
+        default_menu = interactions.SelectMenu(
+            custom_id="default_menu",
             type=interactions.ComponentType.ROLE_SELECT,
             options=[
                 interactions.SelectOption(
@@ -136,12 +137,12 @@ class Setup(interactions.Extension):
             ]
         )
 
-        await ctx.send("Quel role sera le role par default ?", components=roles_menu, ephemeral=True)
+        await ctx.send("Quel role sera le role par default ?", components=default_menu, ephemeral=True)
         conn.commit()
         conn.close()
 
-    @interactions.extension_component("roles_menu")
-    async def role_choice(self, ctx: interactions.ComponentContext, choice: list[str]):
+    @interactions.extension_component("default_menu")
+    async def default_role_choice(self, ctx: interactions.ComponentContext, choice: list[str]):
         guild = await ctx.get_guild()
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
@@ -149,19 +150,18 @@ class Setup(interactions.Extension):
         c.execute("SELECT * from roles WHERE type = 'Default'")
         row = c.fetchone()
 
-        if row[0] != choice[0].name:
-            if row is not None:
-                c.execute(f"UPDATE roles SET type = NULL WHERE name = '{row[0]}'")
-                c.execute(f"SELECT type from roles WHERE name = '{choice[0].name}'")
-                c.execute(f"UPDATE roles SET type = 'Default' WHERE name = '{choice[0].name}'")
-
-                await ctx.send(f"**{row[0]}** n'est plus le role par défaut, il a été remplacé par **{choice[0].name}**.")
-            else:
-                c.execute(f"SELECT type from roles WHERE name = '{choice[0].name}'")
-                c.execute(f"UPDATE roles SET type = 'Default' WHERE name = '{choice[0].name}'")
-                await ctx.send(f"**{choice[0].name}** est désormais le role par défaut.")
+        if row is None:
+            c.execute(f"SELECT type from roles WHERE id = '{choice[0].id}'")
+            c.execute(f"UPDATE roles SET type = 'Default' WHERE id = '{choice[0].id}'")
+            await ctx.send(f"**{choice[0].name}** est désormais le role par défaut.", ephemeral=True)
+        elif row[1] == choice[0].id:
+            await ctx.send(f"**{choice[0].name}** est déjà le role par défaut.", ephemeral=True)
         else:
-            await ctx.send(f"**{choice[0].name}** est déjà le role par défaut.")
+            c.execute(f"UPDATE roles SET type = NULL WHERE id = '{row[1]}'")
+            c.execute(f"SELECT type from roles WHERE id = '{choice[0].id}'")
+            c.execute(f"UPDATE roles SET type = 'Default' WHERE id = '{choice[0].id}'")
+
+            await ctx.send(f"**{row[0]}** n'est plus le role par défaut, il a été remplacé par **{choice[0].name}**.", ephemeral=True)
 
         conn.commit()
         conn.close()
