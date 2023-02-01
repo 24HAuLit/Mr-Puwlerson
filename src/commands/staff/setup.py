@@ -49,10 +49,15 @@ class Setup(interactions.Extension):
                         staff_id   INTEGER not null,
                         channel_id INTEGER
                     )""")
+                c.execute("""CREATE TABLE "ticket_count"
+                    (
+                        user_id INTEGER PRIMARY KEY,
+                        count INTEGER DEFAULT 0
+                    )""")
 
             c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='blacklist'""")
             if c.fetchone()[0] == 1:
-                await ctx.send("'Blacklist' database already created.", ephemeral=True)
+                await ctx.send("**Blacklist** database already created.", ephemeral=True)
             else:
                 c.execute("""CREATE TABLE blacklist
                     (
@@ -64,7 +69,7 @@ class Setup(interactions.Extension):
 
             c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='channels'""")
             if c.fetchone()[0] == 1:
-                await ctx.send("'Channels' database already created.", ephemeral=True)
+                await ctx.send("**Channels** database already created.", ephemeral=True)
             else:
                 c.execute("""CREATE TABLE channels
                     (
