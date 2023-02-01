@@ -50,6 +50,7 @@ COMMANDS_STAFF = [
 
 TOKEN = os.getenv("TOKEN_OFFICIAL")
 
+TICKET_MAXIMUM = 3
 DATA = {
     "main": {
         "guild": 419529681885331456,
@@ -83,6 +84,7 @@ DATA = {
         }
     },
     "roles": {
+        "everyone": 419529681885331456,
         "Default": 419556483861053448,
         "Staff": 1018602650566139984,
         "Moderator": 419532481319010314,

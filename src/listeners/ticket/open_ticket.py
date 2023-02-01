@@ -1,7 +1,7 @@
 import sqlite3
 import interactions
 from datetime import datetime
-from const import DATA
+from const import DATA, TICKET_MAXIMUM
 from src.listeners.ticket.components.claim import ticket_claim
 from src.listeners.ticket.components.close import ticket_close_reason, ticket_close
 
@@ -12,9 +12,24 @@ class OpenTicket(interactions.Extension):
         self.bot: interactions.Client = bot
 
     @interactions.extension_component("open_ticket")
-    async def button_open(self, ctx):
+    async def button_open(self, ctx: interactions.ComponentContext):
         conn = sqlite3.connect('./Database/puwlerson.db')
         c = conn.cursor()
+
+        # Partie vérification limite de ticket
+        c.execute("SELECT count FROM ticket_count WHERE user_id = ?", (int(ctx.author.id),))
+        count = c.fetchone()
+        if DATA["roles"]["Staff"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
+            pass
+        else:
+            if count is not None and count[0] >= TICKET_MAXIMUM:
+                await ctx.send("Vous avez atteint la limite de ticket", ephemeral=True)
+                return
+
+            c.execute(
+                """INSERT OR REPLACE INTO ticket_count (user_id, count) VALUES (?, COALESCE((SELECT count FROM 
+                ticket_count WHERE user_id=?), 0) + 1)""",
+                (int(ctx.author.id), int(ctx.author.id)))
 
         # Partie création ticket
         guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["main"]["guild"])
@@ -22,7 +37,7 @@ class OpenTicket(interactions.Extension):
             name=f"ticket-{ctx.user.username}", type=interactions.ChannelType.GUILD_TEXT,
             parent_id=DATA["main"]["ticket"],
             permission_overwrites=[
-                interactions.Overwrite(id=DATA["roles"]["Default"], type=0, deny=2199023255551),
+                interactions.Overwrite(id=DATA["roles"]["everyone"], type=0, deny=2199023255551),
                 interactions.Overwrite(id=int(ctx.author.id), type=1,
                                        allow=64 | 1024 | 2048 | 32768 | 65536 | 262144 | 2147483648),
                 interactions.Overwrite(id=DATA["roles"]["Staff"], type=0,

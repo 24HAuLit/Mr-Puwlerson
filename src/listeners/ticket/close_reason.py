@@ -33,8 +33,24 @@ class CloseReasonTicket(interactions.Extension):
 
     @interactions.extension_modal("close_reason")
     async def on_modal_finish(self, _ctx, reason: str):
-        # Partie transcript
         channel = await _ctx.get_channel()
+        conn = sqlite3.connect('./Database/puwlerson.db')
+        c = conn.cursor()
+
+        # Partie Database
+        c.execute(f'SELECT * from ticket WHERE channel_id = {int(channel.id)}')
+        result = c.fetchone()
+
+        c.execute("SELECT count FROM ticket_count WHERE user_id = '{}'".format(result[1]))
+        count = c.fetchone()
+
+        if count[0] is not None or count[0] != (0,):  # Si le nombre de tickets est supérieur à 0.
+            c.execute(
+                """INSERT OR REPLACE INTO ticket_count (user_id, count) VALUES (?, COALESCE((SELECT count FROM 
+                ticket_count WHERE user_id=?), 0) - 1)""",
+                (result[1], result[1]))
+
+        # Partie transcript
         transcript = await get_transcript(channel=channel, mode="plain")
         file = interactions.File(filename="transcript.txt", fp=io.StringIO(transcript))
 
@@ -54,8 +70,6 @@ class CloseReasonTicket(interactions.Extension):
         await _ctx.channel.delete()
 
         # Partie logs
-        conn = sqlite3.connect('./Database/puwlerson.db')
-        c = conn.cursor()
         logs = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["ticket"]["close"])
         c.execute(f'SELECT * FROM ticket WHERE channel_id = {int(channel.id)}')
         row = c.fetchone()
