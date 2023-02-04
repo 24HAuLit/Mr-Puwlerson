@@ -28,7 +28,7 @@ class Nuke(interactions.Extension):
             await ctx.send("Voulez-vous vraiment détruire ce salon ? **Cette action est irréversible.**",
                            components=[self.confirm_button, self.refused_button], ephemeral=True)
         else:
-            await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande'.", ephemeral=True)
+            await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
             interactions.StopCommand()
         try:
             await self.bot.wait_for_component(
