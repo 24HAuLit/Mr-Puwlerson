@@ -29,17 +29,19 @@ class Giveaway(interactions.Extension):
                 return await ctx.send("Un giveaway est déjà en cours !", ephemeral=True)
 
             timestamp = time() + seconds
+            channel = await interactions.get(self.bot, interactions.Channel, object_id=DATA["main"]["giveaway"])
 
             # Giveaway starting
             self.check = True
             em = interactions.Embed(
-                title="Giveaway",
-                description=f"Un giveaway a été lancé par {ctx.author.mention} !",
-                color=0x00FF00
+                title="Nouveau Giveaway ! 🎊",
+                description=f"Un giveaway a été lancé par {ctx.author.mention} !\n*Cliquez sur le bouton ci-dessous pour participer.*",
+                color=0x00FFC8
             )
             em.add_field(name="Gain", value=gift)
             em.add_field(name="Date de fin", value=f"<t:{int(timestamp)}:R>")
-            message = await ctx.send(embeds=em, components=[self.button])
+            await ctx.send("Le giveaway a bien été lancé !", ephemeral=True)
+            message = await channel.send(embeds=em, components=[self.button])
 
             # Giveaway ending
             await asyncio.sleep(seconds)
@@ -47,20 +49,21 @@ class Giveaway(interactions.Extension):
             user = await interactions.get(self.bot, interactions.User, object_id=winner)
 
             em_end = interactions.Embed(
-                title="Giveaway",
+                title="Nouveau Giveaway ! 🎊",
                 description=f"Le giveaway lancé par {ctx.author.mention} est terminé ! ",
-                color=0x00FF00
+                color=0x75FD75
             )
             em_end.add_field(name="Gain", value=gift)
             em_end.add_field(name="Gagnant", value=user.mention)
 
             await message.edit(embeds=em_end, components=[])
 
-            await ctx.send(f"Le giveaway est terminé ! Le gagnant est {user.mention} !")
+            await channel.send(f"Le giveaway est terminé ! Le gagnant est {user.mention} !")
             self.dic.clear()
             self.check = False
         else:
             await ctx.send("Vous n'avez pas la permission de faire cela !", ephemeral=True)
+            return interactions.StopCommand()
 
     @interactions.extension_component("giveaway")
     async def on_button_click(self, ctx: interactions.ComponentContext):
