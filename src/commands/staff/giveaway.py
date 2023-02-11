@@ -67,12 +67,14 @@ class Giveaway(interactions.Extension):
 
     @interactions.extension_component("giveaway")
     async def on_button_click(self, ctx: interactions.ComponentContext):
+        if DATA["roles"]["Admin"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
+            return await ctx.send("Vous ne pouvez pas participer au giveaway !", ephemeral=True)
         if ctx.author.id not in self.dic:
             self.dic[ctx.author.id] = 1
-            await ctx.send(f"Vous participez désormais au giveaway !", ephemeral=True)
+            return await ctx.send(f"Vous participez désormais au giveaway !", ephemeral=True)
         else:
             self.dic.pop(ctx.author.id)
-            await ctx.send(f"Vous ne participez plus au giveaway !", ephemeral=True)
+            return await ctx.send(f"Vous ne participez plus au giveaway !", ephemeral=True)
 
 
 def setup(bot):
