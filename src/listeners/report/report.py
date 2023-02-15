@@ -18,7 +18,7 @@ class Report(interactions.Extension):
         channel = await message.get_channel()
         content = message.content
 
-        conn = sqlite3.connect('./Database/puwlerson.db')
+        conn = sqlite3.connect('./Database/419529681885331456.db')
         c = conn.cursor()
         c.execute(f'SELECT * from blacklist WHERE user_id = {int(message.author.id)}')
         row = c.fetchone()

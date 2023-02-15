@@ -14,7 +14,8 @@ class ConfirmClose(interactions.Extension):
     @interactions.extension_component("confirm_close")
     async def confirm_close_button(self, ctx):
         channel = await ctx.get_channel()
-        conn = sqlite3.connect('./Database/puwlerson.db')
+        guild = await ctx.get_guild()
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 
         # Partie Database

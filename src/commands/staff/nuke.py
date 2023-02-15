@@ -1,4 +1,6 @@
 import asyncio
+import sqlite3
+
 import interactions
 from datetime import datetime
 from const import DATA
@@ -23,13 +25,19 @@ class Nuke(interactions.Extension):
     @interactions.extension_command(dm_permission=False)
     async def nuke(self, ctx: interactions.CommandContext):
         """Détruis le channel tah Nuketown sur Black Ops 1."""
+        guild = await ctx.get_guild()
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
 
-        if DATA["roles"]["Admin"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
+        if c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles or \
+                c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0] in ctx.author.roles:
             await ctx.send("Voulez-vous vraiment détruire ce salon ? **Cette action est irréversible.**",
                            components=[self.confirm_button, self.refused_button], ephemeral=True)
         else:
             await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
             interactions.StopCommand()
+
+        conn.close()
         try:
             await self.bot.wait_for_component(
                 components=[self.confirm_button, self.refused_button], check=[self.button_confirm, self.button_refuse],

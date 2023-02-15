@@ -13,17 +13,18 @@ class UnBlacklist(interactions.Extension):
     @interactions.option("Raison du unblacklist", required=False)
     async def unblacklist(self, ctx: interactions.CommandContext, user: interactions.User, reason: str = "Aucune raison"):
         """Pour pouvoir unblacklist un membre."""
+        guild = await ctx.get_guild()
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
 
-        if DATA["roles"]["Admin"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
+        if c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles or \
+                c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0] in ctx.author.roles:
             user_id = user.id
             reason = reason
             channel = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["blacklist"])
 
-            conn = sqlite3.connect('./Database/puwlerson.db')
-            c = conn.cursor()
             c.execute("DELETE FROM blacklist WHERE user_id='{}'".format(user_id))
             conn.commit()
-            conn.close()
 
             await ctx.send(f"{user.mention} ({user.id}) a bien été unblacklist.", ephemeral=True)
             em = interactions.Embed(
@@ -49,6 +50,8 @@ class UnBlacklist(interactions.Extension):
         else:
             await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande'.", ephemeral=True)
             interactions.StopCommand()
+
+        conn.close()
 
 
 def setup(bot):

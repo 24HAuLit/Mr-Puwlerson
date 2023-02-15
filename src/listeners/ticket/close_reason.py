@@ -13,7 +13,10 @@ class CloseReasonTicket(interactions.Extension):
 
     @interactions.extension_component("close_reason_ticket")
     async def button_close_reason(self, ctx):
-        if DATA["roles"]["Staff"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
+        guild = await ctx.get_guild()
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
+        if c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles or c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles:
             modal = interactions.Modal(
                 title="Raison",
                 custom_id="close_reason",
@@ -30,11 +33,13 @@ class CloseReasonTicket(interactions.Extension):
             await ctx.popup(modal)
         else:
             await ctx.send(":x: Vous n'avez pas la permission de faire ceci.", ephemeral=True)
+        conn.close()
 
     @interactions.extension_modal("close_reason")
     async def on_modal_finish(self, _ctx, reason: str):
         channel = await _ctx.get_channel()
-        conn = sqlite3.connect('./Database/puwlerson.db')
+        guild = await _ctx.get_guild()
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 
         # Partie Database

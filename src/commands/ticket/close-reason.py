@@ -19,7 +19,11 @@ class CmdCloseReason(interactions.Extension):
         channels = interactions.search_iterable(await guild.get_all_channels(),
                                                 lambda c: c.parent_id == DATA["main"]["ticket"])
 
-        if DATA["roles"]["Staff"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
+
+        if c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles or \
+                c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles:
             if ctx.channel in channels:
                 modal = interactions.Modal(
                     title="Raison",
@@ -41,9 +45,12 @@ class CmdCloseReason(interactions.Extension):
             await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
             interactions.StopCommand()
 
+        conn.close()
+
     @interactions.extension_modal("cmd_close_reason")
     async def on_modal_finishes(self, _ctx, reason: str):
         # Partie transcript
+        guild = await _ctx.get_guild()
         channel = await _ctx.get_channel()
         transcript = await get_transcript(channel=channel)
         file = interactions.File(filename="transcript.html", fp=io.StringIO(transcript))
@@ -63,7 +70,7 @@ class CmdCloseReason(interactions.Extension):
         await _ctx.channel.delete()
 
         # Partie Logs
-        conn = sqlite3.connect('./Database/puwlerson.db')
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
         logs = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["ticket"]["close"])
         c.execute(f'SELECT * FROM ticket WHERE channel_id = {int(channel.id)}')

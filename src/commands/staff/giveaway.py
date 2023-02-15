@@ -1,4 +1,6 @@
 import asyncio
+import sqlite3
+
 import interactions
 from random import choice
 from time import time
@@ -21,9 +23,13 @@ class Giveaway(interactions.Extension):
     @interactions.option(description="Combien de temps durera le giveaway ? (en secondes)")
     async def giveaway(self, ctx: interactions.CommandContext, gift: str, seconds: int):
         """Crée un giveaway."""
+        guild = await ctx.get_guild()
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
 
         # Permission check
-        if DATA["roles"]["Admin"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
+        if c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles or \
+                c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0] in ctx.author.roles:
             # Check si un giveaway est déjà en cours
             if self.check:
                 return await ctx.send("Un giveaway est déjà en cours !", ephemeral=True)
@@ -65,14 +71,25 @@ class Giveaway(interactions.Extension):
             await ctx.send("Vous n'avez pas la permission de faire cela !", ephemeral=True)
             return interactions.StopCommand()
 
+        conn.close()
+
     @interactions.extension_component("giveaway")
     async def on_button_click(self, ctx: interactions.ComponentContext):
-        if DATA["roles"]["Admin"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
+        """Permet de participer au giveaway."""
+        guild = await ctx.get_guild()
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
+
+        if c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles or \
+                c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0] in ctx.author.roles:
+            conn.close()
             return await ctx.send("Vous ne pouvez pas participer au giveaway !", ephemeral=True)
         if ctx.author.id not in self.dic:
+            conn.close()
             self.dic[ctx.author.id] = 1
             return await ctx.send(f"Vous participez désormais au giveaway !", ephemeral=True)
         else:
+            conn.close()
             self.dic.pop(ctx.author.id)
             return await ctx.send(f"Vous ne participez plus au giveaway !", ephemeral=True)
 

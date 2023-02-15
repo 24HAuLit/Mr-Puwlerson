@@ -1,3 +1,5 @@
+import sqlite3
+
 import interactions
 from const import DATA
 
@@ -22,10 +24,15 @@ class AddMember(interactions.Extension):
     async def add(self, ctx: interactions.CommandContext, user: interactions.User = None, role: interactions.Role = None):
         """Pour pouvoir ajouter quelqu'un ou un role au ticket."""
 
-        if DATA["roles"]["Staff"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
-            guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["main"]["guild"])
+        guild = await ctx.get_guild()
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
+
+        if c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles or \
+                c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles:
+
             channels = interactions.search_iterable(await guild.get_all_channels(),
-                                                    lambda c: c.parent_id == DATA["main"]["ticket"])
+                                                    lambda f: f.parent_id == DATA["main"]["ticket"])
             if ctx.channel in channels:
                 if user is not None:
                     new_perms = [interactions.Overwrite(id=int(user.id), type=1,
@@ -47,6 +54,7 @@ class AddMember(interactions.Extension):
             await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
             interactions.StopCommand()
 
+        conn.close()
 
 def setup(bot):
     AddMember(bot)

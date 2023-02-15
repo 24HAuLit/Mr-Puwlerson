@@ -13,13 +13,14 @@ class OpenTicket(interactions.Extension):
 
     @interactions.extension_component("open_ticket")
     async def button_open(self, ctx: interactions.ComponentContext):
-        conn = sqlite3.connect('./Database/puwlerson.db')
+        guild = await ctx.get_guild()
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 
         # Partie vérification limite de ticket
         c.execute("SELECT count FROM ticket_count WHERE user_id = ?", (int(ctx.author.id),))
         count = c.fetchone()
-        if DATA["roles"]["Staff"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
+        if c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles or c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles:
             pass
         else:
             if count is not None and count[0] >= TICKET_MAXIMUM:
@@ -32,7 +33,6 @@ class OpenTicket(interactions.Extension):
                 (int(ctx.author.id), int(ctx.author.id)))
 
         # Partie création ticket
-        guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["main"]["guild"])
         channel = await guild.create_channel(
             name=f"ticket-{ctx.user.username}", type=interactions.ChannelType.GUILD_TEXT,
             parent_id=DATA["main"]["ticket"],

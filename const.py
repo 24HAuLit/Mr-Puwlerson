@@ -44,7 +44,17 @@ COMMANDS_TICKET = [
 COMMANDS_STAFF = [
     file.replace(".py", "")
     for file in os.listdir(f"{src_path}/src/commands/staff")
-    if file.endswith(".py") and not file.endswith("setup.py")
+    if file.endswith(".py")
+]
+COMMANDS_SETUP = [
+    file.replace(".py", "")
+    for file in os.listdir(f"{src_path}/src/commands/staff/setup")
+    if file.endswith(".py")
+]
+SETUP_ROLES = [
+    file.replace(".py", "")
+    for file in os.listdir(f"{src_path}/src/commands/staff/setup/roles")
+    if file.endswith(".py")
 ]
 
 
@@ -83,13 +93,5 @@ DATA = {
             "leave": 1039280760403787829,
             "report": 1065713793667174470,
         }
-    },
-    "roles": {
-        "everyone": 419529681885331456,
-        "Default": 419556483861053448,
-        "Staff": 1018602650566139984,
-        "Moderator": 419532481319010314,
-        "Admin": 419532345134284810,
-        "Owner": 419532166888816640
     }
 }

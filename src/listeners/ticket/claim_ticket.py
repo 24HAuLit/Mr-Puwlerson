@@ -12,14 +12,12 @@ class ClaimTicket(interactions.Extension):
     async def button_claim(self, ctx):
         channel = await ctx.get_channel()
         id_staff = ctx.author.id
+        guild = await ctx.get_guild()
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
 
-        if DATA["roles"]["Staff"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
-            # Partie database
-            conn = sqlite3.connect('./Database/puwlerson.db')
-            c = conn.cursor()
+        if c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles or c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles:
             c.execute(f"UPDATE ticket SET staff_id = {id_staff} WHERE channel_id = {int(channel.id)}")
-            conn.commit()
-            conn.close()
 
             # Partie message
             await ctx.message.edit(components=[ticket_close(), ticket_close_reason()])
@@ -30,6 +28,9 @@ class ClaimTicket(interactions.Extension):
             await ctx.send(embeds=em)
         else:
             await ctx.send(":x: Vous n'avez pas la permission de faire ceci.", ephemeral=True)
+
+        conn.commit()
+        conn.close()
 
 
 def setup(bot):

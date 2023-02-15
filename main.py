@@ -1,5 +1,4 @@
 import interactions
-from interactions.ext.voice import VoiceClient
 from interactions.ext.wait_for import setup
 from dotenv import load_dotenv
 
@@ -19,9 +18,15 @@ class Main:
 
     def setup(self):
         # Partie commandes
+        # [self.bot.load(f"src.{root.replace(f'{src_path2}/', '')}.{ext.replace('.py', '')}")
+        #  for root, dirs, files in os.walk(f"{src_path2}/{directory}")
+        #  for ext in files
+        #  if ext.endswith(".py")]
         [self.bot.load(f"src.commands.{ext}") for ext in COMMANDS]
         [self.bot.load(f"src.commands.staff.{ext}") for ext in COMMANDS_STAFF]
         [self.bot.load(f"src.commands.ticket.{ext}") for ext in COMMANDS_TICKET]
+        [self.bot.load(f"src.commands.staff.setup.{ext}") for ext in COMMANDS_SETUP]
+        [self.bot.load(f"src.commands.staff.setup.roles.{ext}") for ext in SETUP_ROLES]
 
         # Partie listeners
         [self.bot.load(f"src.listeners.{ext}") for ext in LISTENERS]

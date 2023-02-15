@@ -1,3 +1,5 @@
+import sqlite3
+
 import interactions
 from const import DATA
 
@@ -23,7 +25,11 @@ class RemoveMember(interactions.Extension):
         channels = interactions.search_iterable(await guild.get_all_channels(),
                                                 lambda c: c.parent_id == DATA["main"]["ticket"])
 
-        if DATA["roles"]["Staff"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
+
+        if c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles or \
+                c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles:
             if ctx.channel in channels:
                 if user is not None:
                     perms = [interactions.Overwrite(id=int(user.id), type=1,
@@ -44,6 +50,8 @@ class RemoveMember(interactions.Extension):
         else:
             await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
             interactions.StopCommand()
+
+        conn.close()
 
 
 def setup(bot):

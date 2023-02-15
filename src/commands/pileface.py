@@ -8,6 +8,7 @@ class PileFace(interactions.Extension):
 
     @interactions.extension_command()
     async def pileface(self, ctx: interactions.CommandContext):
+        """Lance une pièce et affiche le résultat"""
         list = ["pile", "face"]
         await ctx.send(f"La pièce est tombé sur **{random.choice(list)}**")
 

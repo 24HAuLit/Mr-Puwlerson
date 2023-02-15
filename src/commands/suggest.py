@@ -23,8 +23,9 @@ class Suggestion(interactions.Extension):
     @interactions.option("Ecris ta suggestion ici.")
     async def suggest(self, ctx: interactions.CommandContext, suggestion: str):
         """Pour pouvoir proposer une suggestion."""
+        guild = await ctx.get_guild()
 
-        conn = sqlite3.connect('./Database/puwlerson.db')
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
         c.execute(f'SELECT * from blacklist WHERE user_id = {int(ctx.author.id)}')
         row = c.fetchone()

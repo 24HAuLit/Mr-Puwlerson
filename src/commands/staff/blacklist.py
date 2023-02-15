@@ -13,14 +13,15 @@ class Blacklist(interactions.Extension):
     @interactions.option("Raison du blacklist")
     async def blacklist(self, ctx: interactions.CommandContext, user: interactions.User, reason: str):
         """Pour pouvoir blacklist un membre des reports et des suggestions."""
+        guild = await ctx.get_guild()
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
 
-        if DATA["roles"]["Admin"] in ctx.author.roles or DATA["roles"]["Owner"] in ctx.author.roles:
+        if c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0] in ctx.author.roles or c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles:
             user_id = user.id
-            channel = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["blacklist"])
-            dm = user_id
+            channel = await interactions.get(self.bot, interactions.Channel,
+                                             object_id=DATA["logs"]["moderation"]["blacklist"])
 
-            conn = sqlite3.connect('./Database/puwlerson.db')
-            c = conn.cursor()
             c.execute("INSERT INTO blacklist VALUES (NULL, '{}', '{}')".format(user_id, reason))
             conn.commit()
             conn.close()
@@ -41,11 +42,12 @@ class Blacklist(interactions.Extension):
                 color=0xFF0000,
                 timestamp=datetime.utcnow()
             )
-            em_dm.set_footer(icon_url=ctx.author.get_avatar_url(), text=f"Staff : {ctx.author.username}#{ctx.author.discriminator} ({ctx.author.id})")
+            em_dm.set_footer(icon_url=ctx.author.get_avatar_url(),
+                             text=f"Staff : {ctx.author.username}#{ctx.author.discriminator} ({ctx.author.id})")
             await user.send(embeds=em_dm)
 
         else:
-            await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande'.", ephemeral=True)
+            await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
             interactions.StopCommand()
 
 

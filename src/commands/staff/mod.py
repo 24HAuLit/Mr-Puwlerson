@@ -1,3 +1,5 @@
+import sqlite3
+
 import interactions
 from interactions import CommandContext, Embed
 from datetime import datetime, timedelta
@@ -10,13 +12,19 @@ class Mod(interactions.Extension):
 
     @interactions.extension_command()
     async def mod(self, ctx):
+        guild = await ctx.get_guild()
+        conn = sqlite3.connect(f"./Database/{guild.id}.db")
+        c = conn.cursor()
+
         if await ctx.author.has_permissions(interactions.Permissions.ALL):
             pass
-        elif DATA["roles"]["Staff"] in ctx.author.roles:
+        elif c.execute(f"SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles:
             pass
         else:
             await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
             return interactions.StopCommand()
+
+        conn.close()
 
     @mod.subcommand()
     @interactions.option(
@@ -34,7 +42,7 @@ class Mod(interactions.Extension):
             color=0xFF5A5A,
             timestamp=datetime.utcnow()
         )
-        em.set_footer(icon_url=ctx.member.user.avatar_url, text=f"Commande demandé par {ctx.author}.")
+        em.set_footer(icon_url=ctx.member.user.avatar_url, text=f"Commande demandé par {ctx.author.name}#{ctx.author.discriminator}.")
 
         await ctx.send(embeds=em, ephemeral=True)
 
