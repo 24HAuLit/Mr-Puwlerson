@@ -51,7 +51,7 @@ class Message(interactions.Extension):
             guild = await after.get_guild()
         logs_edit = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["messages"]["edit"])
 
-        if before.author.bot:
+        if after.author.bot:
             return
         else:
             if (channel.id in self.banned_channels) or (channel.type == interactions.ChannelType.DM):
@@ -89,6 +89,8 @@ class Message(interactions.Extension):
             guild = await message.get_guild()
         logs_delete = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["messages"]["delete"])
 
+        if message.author is None:
+            return
         if message.author.bot:
             return
         else:
