@@ -82,7 +82,7 @@ class Mod(interactions.Extension):
 
         em = Embed(
             title="🟠・Nouvelle exclusion temporaire",
-            description=f"Un membre vient de se faire exclure temporairement de **{guild}**.",
+            description=f"Un membre vient de se faire exclure temporairement de **{guild.name}**.",
             color=0xFF5A5A,
             timestamp=datetime.utcnow()
         )
@@ -115,12 +115,12 @@ class Mod(interactions.Extension):
 
         em = Embed(
             title="🟢・Fin d'exclusion temporaire",
-            description=f"Un staff vient de retirer l'exclusion temporaire d'un membre sur **{guild}**.",
+            description=f"Un staff vient de retirer l'exclusion temporaire d'un membre sur **{guild.name}**.",
             color=0x4CFF4C,
             timestamp=datetime.utcnow()
         )
-        em.add_field(name="__Staff :__", value=ctx.author.name, inline=True)
-        em.add_field(name="__Membre :__", value=user.name, inline=True)
+        em.add_field(name="__Staff :__", value=f"{ctx.author.username}#{ctx.author.discriminator}", inline=True)
+        em.add_field(name="__Membre :__", value=f"{user.username}#{user.discriminator}", inline=True)
         em.add_field(name="__Raison :__", value=reason)
         em.set_footer(text=f"Staff ID : {ctx.author.id} | Member ID : {user.id}")
 
