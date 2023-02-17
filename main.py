@@ -1,5 +1,4 @@
 import interactions
-from interactions.ext.wait_for import setup
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,18 +9,11 @@ from const import *
 class Main:
     def __init__(self):
         self.bot = interactions.Client(token=TOKEN, intents=interactions.Intents.ALL)
-
-        interactions.ext.wait_for.setup(self.bot)
         self.setup()
-
         self.bot.start()
 
     def setup(self):
         # Partie commandes
-        # [self.bot.load(f"src.{root.replace(f'{src_path2}/', '')}.{ext.replace('.py', '')}")
-        #  for root, dirs, files in os.walk(f"{src_path2}/{directory}")
-        #  for ext in files
-        #  if ext.endswith(".py")]
         [self.bot.load(f"src.commands.{ext}") for ext in COMMANDS]
         [self.bot.load(f"src.commands.staff.{ext}") for ext in COMMANDS_STAFF]
         [self.bot.load(f"src.commands.ticket.{ext}") for ext in COMMANDS_TICKET]
