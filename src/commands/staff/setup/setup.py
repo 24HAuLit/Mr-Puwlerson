@@ -32,29 +32,10 @@ class Setup(interactions.Extension):
     @interactions.extension_component("server_type")
     async def select(self, ctx: interactions.ComponentContext, choice: list[str]):
         guild = await ctx.get_guild()
-        channels = await ctx.guild.get_all_channels()
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
         if choice[0] == "main":
-            c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='ticket'""")
-            if c.fetchone()[0] == 1:
-                await ctx.send("**Ticket** database already created.", ephemeral=True)
-            else:
-                c.execute("""CREATE TABLE "ticket"
-                    (
-                        ticket_id  INTEGER not null
-                            primary key autoincrement,
-                        author_id  INTEGER not null,
-                        staff_id   INTEGER not null,
-                        channel_id INTEGER
-                    )""")
-                c.execute("""CREATE TABLE "ticket_count"
-                    (
-                        user_id INTEGER PRIMARY KEY,
-                        count INTEGER DEFAULT 0
-                    )""")
-
             c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='blacklist'""")
             if c.fetchone()[0] == 1:
                 await ctx.send("**Blacklist** database already created.", ephemeral=True)
@@ -66,6 +47,9 @@ class Setup(interactions.Extension):
                         user_id      integer not null,
                         reason       text
                     )""")
+                await ctx.send("**Blacklist** database created.", ephemeral=True)
+            await ctx.send("Configuration du serveur principal terminée. Vous pouvez désormais configurer les "
+                           "channels et les roles", ephemeral=True)
         else:
             await ctx.send("Logs test : Work in progress", ephemeral=True)
 
@@ -213,6 +197,50 @@ class Setup(interactions.Extension):
         )
 
         await ctx.send("Quel role sera le role par default ?", components=default_menu, ephemeral=True)
+        conn.commit()
+        conn.close()
+
+    @setup.subcommand()
+    async def tickets(self, ctx: interactions.CommandContext):
+        """Permet de configurer les différents salons nécessaires au bon fonctionnement des tickets."""
+        guild = await ctx.get_guild()
+        channels = await ctx.guild.get_all_channels()
+
+        conn = sqlite3.connect(f"./Database/{guild.id}.db")
+        c = conn.cursor()
+
+        c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='ticket'""")
+        if c.fetchone()[0] == 1:
+            await ctx.send("La table tickets existe déjà.", ephemeral=True)
+        else:
+            c.execute("""CREATE TABLE "ticket"
+                                (
+                                    ticket_id  INTEGER not null
+                                        primary key autoincrement,
+                                    author_id  INTEGER not null,
+                                    staff_id   INTEGER not null,
+                                    channel_id INTEGER
+                                )""")
+            c.execute("""CREATE TABLE "ticket_count"
+                                (
+                                    user_id INTEGER PRIMARY KEY,
+                                    count INTEGER DEFAULT 0
+                                )""")
+            await ctx.send("La table tickets a été créée.", ephemeral=True)
+
+        ticket_category = interactions.SelectMenu(
+            custom_id="ticket_category",
+            placeholder="Sélectionnez la catégorie des tickets.",
+            max_values=1,
+            min_values=1,
+            options=[
+                interactions.SelectOption(label=channels[x].name, value=str(channels[x].id), default=False)
+                for x in range(len(channels))
+            ]
+        )
+
+        await ctx.send("Sélectionnez la catégorie des tickets.", components=ticket_category, ephemeral=True)
+
         conn.commit()
         conn.close()
 

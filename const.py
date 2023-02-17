@@ -61,6 +61,11 @@ SETUP_CHANNELS = [
     for file in os.listdir(f"{src_path}/src/commands/staff/setup/channels")
     if file.endswith(".py")
 ]
+SETUP_TICKETS = [
+    file.replace(".py", "")
+    for file in os.listdir(f"{src_path}/src/commands/staff/setup/tickets")
+    if file.endswith(".py")
+]
 
 
 TOKEN = os.getenv("TOKEN_OFFICIAL")
