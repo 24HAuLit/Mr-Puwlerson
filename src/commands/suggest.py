@@ -31,7 +31,8 @@ class Suggestion(interactions.Extension):
         row = c.fetchone()
 
         if row is not None:
-            await ctx.send("Désolé, mais vous êtes blacklist. Vous ne pouvez donc pas envoyé de suggestion.", ephemeral=True)
+            await ctx.send("Désolé, mais vous êtes blacklist. Vous ne pouvez donc pas envoyé de suggestion.",
+                           ephemeral=True)
         else:
             channel = await interactions.get(self.bot, interactions.Channel, object_id=DATA["main"]["suggestion"])
             self.counter += 1
