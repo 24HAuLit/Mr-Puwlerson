@@ -36,9 +36,9 @@ class CloseReasonTicket(interactions.Extension):
         conn.close()
 
     @interactions.extension_modal("close_reason")
-    async def on_modal_finish(self, _ctx, reason: str):
-        channel = await _ctx.get_channel()
-        guild = await _ctx.get_guild()
+    async def on_modal_finish(self, ctx, reason: str):
+        channel = await ctx.get_channel()
+        guild = await ctx.get_guild()
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 
@@ -63,16 +63,16 @@ class CloseReasonTicket(interactions.Extension):
             description="Transcript effectué.",
             color=0x00FF00
         )
-        await _ctx.send(embeds=em2)
+        await ctx.send(embeds=em2)
 
         # Partie suppression
         em = interactions.Embed(
             description="Ce ticket va être fermé dans quelques instant...",
             color=0xFF0000
         )
-        await _ctx.send(embeds=em)
+        await ctx.send(embeds=em)
         await asyncio.sleep(5)
-        await _ctx.channel.delete()
+        await ctx.channel.delete()
 
         # Partie logs
         logs = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["ticket"]["close"])
