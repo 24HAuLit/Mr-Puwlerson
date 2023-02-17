@@ -37,10 +37,10 @@ class OpenTicket(interactions.Extension):
             name=f"ticket-{ctx.user.username}", type=interactions.ChannelType.GUILD_TEXT,
             parent_id=DATA["main"]["ticket"],
             permission_overwrites=[
-                interactions.Overwrite(id=DATA["roles"]["everyone"], type=0, deny=2199023255551),
+                interactions.Overwrite(id=c.execute("SELECT id FROM roles WHERE name = '@everyone'").fetchone()[0], type=0, deny=2199023255551),
                 interactions.Overwrite(id=int(ctx.author.id), type=1,
                                        allow=64 | 1024 | 2048 | 32768 | 65536 | 262144 | 2147483648),
-                interactions.Overwrite(id=DATA["roles"]["Staff"], type=0,
+                interactions.Overwrite(id=c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0], type=0,
                                        allow=64 | 1024 | 2048 | 8192 | 32768 | 65536 | 262144 | 2147483648)
             ]
         )
