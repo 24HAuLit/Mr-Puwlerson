@@ -1,4 +1,5 @@
 import interactions
+from datetime import datetime
 
 
 class OnReady(interactions.Extension):
@@ -10,6 +11,7 @@ class OnReady(interactions.Extension):
         print("+------------------+")
         print(f"Logged in as {self.bot.me.name} (ID : {self.bot.me.id})")
         print(f"Connected to {len(self.bot.guilds)} guilds")
+        print(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
         print("+------------------+")
 
 
