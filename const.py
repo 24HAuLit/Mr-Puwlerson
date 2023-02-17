@@ -56,6 +56,11 @@ SETUP_ROLES = [
     for file in os.listdir(f"{src_path}/src/commands/staff/setup/roles")
     if file.endswith(".py")
 ]
+SETUP_CHANNELS = [
+    file.replace(".py", "")
+    for file in os.listdir(f"{src_path}/src/commands/staff/setup/channels")
+    if file.endswith(".py")
+]
 
 
 TOKEN = os.getenv("TOKEN_OFFICIAL")
