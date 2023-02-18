@@ -22,14 +22,8 @@ class ConfirmClose(interactions.Extension):
         c.execute(f'SELECT * from ticket WHERE channel_id = {int(channel.id)}')
         result = c.fetchone()
 
-        c.execute("SELECT count FROM ticket_count WHERE user_id = '{}'".format(result[1]))
-        count = c.fetchone()
-
-        if count[0] is not None or count[0] != (0,):  # Si le nombre de tickets est supérieur à 0.
-            c.execute(
-                """INSERT OR REPLACE INTO ticket_count (user_id, count) VALUES (?, COALESCE((SELECT count FROM 
-                ticket_count WHERE user_id=?), 0) - 1)""",
-                (result[1], result[1]))
+        c.execute("UPDATE ticket_count SET count = count+1 WHERE user_id = '{}'".format(result[1]))
+        conn.commit()
 
         # Partie transcript
         transcript = await get_transcript(channel=channel, mode="plain")
@@ -70,7 +64,6 @@ class ConfirmClose(interactions.Extension):
 
         await logs.send(embeds=em3, files=file)
 
-        conn.commit()
         conn.close()
 
 

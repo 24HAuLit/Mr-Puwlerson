@@ -46,14 +46,8 @@ class CloseReasonTicket(interactions.Extension):
         c.execute(f'SELECT * from ticket WHERE channel_id = {int(channel.id)}')
         result = c.fetchone()
 
-        c.execute("SELECT count FROM ticket_count WHERE user_id = '{}'".format(result[1]))
-        count = c.fetchone()
-
-        if count[0] is not None or count[0] != (0,):  # Si le nombre de tickets est supérieur à 0.
-            c.execute(
-                """INSERT OR REPLACE INTO ticket_count (user_id, count) VALUES (?, COALESCE((SELECT count FROM 
-                ticket_count WHERE user_id=?), 0) - 1)""",
-                (result[1], result[1]))
+        c.execute("UPDATE ticket_count SET count = count+1 WHERE user_id = '{}'".format(result[1]))
+        conn.commit()
 
         # Partie transcript
         transcript = await get_transcript(channel=channel, mode="plain")
@@ -86,7 +80,7 @@ class CloseReasonTicket(interactions.Extension):
         )
         em3.add_field(name="__**Ticket ID**__", value=row[0], inline=True)
         em3.add_field(name="__**Ouvert par**__", value=f"<@{row[1]}>", inline=True)
-        em3.add_field(name="__**Fermé par**__", value=_ctx.author.mention, inline=True)
+        em3.add_field(name="__**Fermé par**__", value=ctx.author.mention, inline=True)
         if row[2] != "None":
             em3.add_field(name="__**Claim par**__", value=f"<@{row[2]}>", inline=True)
         em3.add_field(name="__**Raison**__", value=reason, inline=True)

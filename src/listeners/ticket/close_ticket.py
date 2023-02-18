@@ -17,6 +17,8 @@ class CloseTicket(interactions.Extension):
         else:
             await ctx.send(":x: Vous n'avez pas la permission de faire ceci.", ephemeral=True)
 
+        conn.close()
+
 
 def setup(bot):
     CloseTicket(bot)

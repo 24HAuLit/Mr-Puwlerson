@@ -224,7 +224,7 @@ class Setup(interactions.Extension):
             c.execute("""CREATE TABLE "ticket_count"
                                 (
                                     user_id INTEGER PRIMARY KEY,
-                                    count INTEGER DEFAULT 0
+                                    count INTEGER DEFAULT 3
                                 )""")
             await ctx.send("La table tickets a été créée.", ephemeral=True)
 
@@ -240,6 +240,26 @@ class Setup(interactions.Extension):
         )
 
         await ctx.send("Sélectionnez la catégorie des tickets.", components=ticket_category, ephemeral=True)
+
+        conn.commit()
+        conn.close()
+
+    @setup.subcommand()
+    @interactions.option("Nombre de ticket maximum par utilisateur. (Par défaut 3)")
+    async def max_ticket(self, ctx: interactions.CommandContext, limit: int):
+        """Permet de fixer une limite de ticket ouvert par utilisateur."""
+        guild = await ctx.get_guild()
+
+        conn = sqlite3.connect(f"./Database/{guild.id}.db")
+        c = conn.cursor()
+
+        c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='ticket_count'""")
+        if c.fetchone()[0] == 1:
+            c.execute("""UPDATE ticket_count SET count = '{}'""".format(limit))
+            await ctx.send(f"Le nombre de ticket maximum par utilisateur a été mis à jour et est désormais de **{limit}**.", ephemeral=True)
+        else:
+            await ctx.send("La table `ticket_count` n'a pas été crée. Veuillez faire `/setup tickets` pour la créer",
+                           ephemeral=True)
 
         conn.commit()
         conn.close()

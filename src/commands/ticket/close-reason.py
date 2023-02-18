@@ -17,7 +17,7 @@ class CmdCloseReason(interactions.Extension):
 
         guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["principal"]["guild"])
         channels = interactions.search_iterable(await guild.get_all_channels(),
-                                                lambda c: c.parent_id == DATA["main"]["ticket"])
+                                                lambda f: f.parent_id == DATA["main"]["ticket"])
 
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
@@ -48,30 +48,40 @@ class CmdCloseReason(interactions.Extension):
         conn.close()
 
     @interactions.extension_modal("cmd_close_reason")
-    async def on_modal_finishes(self, _ctx, reason: str):
+    async def on_modal_finishes(self, ctx, reason: str):
         # Partie transcript
-        guild = await _ctx.get_guild()
-        channel = await _ctx.get_channel()
+        guild = await ctx.get_guild()
+        channel = await ctx.get_channel()
+
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
+
+        # Partie Database
+        c.execute(f'SELECT * from ticket WHERE channel_id = {int(channel.id)}')
+        result = c.fetchone()
+
+        c.execute("UPDATE ticket_count SET count = count+1 WHERE user_id = '{}'".format(result[1]))
+        conn.commit()
+
+        # Partie transcript
         transcript = await get_transcript(channel=channel)
         file = interactions.File(filename="transcript.html", fp=io.StringIO(transcript))
         em2 = interactions.Embed(
             description="Transcript effectué.",
             color=0x00FF00
         )
-        await _ctx.send(embeds=em2)
+        await ctx.send(embeds=em2)
 
         # Partie delete
         em = interactions.Embed(
             description="Ce ticket va être fermé dans quelques instant...",
             color=0xFF0000
         )
-        await _ctx.send(embeds=em)
+        await ctx.send(embeds=em)
         await asyncio.sleep(5)
-        await _ctx.channel.delete()
+        await ctx.channel.delete()
 
         # Partie Logs
-        conn = sqlite3.connect(f'./Database/{guild.id}.db')
-        c = conn.cursor()
         logs = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["ticket"]["close"])
         c.execute(f'SELECT * FROM ticket WHERE channel_id = {int(channel.id)}')
         row = c.fetchone()
@@ -83,7 +93,7 @@ class CmdCloseReason(interactions.Extension):
         )
         em3.add_field(name="__**Ticket ID**__", value=row[0], inline=True)
         em3.add_field(name="__**Ouvert par**__", value=f"<@{row[1]}>", inline=True)
-        em3.add_field(name="__**Fermé par**__", value=_ctx.author.mention, inline=True)
+        em3.add_field(name="__**Fermé par**__", value=ctx.author.mention, inline=True)
         if row[2] != "None":
             em3.add_field(name="__**Claim par**__", value=f"<@{row[2]}>", inline=True)
         em3.add_field(name="__**Raison**__", value=reason, inline=True)

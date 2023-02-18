@@ -20,24 +20,26 @@ class OpenTicket(interactions.Extension):
         # Partie vérification limite de ticket
         c.execute("SELECT count FROM ticket_count WHERE user_id = ?", (int(ctx.author.id),))
         count = c.fetchone()
-        if c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles or c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles:
+        if c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles or \
+                c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles:
             pass
         else:
-            if count is not None and count[0] >= TICKET_MAXIMUM:
-                await ctx.send("Vous avez atteint la limite de ticket", ephemeral=True)
-                return
+            if count is not None and count[0] == 0:
+                return await ctx.send("Vous avez atteint la limite de ticket", ephemeral=True)
 
             c.execute(
                 """INSERT OR REPLACE INTO ticket_count (user_id, count) VALUES (?, COALESCE((SELECT count FROM 
-                ticket_count WHERE user_id=?), 0) + 1)""",
+                ticket_count WHERE user_id=?), 0) - 1)""",
                 (int(ctx.author.id), int(ctx.author.id)))
+            conn.commit()
 
         # Partie création ticket
         channel = await guild.create_channel(
             name=f"ticket-{ctx.user.username}", type=interactions.ChannelType.GUILD_TEXT,
             parent_id=DATA["main"]["ticket"],
             permission_overwrites=[
-                interactions.Overwrite(id=c.execute("SELECT id FROM roles WHERE name = '@everyone'").fetchone()[0], type=0, deny=2199023255551),
+                interactions.Overwrite(id=c.execute("SELECT id FROM roles WHERE name = '@everyone'").fetchone()[0],
+                                       type=0, deny=2199023255551),
                 interactions.Overwrite(id=int(ctx.author.id), type=1,
                                        allow=64 | 1024 | 2048 | 32768 | 65536 | 262144 | 2147483648),
                 interactions.Overwrite(id=c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0], type=0,
