@@ -11,13 +11,13 @@ class CmdCloseReason(interactions.Extension):
     def __init__(self, bot):
         self.bot: interactions.Client = bot
 
-    @interactions.extension_command()
+    @interactions.extension_command(dm_permission=False)
     async def close_reason(self, ctx: interactions.CommandContext):
         """Pour pouvoir fermer le ticket avec une raison."""
 
         guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["principal"]["guild"])
         channels = interactions.search_iterable(await guild.get_all_channels(),
-                                                lambda f: f.parent_id == DATA["main"]["ticket"])
+                                                lambda f: f.parent_id == c.execute("SELECT id FROM channels WHERE type = 'ticket_parent'").fetchone()[0])
 
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()

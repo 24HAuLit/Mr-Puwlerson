@@ -7,17 +7,18 @@ class UnClaimCommand(interactions.Extension):
     def __init__(self, bot):
         self.bot: interactions.Client = bot
 
-    @interactions.extension_command()
+    @interactions.extension_command(dm_permission=False)
     async def unclaim(self, ctx: interactions.CommandContext):
         """Pour pouvoir retirer sa revendication d'un ticket."""
 
         guild = await ctx.get_guild()
-        channels = interactions.search_iterable(await guild.get_all_channels(),
-                                                lambda f: f.parent_id == DATA["main"]["ticket"])
-        channel = await ctx.get_channel()
-
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
+
+        channels = interactions.search_iterable(await guild.get_all_channels(),
+                                                lambda f: f.parent_id == c.execute(
+                                                    "SELECT id FROM channels WHERE type = 'ticket_parent'").fetchone()[0])
+        channel = await ctx.get_channel()
 
         if c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles or \
                 c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles:

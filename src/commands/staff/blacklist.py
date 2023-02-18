@@ -8,7 +8,7 @@ class Blacklist(interactions.Extension):
     def __init__(self, bot):
         self.bot: interactions.Client = bot
 
-    @interactions.extension_command()
+    @interactions.extension_command(dm_permission=False)
     @interactions.option("Membre à blacklist")
     @interactions.option("Raison du blacklist")
     async def blacklist(self, ctx: interactions.CommandContext, user: interactions.User, reason: str):

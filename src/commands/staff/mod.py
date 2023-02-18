@@ -10,7 +10,7 @@ class Mod(interactions.Extension):
     def __init__(self, bot):
         self.bot: interactions.Client = bot
 
-    @interactions.extension_command()
+    @interactions.extension_command(dm_permission=False)
     async def mod(self, ctx):
         guild = await ctx.get_guild()
         conn = sqlite3.connect(f"./Database/{guild.id}.db")

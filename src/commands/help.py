@@ -9,7 +9,7 @@ class Help(interactions.Extension):
     def __init__(self, bot):
         self.bot: interactions.Client = bot
 
-    @interactions.extension_command()
+    @interactions.extension_command(dm_permission=False)
     async def help(self, ctx: interactions.CommandContext):
         """Pour avoir toutes les commandes à porter de main."""
 

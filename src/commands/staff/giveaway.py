@@ -18,7 +18,7 @@ class Giveaway(interactions.Extension):
         self.dic = {}
         self.check = False
 
-    @interactions.extension_command()
+    @interactions.extension_command(dm_permission=False)
     @interactions.option(description="Quel sera le cadeau ?")
     @interactions.option(description="Combien de temps durera le giveaway ? (en secondes)")
     async def giveaway(self, ctx: interactions.CommandContext, gift: str, seconds: int):

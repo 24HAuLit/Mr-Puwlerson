@@ -8,7 +8,8 @@ class UserInfo(interactions.Extension):
 
     @interactions.extension_command(
         name="userinfo",
-        description="Permet d'obtenir les informations d'un utilisateur"
+        description="Permet d'obtenir les informations d'un utilisateur",
+        dm_permission=False
     )
     @interactions.option(
         name="user",

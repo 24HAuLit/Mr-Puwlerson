@@ -8,7 +8,7 @@ class UnBlacklist(interactions.Extension):
     def __init__(self, bot):
         self.bot: interactions.Client = bot
 
-    @interactions.extension_command()
+    @interactions.extension_command(dm_permission=False)
     @interactions.option("Membre à unblacklist")
     @interactions.option("Raison du unblacklist", required=False)
     async def unblacklist(self, ctx: interactions.CommandContext, user: interactions.User, reason: str = "Aucune raison"):

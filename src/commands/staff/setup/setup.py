@@ -16,7 +16,7 @@ class Setup(interactions.Extension):
             ]
         )
 
-    @interactions.extension_command()
+    @interactions.extension_command(default_member_permissions=interactions.Permissions.ADMINISTRATOR, dm_permission=False)
     async def setup(self, ctx: interactions.CommandContext):
         if ctx.author.id == ctx.guild.owner_id:
             pass

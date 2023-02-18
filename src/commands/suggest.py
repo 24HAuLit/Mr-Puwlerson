@@ -18,7 +18,7 @@ class Suggestion(interactions.Extension):
         return await ctx.send(f"Tu dois encore attendre {amount} minutes avant de pouvoir réutiliser cette commande.",
                               ephemeral=True)
 
-    @interactions.extension_command()
+    @interactions.extension_command(dm_permission=False)
     @cooldown(minutes=10, error=cooldown_err, type="user")
     @interactions.option("Ecris ta suggestion ici.")
     async def suggest(self, ctx: interactions.CommandContext, suggestion: str):

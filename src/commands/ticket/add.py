@@ -8,7 +8,7 @@ class AddMember(interactions.Extension):
     def __init__(self, bot):
         self.bot: interactions.Client = bot
 
-    @interactions.extension_command()
+    @interactions.extension_command(dm_permission=False)
     @interactions.option(
         type=interactions.OptionType.USER,
         name="user",
@@ -33,7 +33,9 @@ class AddMember(interactions.Extension):
                 c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles:
 
             channels = interactions.search_iterable(await guild.get_all_channels(),
-                                                    lambda f: f.parent_id == DATA["main"]["ticket"])
+                                                    lambda f: f.parent_id == c.execute("SELECT id FROM channels WHERE "
+                                                                                       "type = "
+                                                                                       "'ticket_parent'").fetchone()[0])
             if ctx.channel in channels:
                 if user is not None:
                     new_perms = [interactions.Overwrite(id=int(user.id), type=1,

@@ -8,7 +8,7 @@ class RemoveMember(interactions.Extension):
     def __init__(self, bot):
         self.bot: interactions.Client = bot
 
-    @interactions.extension_command()
+    @interactions.extension_command(dm_permission=False)
     @interactions.option(
         description="Pour retirer un membre au ticket",
         required=False
@@ -18,15 +18,17 @@ class RemoveMember(interactions.Extension):
         required=False
     )
     async def remove(self, ctx: interactions.CommandContext, user: interactions.User = None,
-                   role: interactions.Role = None):
+                     role: interactions.Role = None):
         """Pour pouvoir retirer quelqu'un ou un role au ticket."""
 
-        guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["main"]["guild"])
-        channels = interactions.search_iterable(await guild.get_all_channels(),
-                                                lambda f: f.parent_id == DATA["main"]["ticket"])
-
-        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        guild = await ctx.get_guild()
+        conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
+
+        channels = interactions.search_iterable(await guild.get_all_channels(),
+                                                lambda f: f.parent_id == c.execute("SELECT id FROM channels WHERE "
+                                                                                   "type = "
+                                                                                   "'ticket_parent'").fetchone()[0])
 
         if c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles or \
                 c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles:
