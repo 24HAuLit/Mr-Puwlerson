@@ -21,7 +21,8 @@ class AddMember(interactions.Extension):
         description="Pour ajouter un role au ticket",
         required=False
     )
-    async def add(self, ctx: interactions.CommandContext, user: interactions.User = None, role: interactions.Role = None):
+    async def add(self, ctx: interactions.CommandContext, user: interactions.User = None,
+                  role: interactions.Role = None):
         """Pour pouvoir ajouter quelqu'un ou un role au ticket."""
 
         guild = await ctx.get_guild()
@@ -55,6 +56,7 @@ class AddMember(interactions.Extension):
             interactions.StopCommand()
 
         conn.close()
+
 
 def setup(bot):
     AddMember(bot)

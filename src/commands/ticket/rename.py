@@ -15,7 +15,7 @@ class Rename(interactions.Extension):
 
         guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["principal"]["guild"])
         channels = interactions.search_iterable(await guild.get_all_channels(),
-                                                lambda c: c.parent_id == DATA["main"]["ticket"])
+                                                lambda f: f.parent_id == DATA["main"]["ticket"])
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 

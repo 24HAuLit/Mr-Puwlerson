@@ -13,7 +13,7 @@ class UnClaimCommand(interactions.Extension):
 
         guild = await ctx.get_guild()
         channels = interactions.search_iterable(await guild.get_all_channels(),
-                                                lambda c: c.parent_id == DATA["main"]["ticket"])
+                                                lambda f: f.parent_id == DATA["main"]["ticket"])
         channel = await ctx.get_channel()
 
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
