@@ -1,7 +1,5 @@
 import sqlite3
-
 import interactions
-from const import DATA
 
 
 class Rename(interactions.Extension):

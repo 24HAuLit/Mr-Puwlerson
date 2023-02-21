@@ -74,8 +74,7 @@ class Setup(interactions.Extension):
                     if "'" in channels[x].name:
                         channel = channels[x].name.replace("'", "")
                         c.execute(
-                            """INSERT INTO channels VALUES ('{}', '{}', NULL, '{}')""".format(channel, channels[x].id,
-                                                                                              0))
+                            """INSERT INTO channels VALUES ('{}', '{}', NULL, '{}')""".format(channel, channels[x].id, 0))
                     else:
                         c.execute(
                             """INSERT INTO channels VALUES ('{}', '{}', NULL, '{}')""".format(channels[x].name,

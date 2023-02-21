@@ -15,7 +15,7 @@ class Suggestion(interactions.Extension):
     counter = 0
 
     async def cooldown_err(self, ctx, amount):
-        return await ctx.send(f"Tu dois encore attendre {amount} minutes avant de pouvoir réutiliser cette commande.",
+        return await ctx.send(f"Tu dois encore attendre **{amount}** minutes avant de pouvoir réutiliser cette commande.",
                               ephemeral=True)
 
     @interactions.extension_command(dm_permission=False)

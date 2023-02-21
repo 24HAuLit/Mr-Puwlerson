@@ -1,7 +1,5 @@
 import sqlite3
-
 import interactions
-from const import DATA
 from src.listeners.ticket.components.close import confirm_close
 
 
