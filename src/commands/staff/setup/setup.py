@@ -1,5 +1,4 @@
 import os
-
 import interactions
 import sqlite3
 
@@ -29,7 +28,7 @@ class Setup(interactions.Extension):
 
     @setup.subcommand()
     async def server(self, ctx: interactions.CommandContext):
-        """Permet de configurer les différents types de serveur."""
+        """Permet de configurer les différents types de serveur (Principal et logs)."""
         await ctx.send("Quel type de serveur voulez-vous configurer ?", components=self.select_menu, ephemeral=True)
 
     @interactions.extension_component("server_type")
@@ -123,7 +122,7 @@ class Setup(interactions.Extension):
                                                    parent_id=ticket_parent.id)
             elif category == 3:
                 await ctx.send("Configuration des channels de serveur...", ephemeral=True)
-                server_parent = await ctx.guild.create_channel(name="serveur",
+                server_parent = await ctx.guild.create_channel(name="server",
                                                                type=interactions.ChannelType.GUILD_CATEGORY)
                 for x in range(len(server)):
                     await ctx.guild.create_channel(name=server[x], type=interactions.ChannelType.GUILD_TEXT,

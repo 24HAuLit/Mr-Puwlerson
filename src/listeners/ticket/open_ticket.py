@@ -1,7 +1,6 @@
 import sqlite3
 import interactions
 from datetime import datetime
-from const import DATA, TICKET_MAXIMUM
 from src.listeners.ticket.components.claim import ticket_claim
 from src.listeners.ticket.components.close import ticket_close_reason, ticket_close
 
@@ -36,7 +35,7 @@ class OpenTicket(interactions.Extension):
         # Partie création ticket
         channel = await guild.create_channel(
             name=f"ticket-{ctx.user.username}", type=interactions.ChannelType.GUILD_TEXT,
-            parent_id=DATA["main"]["ticket"],
+            parent_id=c.execute("SELECT id FROM channels WHERE type = 'ticket_parent'").fetchone()[0],
             permission_overwrites=[
                 interactions.Overwrite(id=c.execute("SELECT id FROM roles WHERE name = '@everyone'").fetchone()[0],
                                        type=0, deny=2199023255551),
@@ -64,7 +63,8 @@ class OpenTicket(interactions.Extension):
         conn.close()
 
         # Partie Logs
-        logs_create = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["ticket"]["create"])
+        logs_create = await interactions.get(self.bot, interactions.Channel, object_id=await interactions.get(self.bot,
+            interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'create'").fetchone()[0]))
         em2 = interactions.Embed(
             title="Nouveau ticket",
             description=f"**{ctx.author.username}#{ctx.author.discriminator}** a crée un nouveau ticket (**{channel.name}**).",

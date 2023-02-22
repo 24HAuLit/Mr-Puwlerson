@@ -34,6 +34,10 @@ class Mod(interactions.Extension):
     async def clear(self, ctx: CommandContext, number: int = 5):
         """Supprime X message(x) du chat."""
 
+        guild = await ctx.get_guild()
+        conn = sqlite3.connect(f"./Database/{guild.id}.db")
+        c = conn.cursor()
+
         channel = ctx.channel
         await channel.purge(amount=number)
 
@@ -46,7 +50,9 @@ class Mod(interactions.Extension):
 
         await ctx.send(embeds=em, ephemeral=True)
 
-        logs_clear = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["clear"])
+        logs_clear = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'clear'").fetchone()[0])
+
+        conn.close()
 
         em2 = Embed(
             title="🧹・Nouveau clear",
@@ -77,8 +83,13 @@ class Mod(interactions.Extension):
 
         # Partie Logs
 
-        logs_timeout = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["timeout"])
         guild = await ctx.get_guild()
+        conn = sqlite3.connect(f"./Database/{guild.id}.db")
+        c = conn.cursor()
+
+        logs_timeout = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'timeout'").fetchone()[0])
+
+        conn.close()
 
         em = Embed(
             title="🟠・Nouvelle exclusion temporaire",
@@ -96,20 +107,20 @@ class Mod(interactions.Extension):
 
     @mod.subcommand()
     @interactions.option("User to untimeout.")
-    @interactions.option(
-        name="reason",
-        description="Raison pour retirer l'exclusion.",
-        type=interactions.OptionType.STRING,
-        required=False
-    )
+    @interactions.option("Raison pour retirer l'exclusion.", required=False)
     async def untimeout(self, ctx: interactions.CommandContext, user: interactions.User, reason: str = "Aucune raison"):
         """Pour annuler l'exclusion temporaire d'un membre."""
 
         await user.modify(communication_disabled_until=None, guild_id=DATA["main"]["guild"], reason=reason)
         await ctx.send(f"L'exclusion de {user.mention} a été annulé pour **{reason}**.", ephemeral=True)
 
-        logs_untimeout = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["timeout"])
         guild = await ctx.get_guild()
+        conn = sqlite3.connect(f"./Database/{guild.id}.db")
+        c = conn.cursor()
+
+        logs_untimeout = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'timeout'").fetchone()[0])
+
+        conn.close()
 
         # Partie Logs
 

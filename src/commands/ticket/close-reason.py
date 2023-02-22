@@ -15,12 +15,14 @@ class CmdCloseReason(interactions.Extension):
     async def close_reason(self, ctx: interactions.CommandContext):
         """Pour pouvoir fermer le ticket avec une raison."""
 
-        guild = await interactions.get(self.bot, interactions.Guild, object_id=DATA["principal"]["guild"])
-        channels = interactions.search_iterable(await guild.get_all_channels(),
-                                                lambda f: f.parent_id == c.execute("SELECT id FROM channels WHERE type = 'ticket_parent'").fetchone()[0])
+        guild = await ctx.get_guild()
 
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
+
+        channels = interactions.search_iterable(await guild.get_all_channels(),
+                                                lambda f: f.parent_id == c.execute(
+                                                    "SELECT id FROM channels WHERE type = 'ticket_parent'").fetchone()[0])
 
         if c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles or \
                 c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles:
@@ -82,7 +84,9 @@ class CmdCloseReason(interactions.Extension):
         await ctx.channel.delete()
 
         # Partie Logs
-        logs = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["ticket"]["close"])
+        logs = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM "
+                                                                                          "logs_channels WHERE name = "
+                                                                                          "'close'").fetchone()[0])
         c.execute(f'SELECT * FROM ticket WHERE channel_id = {int(channel.id)}')
         row = c.fetchone()
         em3 = interactions.Embed(

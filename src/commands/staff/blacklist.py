@@ -20,7 +20,7 @@ class Blacklist(interactions.Extension):
         if c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0] in ctx.author.roles or c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles:
             user_id = user.id
             channel = await interactions.get(self.bot, interactions.Channel,
-                                             object_id=DATA["logs"]["moderation"]["blacklist"])
+                                             object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'blacklist'").fetchone()[0])
 
             c.execute("INSERT INTO blacklist VALUES (NULL, '{}', '{}')".format(user_id, reason))
             conn.commit()

@@ -78,7 +78,7 @@ class Nuke(interactions.Extension):
         await new.send(embeds=embed3)
 
         # Partie Logs
-        logs_nuke = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["nuke"])
+        logs_nuke = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'blacklist'").fetchone()[0])
 
         em2 = interactions.Embed(title="**💣 Nouveau nuke**", description=f"Un channel a été nuke.",
                                  color=0xFF0000,

@@ -21,7 +21,7 @@ class UnBlacklist(interactions.Extension):
                 c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0] in ctx.author.roles:
             user_id = user.id
             reason = reason
-            channel = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["blacklist"])
+            channel = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'blacklist'").fetchone()[0])
 
             c.execute("DELETE FROM blacklist WHERE user_id='{}'".format(user_id))
             conn.commit()
