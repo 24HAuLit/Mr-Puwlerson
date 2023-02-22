@@ -59,12 +59,27 @@ class Giveaway(interactions.Extension):
                 description=f"Le giveaway lancé par {ctx.author.mention} est terminé ! ",
                 color=0x75FD75
             )
-            em_end.add_field(name="Gain", value=gift)
-            em_end.add_field(name="Gagnant", value=user.mention)
+            em_end.add_field(name="Gain", value=gift, inline=True)
+            em_end.add_field(name="Gagnant", value=user.mention, inline=True)
+            em_end.add_field(name="Nombre de participants", value=len(self.dic), inline=True)
 
             await message.edit(embeds=em_end, components=[])
 
             await channel.send(f"Le giveaway est terminé ! Le gagnant est {user.mention} !")
+
+            logs_id = c.execute("SELECT id FROM logs_channels WHERE name = 'giveaway'").fetchone()[0]
+            channel = await interactions.get(self.bot, interactions.Channel, object_id=logs_id)
+
+            em = interactions.Embed(
+                title="Giveaway",
+                description=f"Le giveaway lancé par {ctx.author.mention} est terminé !",
+                color=0x75FD75
+            )
+            em.add_field(name="Gain", value=gift, inline=True)
+            em.add_field(name="Gagnant", value=user.mention, inline=True)
+            em.add_field(name="Nombre de participants", value=len(self.dic), inline=True)
+            await channel.send(embeds=em)
+
             self.dic.clear()
             self.check = False
         else:
