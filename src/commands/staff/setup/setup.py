@@ -1,3 +1,5 @@
+import os
+
 import interactions
 import sqlite3
 
@@ -16,7 +18,8 @@ class Setup(interactions.Extension):
             ]
         )
 
-    @interactions.extension_command(default_member_permissions=interactions.Permissions.ADMINISTRATOR, dm_permission=False)
+    @interactions.extension_command(default_member_permissions=interactions.Permissions.ADMINISTRATOR,
+                                    dm_permission=False)
     async def setup(self, ctx: interactions.CommandContext):
         if ctx.author.id == ctx.guild.owner_id:
             pass
@@ -51,10 +54,89 @@ class Setup(interactions.Extension):
             await ctx.send("Configuration du serveur principal terminée. Vous pouvez désormais configurer les "
                            "channels et les roles", ephemeral=True)
         else:
-            await ctx.send("Logs test : Work in progress", ephemeral=True)
+            modal = interactions.Modal(
+                title="Serveur de logs",
+                custom_id="main_server_id",
+                components=[
+                    interactions.TextInput(
+                        style=interactions.TextStyleType.SHORT,
+                        label="ID du serveur principal",
+                        custom_id="text_input_main_server_id",
+                        min_length=18,
+                        max_length=25
+                    )
+                ]
+            )
+
+            await ctx.popup(modal)
 
         conn.commit()
         conn.close()
+
+    @interactions.extension_modal("main_server_id")
+    async def main_server_id(self, ctx: interactions.ComponentContext, id: str):
+        messages = ['new', 'edit', 'delete']
+        mod = ['clear', 'timeout', 'ban', 'blacklist', 'nuke']
+        ticket = ['create', 'close']
+        server = ['join', 'quit', 'report', 'giveaway']
+
+        if os.path.exists(f"./Database/{id}.db"):
+            pass
+        else:
+            await ctx.send("Le serveur principal n'a pas été configuré.", ephemeral=True)
+            return interactions.StopCommand()
+
+        conn = sqlite3.connect(f"./Database/{id}.db")
+        c = conn.cursor()
+
+        c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='logs_channels'""")
+        if c.fetchone()[0] == 1:
+            await ctx.send("**Logs channels** database already created.", ephemeral=True)
+        else:
+            c.execute("""CREATE TABLE logs_channels
+                (
+                    name text not null,
+                    id   integer not null
+                )""")
+
+        for category in range(4):
+            if category == 0:
+                await ctx.send("Configuration des channels de messages...", ephemeral=True)
+                messages_parent = await ctx.guild.create_channel(name="messages",
+                                                                 type=interactions.ChannelType.GUILD_CATEGORY)
+                for x in range(len(messages)):
+                    await ctx.guild.create_channel(name=messages[x], type=interactions.ChannelType.GUILD_TEXT,
+                                                   parent_id=messages_parent.id)
+            elif category == 1:
+                await ctx.send("Configuration des channels de modération...", ephemeral=True)
+                mod_parent = await ctx.guild.create_channel(name="moderation",
+                                                            type=interactions.ChannelType.GUILD_CATEGORY)
+                for x in range(len(mod)):
+                    await ctx.guild.create_channel(name=mod[x], type=interactions.ChannelType.GUILD_TEXT,
+                                                   parent_id=mod_parent.id)
+            elif category == 2:
+                await ctx.send("Configuration des channels de tickets...", ephemeral=True)
+                ticket_parent = await ctx.guild.create_channel(name="tickets",
+                                                               type=interactions.ChannelType.GUILD_CATEGORY)
+                for x in range(len(ticket)):
+                    await ctx.guild.create_channel(name=ticket[x], type=interactions.ChannelType.GUILD_TEXT,
+                                                   parent_id=ticket_parent.id)
+            elif category == 3:
+                await ctx.send("Configuration des channels de serveur...", ephemeral=True)
+                server_parent = await ctx.guild.create_channel(name="serveur",
+                                                               type=interactions.ChannelType.GUILD_CATEGORY)
+                for x in range(len(server)):
+                    await ctx.guild.create_channel(name=server[x], type=interactions.ChannelType.GUILD_TEXT,
+                                                   parent_id=server_parent.id)
+
+        channels = await ctx.guild.get_all_channels()
+        for x in range(len(channels)):
+            c.execute(f"""INSERT INTO logs_channels VALUES ('{channels[x].name}', {channels[x].id})""")
+
+        conn.commit()
+        conn.close()
+
+        await ctx.send("Configuration du serveur de logs terminée.", ephemeral=True)
 
     @setup.subcommand()
     async def channels(self, ctx: interactions.CommandContext):
@@ -74,7 +156,8 @@ class Setup(interactions.Extension):
                     if "'" in channels[x].name:
                         channel = channels[x].name.replace("'", "")
                         c.execute(
-                            """INSERT INTO channels VALUES ('{}', '{}', NULL, '{}')""".format(channel, channels[x].id, 0))
+                            """INSERT INTO channels VALUES ('{}', '{}', NULL, '{}')""".format(channel, channels[x].id,
+                                                                                              0))
                     else:
                         c.execute(
                             """INSERT INTO channels VALUES ('{}', '{}', NULL, '{}')""".format(channels[x].name,
@@ -255,7 +338,9 @@ class Setup(interactions.Extension):
         c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='ticket_count'""")
         if c.fetchone()[0] == 1:
             c.execute("""UPDATE ticket_count SET count = '{}'""".format(limit))
-            await ctx.send(f"Le nombre de ticket maximum par utilisateur a été mis à jour et est désormais de **{limit}**.", ephemeral=True)
+            await ctx.send(
+                f"Le nombre de ticket maximum par utilisateur a été mis à jour et est désormais de **{limit}**.",
+                ephemeral=True)
         else:
             await ctx.send("La table `ticket_count` n'a pas été crée. Veuillez faire `/setup tickets` pour la créer",
                            ephemeral=True)
