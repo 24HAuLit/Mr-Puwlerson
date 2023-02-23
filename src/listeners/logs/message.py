@@ -1,6 +1,7 @@
+import os.path
+import sqlite3
 import interactions
 from datetime import datetime
-from const import DATA
 
 
 class Message(interactions.Extension):
@@ -14,9 +15,18 @@ class Message(interactions.Extension):
     async def new_message(self, message: interactions.Message):
         channel = await message.get_channel()
         content = message.content
-        if message.guild_id is not None:
-            guild = await message.get_guild()
-        logs_create = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["messages"]["new"])
+        if message.guild_id is None:
+            return
+        guild = await message.get_guild()
+
+        if os.path.exists(f'./Database/{guild.id}.db') is False:
+            return
+
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
+        logs_create = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'new'").fetchone()[0])
+
+        conn.close()
 
         if message.author.bot:
             return
@@ -47,9 +57,16 @@ class Message(interactions.Extension):
         old_content = before.content
         new_content = after.content
         channel = await after.get_channel()
-        if after.guild_id is not None:
-            guild = await after.get_guild()
-        logs_edit = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["messages"]["edit"])
+        if after.guild_id is None:
+            return
+        guild = await after.get_guild()
+
+        if os.path.exists(f'./Database/{guild.id}.db') is False:
+            return
+
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
+        logs_edit = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name='edit'").fetchone()[0])
 
         if after.author.bot:
             return
@@ -80,18 +97,28 @@ class Message(interactions.Extension):
 
                 await logs_edit.send(embeds=em2)
 
+        conn.close()
+
     @interactions.extension_listener(name="on_message_delete")
     async def message_delete(self, message: interactions.Message):
         user = message.author
         channel = await message.get_channel()
         content = message.content
-        if message.guild_id is not None:
-            guild = await message.get_guild()
-        logs_delete = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["messages"]["delete"])
+        if message.guild_id is None:
+            return
+        guild = await message.get_guild()
+
+        if os.path.exists(f'./Database/{guild.id}.db') is False:
+            return
+
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
+
+        logs_delete = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name='delete'").fetchone()[0])
 
         if message.author is None:
             return
-        if message.author.bot:
+        elif message.author.bot:
             return
         else:
             if (channel.id in self.banned_channels) or (channel.type == interactions.ChannelType.DM):
@@ -113,6 +140,8 @@ class Message(interactions.Extension):
                 em.set_footer(text=f"User ID : {user.id} | Message ID : {message.id}")
 
                 await logs_delete.send(embeds=em)
+
+        conn.close()
 
 
 def setup(bot):

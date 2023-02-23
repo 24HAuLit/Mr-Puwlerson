@@ -1,6 +1,7 @@
+import os.path
+import sqlite3
 import interactions
 from datetime import datetime
-from const import DATA
 
 
 class Ban(interactions.Extension):
@@ -10,8 +11,19 @@ class Ban(interactions.Extension):
 
     @interactions.extension_listener(name="on_guild_ban_add")
     async def ban(self, user: interactions.User):
-        logs_ban = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["ban"])
         guild = await interactions.get(self.bot, interactions.Guild, object_id=int(user.guild_id))
+
+        if os.path.exists(f'./Database/{guild.id}.db') is False:
+            return
+
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
+
+        logs_ban = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM "
+                                                                                              "logs_channels WHERE "
+                                                                                              "name = "
+                                                                                              "'ban'").fetchone()[0])
+
         staff_audit = await guild.get_full_audit_logs(action_type=22)
         staff = staff_audit.audit_log_entries[0].user_id
         reason = staff_audit.audit_log_entries[0].reason
@@ -34,8 +46,18 @@ class Ban(interactions.Extension):
 
     @interactions.extension_listener(name="on_guild_ban_remove")
     async def unban(self, user: interactions.User):
-        logs_ban = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["moderation"]["ban"])
         guild = await interactions.get(self.bot, interactions.Guild, object_id=int(user.guild_id))
+
+        if os.path.exists(f'./Database/{guild.id}.db') is False:
+            return
+
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
+
+        logs_unban = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM "
+                                                                                                "logs_channels WHERE "
+                                                                                                "name = "
+                                                                                                "'ban'").fetchone()[0])
         staff_audit = await guild.get_full_audit_logs(action_type=23)
         staff = staff_audit.audit_log_entries[0].user_id
 
@@ -49,7 +71,7 @@ class Ban(interactions.Extension):
         em.add_field(name="__Membre :__", value=user.user.mention, inline=True)
         em.set_footer(text=f"Staff ID : {staff} | User ID : {user.user.id}")
 
-        await logs_ban.send(embeds=em)
+        await logs_unban.send(embeds=em)
 
 
 def setup(bot):

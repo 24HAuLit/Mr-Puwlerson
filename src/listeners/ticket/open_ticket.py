@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import interactions
 from datetime import datetime
@@ -6,13 +7,16 @@ from src.listeners.ticket.components.close import ticket_close_reason, ticket_cl
 
 
 class OpenTicket(interactions.Extension):
-
     def __init__(self, bot):
         self.bot: interactions.Client = bot
 
     @interactions.extension_component("open_ticket")
     async def button_open(self, ctx: interactions.ComponentContext):
         guild = await ctx.get_guild()
+
+        if os.path.exists(f'./Database/{guild.id}.db') is False:
+            return
+
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 
