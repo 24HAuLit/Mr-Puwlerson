@@ -33,11 +33,11 @@ class Setup(interactions.Extension):
 
     @interactions.extension_component("server_type")
     async def select(self, ctx: interactions.ComponentContext, choice: list[str]):
-        guild = await ctx.get_guild()
-        conn = sqlite3.connect(f"./Database/{guild.id}.db")
-        c = conn.cursor()
-
         if choice[0] == "main":
+            guild = await ctx.get_guild()
+            conn = sqlite3.connect(f"./Database/{guild.id}.db")
+            c = conn.cursor()
+
             c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='blacklist'""")
             if c.fetchone()[0] == 1:
                 await ctx.send("**Blacklist** database already created.", ephemeral=True)
@@ -52,6 +52,9 @@ class Setup(interactions.Extension):
                 await ctx.send("**Blacklist** database created.", ephemeral=True)
             await ctx.send("Configuration du serveur principal terminée. Vous pouvez désormais configurer les "
                            "channels et les roles", ephemeral=True)
+
+            conn.commit()
+            conn.close()
         else:
             modal = interactions.Modal(
                 title="Serveur de logs",
@@ -68,9 +71,6 @@ class Setup(interactions.Extension):
             )
 
             await ctx.popup(modal)
-
-        conn.commit()
-        conn.close()
 
     @interactions.extension_modal("main_server_id")
     async def main_server_id(self, ctx: interactions.ComponentContext, id: str):
@@ -142,6 +142,12 @@ class Setup(interactions.Extension):
         """Permet de configurer les différents channels du serveur principal."""
         guild = await ctx.get_guild()
         channels = await ctx.guild.get_all_channels()
+
+        if os.path.exists(f"./Database/{guild.id}.db"):
+            pass
+        else:
+            await ctx.send("Le serveur principal n'a pas été configuré.", ephemeral=True)
+            return interactions.StopCommand()
 
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
@@ -235,6 +241,12 @@ class Setup(interactions.Extension):
         guild = await ctx.get_guild()
         roles = await ctx.guild.get_all_roles()
 
+        if os.path.exists(f"./Database/{guild.id}.db"):
+            pass
+        else:
+            await ctx.send("Le serveur principal n'a pas été configuré.", ephemeral=True)
+            return interactions.StopCommand()
+
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
@@ -287,6 +299,12 @@ class Setup(interactions.Extension):
         guild = await ctx.get_guild()
         channels = await ctx.guild.get_all_channels()
 
+        if os.path.exists(f"./Database/{guild.id}.db"):
+            pass
+        else:
+            await ctx.send("Le serveur principal n'a pas été configuré.", ephemeral=True)
+            return interactions.StopCommand()
+
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
@@ -330,6 +348,12 @@ class Setup(interactions.Extension):
     async def max_ticket(self, ctx: interactions.CommandContext, limit: int):
         """Permet de fixer une limite de ticket ouvert par utilisateur."""
         guild = await ctx.get_guild()
+
+        if os.path.exists(f"./Database/{guild.id}.db"):
+            pass
+        else:
+            await ctx.send("Le serveur principal n'a pas été configuré.", ephemeral=True)
+            return interactions.StopCommand()
 
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
