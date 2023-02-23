@@ -66,7 +66,14 @@ SETUP_TICKETS = [
     for file in os.listdir(f"{src_path}/src/commands/staff/setup/tickets")
     if file.endswith(".py")
 ]
+PLUGINS = [
+    file.replace(".py", "")
+    for file in os.listdir(f"{src_path}/src/commands/staff/plugins")
+    if file.endswith(".py")
+]
 
+
+plugins_list = ['auto_role', 'suggestion', 'report']
 
 TOKEN = os.getenv("TOKEN_OFFICIAL")
 

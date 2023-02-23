@@ -1,6 +1,7 @@
 import os
 import interactions
 import sqlite3
+from const import plugins_list
 
 
 class Setup(interactions.Extension):
@@ -40,7 +41,7 @@ class Setup(interactions.Extension):
 
             c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='blacklist'""")
             if c.fetchone()[0] == 1:
-                await ctx.send("**Blacklist** database already created.", ephemeral=True)
+                await ctx.send("**Blacklist** table already created.", ephemeral=True)
             else:
                 c.execute("""CREATE TABLE blacklist
                     (
@@ -50,6 +51,20 @@ class Setup(interactions.Extension):
                         reason       text
                     )""")
                 await ctx.send("**Blacklist** database created.", ephemeral=True)
+
+            c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='plugins'""")
+            if c.fetchone()[0] == 1:
+                await ctx.send("**Plugins** table already created.", ephemeral=True)
+            else:
+                c.execute("""CREATE TABLE plugins
+                    (
+                        name      text not null,
+                        status    text default 'false' not null
+                    )""")
+                for plugin in plugins_list:
+                    c.execute("""INSERT INTO plugins VALUES (?, ?)""", (plugin, 'false'))
+                await ctx.send("**Plugins** table created.", ephemeral=True)
+
             await ctx.send("Configuration du serveur principal terminée. Vous pouvez désormais configurer les "
                            "channels et les roles", ephemeral=True)
 

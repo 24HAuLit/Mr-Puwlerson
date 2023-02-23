@@ -21,6 +21,7 @@ class Main:
         [self.bot.load(f"src.commands.staff.setup.roles.{ext}") for ext in SETUP_ROLES]
         [self.bot.load(f"src.commands.staff.setup.channels.{ext}") for ext in SETUP_CHANNELS]
         [self.bot.load(f"src.commands.staff.setup.tickets.{ext}") for ext in SETUP_TICKETS]
+        [self.bot.load(f"src.commands.staff.plugins.{ext}") for ext in PLUGINS]
 
         # Partie listeners
         [self.bot.load(f"src.listeners.{ext}") for ext in LISTENERS]
