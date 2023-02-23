@@ -1,3 +1,4 @@
+import os
 import sqlite3
 from datetime import datetime
 import interactions
@@ -14,6 +15,10 @@ class UnBlacklist(interactions.Extension):
     async def unblacklist(self, ctx: interactions.CommandContext, user: interactions.User, reason: str = "Aucune raison"):
         """Pour pouvoir unblacklist un membre."""
         guild = await ctx.get_guild()
+
+        if os.path.exists(f"./Database/{guild.id}.db") is False:
+            return await ctx.send("Ce serveur n'est pas encore configuré.", ephemeral=True)
+
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 

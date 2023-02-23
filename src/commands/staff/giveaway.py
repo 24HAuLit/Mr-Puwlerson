@@ -1,6 +1,6 @@
 import asyncio
+import os
 import sqlite3
-
 import interactions
 from random import choice
 from time import time
@@ -24,6 +24,9 @@ class Giveaway(interactions.Extension):
     async def giveaway(self, ctx: interactions.CommandContext, gift: str, seconds: int):
         """Crée un giveaway."""
         guild = await ctx.get_guild()
+        if os.path.exists(f'./Database/{guild.id}.db') is False:
+            return await ctx.send("Ce serveur n'est pas configuré !", ephemeral=True)
+
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 
@@ -71,7 +74,7 @@ class Giveaway(interactions.Extension):
             channel = await interactions.get(self.bot, interactions.Channel, object_id=logs_id)
 
             em = interactions.Embed(
-                title="Giveaway",
+                title="🎊・Giveaway",
                 description=f"Le giveaway lancé par {ctx.author.mention} est terminé !",
                 color=0x75FD75
             )

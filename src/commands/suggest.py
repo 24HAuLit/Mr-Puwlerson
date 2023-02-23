@@ -1,4 +1,5 @@
 import asyncio
+import os
 import sqlite3
 import interactions
 from datetime import datetime
@@ -25,8 +26,18 @@ class Suggestion(interactions.Extension):
         """Pour pouvoir proposer une suggestion."""
         guild = await ctx.get_guild()
 
+        if os.path.exists(f'./Database/{guild.id}.db') is False:
+            return await ctx.send("Désolé, mais le bot n'est pas configuré sur ce serveur.",
+                                  ephemeral=True)
+
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
+
+        c.execute(f"SELECT status FROM plugins WHERE name = 'suggestion'")
+        if c.fetchone()[0] == 'false':
+            return await ctx.send("Désolé, mais le plugin `suggestion` n'est pas activé sur ce serveur.",
+                                  ephemeral=True)
+
         c.execute(f'SELECT * from blacklist WHERE user_id = {int(ctx.author.id)}')
         row = c.fetchone()
 

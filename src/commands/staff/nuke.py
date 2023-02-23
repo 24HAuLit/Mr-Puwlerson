@@ -1,4 +1,5 @@
 import asyncio
+import os
 import sqlite3
 
 import interactions
@@ -26,6 +27,10 @@ class Nuke(interactions.Extension):
     async def nuke(self, ctx: interactions.CommandContext):
         """Détruis le channel tah Nuketown sur Black Ops 1."""
         guild = await ctx.get_guild()
+
+        if os.path.exists(f"./Database/{guild.id}.db") is False:
+            return await ctx.send("Ce serveur n'est pas encore configuré.", ephemeral=True)
+
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 

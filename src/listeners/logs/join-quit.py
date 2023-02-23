@@ -45,7 +45,7 @@ class JoinQuit(interactions.Extension):
 
         em = interactions.Embed(
             title="🛫・Un utilisateur a quitté un serveur",
-            description=f"**{user.username}#{user.discriminator}** a quitté **{guild}**",
+            description=f"**{user.username}#{user.discriminator}** a quitté **{guild.name}**",
             color=0xFF5A5A,
             timestamp=datetime.utcnow()
         )

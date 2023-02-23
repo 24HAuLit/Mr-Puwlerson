@@ -16,7 +16,7 @@ class Plugins(interactions.Extension):
         required=True,
         choices=[
             interactions.Choice(name="Auto-role", value="auto-role"),
-            interactions.Choice(name="Suggestion", value="suggest"),
+            interactions.Choice(name="Suggestion", value="suggestion"),
             interactions.Choice(name="Report", value="report"),
         ]
     )

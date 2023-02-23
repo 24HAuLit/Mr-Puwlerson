@@ -1,6 +1,5 @@
-import os.path
+import os
 import sqlite3
-
 import interactions
 from datetime import datetime
 from const import DATA

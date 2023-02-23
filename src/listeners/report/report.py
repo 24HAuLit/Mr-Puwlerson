@@ -25,10 +25,11 @@ class Report(interactions.Extension):
 
         if channel.type == interactions.ChannelType.DM:
             if row is not None:
-                await channel.send("Désolé, mais vous êtes blacklist. Vous ne pouvez donc pas envoyé de report.")
+                await channel.send("Désolé, mais vous êtes blacklist. Vous ne pouvez donc pas envoyer de report.")
             else:
                 confirm_message = await channel.send(
-                    "Êtes-vous sur de vouloir faire ce report ? **Tout abus se vera sanctionné d'un blacklist report!**",
+                    "Êtes-vous sur de vouloir faire ce report ? **Tout abus se verra sanctionné d'un blacklist "
+                    "report!**",
                     components=[confirm(), cancel()])
 
                 @interactions.extension_component("send")

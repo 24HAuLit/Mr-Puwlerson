@@ -1,3 +1,4 @@
+import os
 import sqlite3
 
 import interactions
@@ -13,6 +14,10 @@ class Mod(interactions.Extension):
     @interactions.extension_command(dm_permission=False)
     async def mod(self, ctx):
         guild = await ctx.get_guild()
+
+        if os.path.exists(f"./Database/{guild.id}.db") is False:
+            return await ctx.send("Ce serveur n'est pas encore configuré.", ephemeral=True)
+
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
