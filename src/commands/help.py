@@ -1,3 +1,4 @@
+import os.path
 import sqlite3
 
 import interactions
@@ -14,6 +15,10 @@ class Help(interactions.Extension):
         """Pour avoir toutes les commandes à porter de main."""
 
         guild = await ctx.get_guild()
+
+        if os.path.exists(f"./Database/{guild.id}.db") is False:
+            return await ctx.send(":x: | **Le serveur n'a pas encore été configuré.**", ephemeral=True)
+
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
@@ -40,7 +45,7 @@ class Help(interactions.Extension):
             )
             em.add_field(
                 name="**Owner**",
-                value="```• setup server\n• setup roles\n• setup channels\n```",
+                value="```• setup server\n• setup roles\n• setup channels\n• setup tickets\n• setup max_ticket```",
                 inline=True
             )
             em.add_field(
