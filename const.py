@@ -73,7 +73,7 @@ PLUGINS = [
 ]
 
 
-plugins_list = ['auto_role', 'suggestion', 'report']
+plugins_list = ['auto_role', 'suggestion', 'report', 'verif']
 
 TOKEN = os.getenv("TOKEN_OFFICIAL")
 

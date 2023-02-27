@@ -18,6 +18,7 @@ class Plugins(interactions.Extension):
             interactions.Choice(name="Auto-role", value="auto-role"),
             interactions.Choice(name="Suggestion", value="suggestion"),
             interactions.Choice(name="Report", value="report"),
+            interactions.Choice(name="Verification", value="verif"),
         ]
     )
     @interactions.option(
@@ -43,15 +44,23 @@ class Plugins(interactions.Extension):
 
         c.execute(f"SELECT status FROM plugins WHERE name = '{plugin}'")
         if c.fetchone()[0] == status:
-            return await ctx.send(f"Le plugin `{plugin}` est déjà `{status}` !")
+            return await ctx.send(f"Le plugin `{plugin}` est déjà `{status}` !", ephemeral=True)
+        elif plugin == 'auto-role' and c.execute("SELECT status FROM plugins WHERE name = 'verif'").fetchone()[0] == 'true':
+            return await ctx.send("Le plugin `Verification` est déjà activé, vous ne pouvez pas activer le plugin "
+                                  "`Auto-role`. Si vous voulez activer le plugin `Auto-role`, désactivez le plugin "
+                                  "`Verification`.", ephemeral=True)
+        elif plugin == 'verif' and c.execute("SELECT status FROM plugins WHERE name = 'auto-role'").fetchone()[0] == 'true':
+            return await ctx.send("Le plugin `Auto-role` est déjà activé, vous ne pouvez pas activer le plugin "
+                                  "`Verification`. Si vous voulez activer le plugin `Verification`, désactivez le "
+                                  "plugin `auto-role`.", ephemeral=True)
         else:
             c.execute(f"UPDATE plugins SET status = '{status}' WHERE name = '{plugin}'")
             conn.commit()
 
             if status == 'true':
-                await ctx.send(f"Le plugin `{plugin}` a bien été activé !")
+                await ctx.send(f"Le plugin `{plugin}` a bien été activé !", ephemeral=True)
             else:
-                await ctx.send(f"Le plugin `{plugin}` a bien été désactivé !")
+                await ctx.send(f"Le plugin `{plugin}` a bien été désactivé !", ephemeral=True)
 
         conn.close()
 
