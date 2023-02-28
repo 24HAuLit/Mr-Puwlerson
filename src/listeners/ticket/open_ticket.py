@@ -64,11 +64,14 @@ class OpenTicket(interactions.Extension):
 
         c.execute("INSERT INTO ticket VALUES (NULL, '{}', '{}', '{}')".format(author_id, None, channel.id))
         conn.commit()
-        conn.close()
 
         # Partie Logs
-        logs_create = await interactions.get(self.bot, interactions.Channel, object_id=await interactions.get(self.bot,
-            interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'create'").fetchone()[0]))
+        channel_logs = await interactions.get(self.bot,
+                                              interactions.Channel,
+                                              object_id=c.execute(
+                                                  "SELECT id FROM logs_channels WHERE name = 'create'").fetchone()[0])
+
+        logs_create = await interactions.get(self.bot, interactions.Channel, object_id=channel_logs.id)
         em2 = interactions.Embed(
             title="Nouveau ticket",
             description=f"**{ctx.author.username}#{ctx.author.discriminator}** a crée un nouveau ticket (**{channel.name}**).",
@@ -77,6 +80,8 @@ class OpenTicket(interactions.Extension):
         )
         em2.set_footer(text=f"Author ID : {ctx.author.id} | Ticket ID : {c.lastrowid}")
         await logs_create.send(embeds=em2)
+
+        conn.close()
 
 
 def setup(bot):
