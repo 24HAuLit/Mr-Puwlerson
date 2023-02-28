@@ -20,11 +20,15 @@ class OnUserJoin(interactions.Extension):
         conn = sqlite3.connect("./Database/{}.db".format(member.guild_id))
         c = conn.cursor()
 
+        if c.execute("SELECT id FROM channels WHERE type = 'guild'").fetchone()[0] != member.guild_id:
+            return conn.close()
+
         if c.execute("SELECT status FROM plugins WHERE name = 'auto-role'").fetchone()[0] == 'true':
             role = await interactions.get(self.bot, interactions.Role,
                                           object_id=c.execute("SELECT id FROM roles WHERE type = 'Default'").fetchone()[
                                               0])
             await member.add_role(role)
+
         elif c.execute("SELECT status FROM plugins WHERE name = 'verif'").fetchone()[0] == 'true':
 
             self.guild = await interactions.get(self.bot, interactions.Guild, object_id=member.guild_id)
@@ -61,6 +65,9 @@ class OnUserJoin(interactions.Extension):
 
     @interactions.extension_listener()
     async def on_component(self, component: interactions.ComponentContext):
+        if component.guild_id is not None:
+            return
+
         if component.custom_id == self.good_code:
             await self.message.delete()
             await component.send("Vous avez appuyé sur le bon boutton. Vous êtes donc vérifié !")
@@ -71,7 +78,8 @@ class OnUserJoin(interactions.Extension):
             role = await interactions.get(self.bot, interactions.Role,
                                           object_id=c.execute("SELECT id FROM roles WHERE type = 'Default'").fetchone()[0])
 
-            user = await interactions.get(self.bot, interactions.GuildMember, object_id=component.user.id)
+            user = await interactions.get(self.bot, interactions.Member, object_id=component.user.id,
+                                          parent_id=self.guild.id)
 
             await user.add_role(role=role, guild_id=self.guild.id, reason="Verification passed")
 
