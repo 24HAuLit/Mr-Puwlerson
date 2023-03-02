@@ -1,6 +1,5 @@
 import sqlite3
 import interactions
-from const import DATA
 from src.listeners.ticket.components.close import ticket_close, ticket_close_reason
 
 

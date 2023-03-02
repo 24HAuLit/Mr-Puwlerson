@@ -2,7 +2,6 @@ import os
 import sqlite3
 from datetime import datetime
 import interactions
-from const import DATA
 
 
 class Blacklist(interactions.Extension):

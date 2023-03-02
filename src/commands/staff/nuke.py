@@ -1,10 +1,8 @@
 import asyncio
 import os
 import sqlite3
-
 import interactions
 from datetime import datetime
-from const import DATA
 
 
 class Nuke(interactions.Extension):

@@ -69,7 +69,7 @@ class CloseReasonTicket(interactions.Extension):
         await ctx.channel.delete()
 
         # Partie logs
-        logs = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["ticket"]["close"])
+        logs = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'close'").fetchone()[0])
         c.execute(f'SELECT * FROM ticket WHERE channel_id = {int(channel.id)}')
         row = c.fetchone()
         em3 = interactions.Embed(

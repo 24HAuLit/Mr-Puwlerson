@@ -1,10 +1,8 @@
 import os
 import sqlite3
-
 import interactions
 from interactions import CommandContext, Embed
 from datetime import datetime, timedelta
-from const import DATA
 
 
 class Mod(interactions.Extension):
@@ -83,12 +81,12 @@ class Mod(interactions.Extension):
         """Pour exclure temporairement un membre. Si vous pensez qu'il mérite une pause."""
 
         tempo = datetime.utcnow() + timedelta(seconds=duration)
-        await user.modify(communication_disabled_until=tempo.isoformat(), guild_id=DATA["main"]["guild"], reason=reason)
+        guild = await ctx.get_guild()
+        await user.modify(communication_disabled_until=tempo.isoformat(), guild_id=guild.id, reason=reason)
         await ctx.send(f"{user.mention} a été exclu pendant **{duration} secondes** pour **{reason}**.", ephemeral=True)
 
         # Partie Logs
 
-        guild = await ctx.get_guild()
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
@@ -116,10 +114,11 @@ class Mod(interactions.Extension):
     async def untimeout(self, ctx: interactions.CommandContext, user: interactions.User, reason: str = "Aucune raison"):
         """Pour annuler l'exclusion temporaire d'un membre."""
 
-        await user.modify(communication_disabled_until=None, guild_id=DATA["main"]["guild"], reason=reason)
+        guild = await ctx.get_guild()
+
+        await user.modify(communication_disabled_until=None, guild_id=guild.id, reason=reason)
         await ctx.send(f"L'exclusion de {user.mention} a été annulé pour **{reason}**.", ephemeral=True)
 
-        guild = await ctx.get_guild()
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 

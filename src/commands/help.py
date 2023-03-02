@@ -2,7 +2,6 @@ import os
 import sqlite3
 import interactions
 from datetime import datetime
-from const import DATA
 
 
 class Help(interactions.Extension):
@@ -118,11 +117,12 @@ class Help(interactions.Extension):
             return await ctx.send(embeds=em2, ephemeral=True)
 
         else:
+            suggest = c.execute("SELECT id FROM channels WHERE type = 'suggest'").fetchone()[0]
             em3 = interactions.Embed(
                 title="📑 Liste des commandes",
                 description="• help | **Permet de connaître toutes les commandes du serveur.**\n• ping | "
                             "**Pong!**\n• pileface | **Permet de lancer une pièce (Pile ou Face)**\n• suggest | "
-                            f"**Pour pouvoir poster une suggestion dans <#{DATA['main']['suggestion']}>** ",
+                            f"**Pour pouvoir poster une suggestion dans <#{suggest}>** ",
                 color=0x00FFEE,
                 timestamp=datetime.utcnow()
             )
@@ -131,6 +131,8 @@ class Help(interactions.Extension):
                 text="Le bot utilise les slash-commands, donc il faut mettre un / a chaque début."
             )
             await ctx.send(embeds=em3, ephemeral=True)
+
+        conn.close()
 
 
 def setup(bot):

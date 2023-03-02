@@ -4,7 +4,6 @@ import asyncio
 import interactions
 from interactions.ext.transcript import get_transcript
 from datetime import datetime
-from const import DATA
 
 
 class ConfirmClose(interactions.Extension):

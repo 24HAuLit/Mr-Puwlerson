@@ -2,7 +2,6 @@ import asyncio
 import sqlite3
 from datetime import datetime
 import interactions
-from const import DATA
 from src.listeners.report.components.components import confirm, cancel
 
 
@@ -40,7 +39,7 @@ class Report(interactions.Extension):
                     button_ctx: interactions.ComponentContext = await self.bot.wait_for_component(
                         components=confirm(), check=report_confirm, timeout=15
                     )
-                    report_channel = await interactions.get(self.bot, interactions.Channel, object_id=DATA["logs"]["global"]["report"])
+                    report_channel = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'report'").fetchone()[0])
                     em_report = interactions.Embed(
                         title="🎯・Nouveau report",
                         description=content,
