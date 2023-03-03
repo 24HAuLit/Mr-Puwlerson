@@ -38,6 +38,10 @@ class Mod(interactions.Extension):
         """Supprime X message(x) du chat."""
 
         guild = await ctx.get_guild()
+
+        if os.path.exists(f"./Database/{guild.id}.db") is False:
+            return await ctx.send("Ce serveur n'est pas encore configuré.", ephemeral=True)
+
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
@@ -87,6 +91,9 @@ class Mod(interactions.Extension):
 
         # Partie Logs
 
+        if os.path.exists(f"./Database/{guild.id}.db") is False:
+            return await ctx.send("Ce serveur n'est pas encore configuré.", ephemeral=True)
+
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
@@ -118,6 +125,9 @@ class Mod(interactions.Extension):
 
         await user.modify(communication_disabled_until=None, guild_id=guild.id, reason=reason)
         await ctx.send(f"L'exclusion de {user.mention} a été annulé pour **{reason}**.", ephemeral=True)
+
+        if os.path.exists(f"./Database/{guild.id}.db") is False:
+            return await ctx.send("Ce serveur n'est pas encore configuré.", ephemeral=True)
 
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
