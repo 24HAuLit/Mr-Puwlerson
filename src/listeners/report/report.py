@@ -1,8 +1,9 @@
 import asyncio
 import sqlite3
-from datetime import datetime
 import interactions
+from datetime import datetime
 from src.listeners.report.components.components import confirm, cancel
+from message_config import ErrorMessage
 
 
 class Report(interactions.Extension):
@@ -24,7 +25,7 @@ class Report(interactions.Extension):
 
         if channel.type == interactions.ChannelType.DM:
             if row is not None:
-                await channel.send("Désolé, mais vous êtes blacklist. Vous ne pouvez donc pas envoyer de report.")
+                await channel.send(ErrorMessage.BlacklistError())
             else:
                 confirm_message = await channel.send(
                     "Êtes-vous sur de vouloir faire ce report ? **Tout abus se verra sanctionné d'un blacklist "

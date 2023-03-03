@@ -1,6 +1,7 @@
 import sqlite3
 import interactions
 from src.listeners.ticket.components.close import ticket_close, ticket_close_reason
+from message_config import ErrorMessage
 
 
 class ClaimTicket(interactions.Extension):
@@ -26,7 +27,7 @@ class ClaimTicket(interactions.Extension):
             )
             await ctx.send(embeds=em)
         else:
-            await ctx.send(":x: Vous n'avez pas la permission de faire ceci.", ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
 
         conn.commit()
         conn.close()

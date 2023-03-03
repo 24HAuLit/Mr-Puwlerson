@@ -1,5 +1,7 @@
+import os
 import sqlite3
 import interactions
+from message_config import ErrorMessage
 
 
 class RemoveMember(interactions.Extension):
@@ -18,8 +20,11 @@ class RemoveMember(interactions.Extension):
     async def remove(self, ctx: interactions.CommandContext, user: interactions.User = None,
                      role: interactions.Role = None):
         """Pour pouvoir retirer quelqu'un ou un role au ticket."""
-
         guild = await ctx.get_guild()
+
+        if os.path.exists(f"./Database/{guild.id}.db") is False:
+            return await ctx.send(ErrorMessage.database_not_found(guild.id), ephemeral=True)
+
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
@@ -44,11 +49,11 @@ class RemoveMember(interactions.Extension):
                     em = interactions.Embed(description=f"{role.mention} a été retiré du ticket.", color=0xFF5A5A)
                     await ctx.send(embeds=em)
                 else:
-                    await ctx.send("Argument manquant : [User/Role]", ephemeral=True)
+                    await ctx.send(ErrorMessage.MissingRequiredArgument("User/ Role"), ephemeral=True)
             else:
-                await ctx.send("Vous ne pouvez pas utiliser cette commande dans ce salon.", ephemeral=True)
+                await ctx.send(ErrorMessage.ChannelError(), ephemeral=True)
         else:
-            await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
             interactions.StopCommand()
 
         conn.close()

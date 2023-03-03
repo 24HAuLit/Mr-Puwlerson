@@ -6,6 +6,7 @@ from datetime import datetime
 from interactions.ext.enhanced import cooldown
 from src.listeners.suggestion.components.accept import suggest_accept
 from src.listeners.suggestion.components.deny import suggest_deny
+from message_config import ErrorMessage
 
 
 class Suggestion(interactions.Extension):
@@ -26,23 +27,20 @@ class Suggestion(interactions.Extension):
         guild = await ctx.get_guild()
 
         if os.path.exists(f'./Database/{guild.id}.db') is False:
-            return await ctx.send("Désolé, mais le bot n'est pas configuré sur ce serveur.",
-                                  ephemeral=True)
+            return await ctx.send(ErrorMessage.database_not_found(guild.id), ephemeral=True)
 
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 
         c.execute(f"SELECT status FROM plugins WHERE name = 'suggestion'")
         if c.fetchone()[0] == 'false':
-            return await ctx.send("Désolé, mais le plugin `suggestion` n'est pas activé sur ce serveur.",
-                                  ephemeral=True)
+            return await ctx.send(ErrorMessage.PluginError('suggestion'), ephemeral=True)
 
         c.execute(f'SELECT * from blacklist WHERE user_id = {int(ctx.author.id)}')
         row = c.fetchone()
 
         if row is not None:
-            await ctx.send("Désolé, mais vous êtes blacklist. Vous ne pouvez donc pas envoyé de suggestion.",
-                           ephemeral=True)
+            await ctx.send(ErrorMessage.BlacklistError(), ephemeral=True)
         else:
             channel = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM channels WHERE type = 'suggest'").fetchone()[0])
             self.counter += 1

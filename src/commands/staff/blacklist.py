@@ -1,7 +1,8 @@
 import os
 import sqlite3
-from datetime import datetime
 import interactions
+from message_config import ErrorMessage
+from datetime import datetime
 
 
 class Blacklist(interactions.Extension):
@@ -16,7 +17,7 @@ class Blacklist(interactions.Extension):
         guild = await ctx.get_guild()
 
         if os.path.exists(f"./Database/{guild.id}.db") is False:
-            return await ctx.send("Ce serveur n'est pas encore configuré.", ephemeral=True)
+            return await ctx.send(ErrorMessage.database_not_found(guild.id), ephemeral=True)
 
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
@@ -51,8 +52,8 @@ class Blacklist(interactions.Extension):
             await user.send(embeds=em_dm)
 
         else:
-            await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
-            interactions.StopCommand()
+            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
+            return interactions.StopCommand()
 
 
 def setup(bot):

@@ -1,16 +1,16 @@
-import interactions
-import random
+from interactions import Extension, Client, extension_command, CommandContext
+from random import choice
 
 
-class PileFace(interactions.Extension):
+class PileFace(Extension):
     def __int__(self, bot):
-        self.bot: interactions.Client = bot
+        self.bot: Client = bot
 
-    @interactions.extension_command()
-    async def pileface(self, ctx: interactions.CommandContext):
+    @extension_command()
+    async def pileface(self, ctx: CommandContext):
         """Lance une pièce et affiche le résultat"""
-        list = ["pile", "face"]
-        await ctx.send(f"La pièce est tombé sur **{random.choice(list)}**")
+        element = ["pile", "face"]
+        await ctx.send(f"La pièce est tombé sur **{choice(element)}**")
 
 
 def setup(bot):

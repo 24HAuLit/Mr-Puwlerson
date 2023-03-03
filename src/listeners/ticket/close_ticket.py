@@ -1,5 +1,6 @@
 import sqlite3
 import interactions
+from message_config import ErrorMessage
 from src.listeners.ticket.components.close import confirm_close
 
 
@@ -15,7 +16,7 @@ class CloseTicket(interactions.Extension):
         if c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles or c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles:
             await ctx.send("Êtes-vous sur de vouloir fermer ce ticket ?", components=confirm_close(), ephemeral=True)
         else:
-            await ctx.send(":x: Vous n'avez pas la permission de faire ceci.", ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
 
         conn.close()
 

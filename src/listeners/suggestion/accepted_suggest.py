@@ -3,6 +3,7 @@ import interactions
 from datetime import datetime
 from const import DATA
 from src.listeners.suggestion.components.accept import modal_accept
+from message_config import ErrorMessage
 
 
 class SuggestionAccepted(interactions.Extension):
@@ -19,7 +20,7 @@ class SuggestionAccepted(interactions.Extension):
                 or c.execute("SELECT id FROM roles WHERE type = 'Owner'".format(ctx.author.id)).fetchone()[0] in ctx.author.roles:
             await ctx.popup(modal_accept())
         else:
-            await ctx.send("Vous n'avez pas la permission d'accepter une suggestion.", ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
 
         conn.close()
 

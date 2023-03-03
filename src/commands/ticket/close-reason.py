@@ -1,10 +1,11 @@
 import asyncio
 import io
+import os
 import sqlite3
 import interactions
 from interactions.ext.transcript import get_transcript
 from datetime import datetime
-from const import DATA
+from message_config import ErrorMessage
 
 
 class CmdCloseReason(interactions.Extension):
@@ -14,8 +15,10 @@ class CmdCloseReason(interactions.Extension):
     @interactions.extension_command(dm_permission=False)
     async def close_reason(self, ctx: interactions.CommandContext):
         """Pour pouvoir fermer le ticket avec une raison."""
-
         guild = await ctx.get_guild()
+
+        if os.path.exists(f'./Database/{guild.id}.db') is False:
+            return await ctx.send(ErrorMessage.database_not_found(guild.id), ephemeral=True)
 
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
@@ -42,10 +45,12 @@ class CmdCloseReason(interactions.Extension):
                 )
                 await ctx.popup(modal)
             else:
-                await ctx.send("Vous ne pouvez pas utiliser cette commande dans ce salon.", ephemeral=True)
+                conn.close()
+                return await ctx.send(ErrorMessage.ChannelError(), ephemeral=True)
         else:
-            await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
-            interactions.StopCommand()
+            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
+            conn.close()
+            return interactions.StopCommand()
 
         conn.close()
 

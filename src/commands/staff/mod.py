@@ -3,6 +3,7 @@ import sqlite3
 import interactions
 from interactions import CommandContext, Embed
 from datetime import datetime, timedelta
+from message_config import ErrorMessage
 
 
 class Mod(interactions.Extension):
@@ -14,7 +15,7 @@ class Mod(interactions.Extension):
         guild = await ctx.get_guild()
 
         if os.path.exists(f"./Database/{guild.id}.db") is False:
-            return await ctx.send("Ce serveur n'est pas encore configuré.", ephemeral=True)
+            return await ctx.send(ErrorMessage.database_not_found(guild.id), ephemeral=True)
 
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
@@ -24,7 +25,7 @@ class Mod(interactions.Extension):
         elif c.execute(f"SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles:
             pass
         else:
-            await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
             return interactions.StopCommand()
 
         conn.close()
@@ -36,11 +37,10 @@ class Mod(interactions.Extension):
     )
     async def clear(self, ctx: CommandContext, number: int = 5):
         """Supprime X message(x) du chat."""
-
         guild = await ctx.get_guild()
 
         if os.path.exists(f"./Database/{guild.id}.db") is False:
-            return await ctx.send("Ce serveur n'est pas encore configuré.", ephemeral=True)
+            return
 
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
@@ -83,16 +83,16 @@ class Mod(interactions.Extension):
     )
     async def timeout(self, ctx: interactions.CommandContext, user: interactions.User, duration: int, reason: str = "Aucune raison"):
         """Pour exclure temporairement un membre. Si vous pensez qu'il mérite une pause."""
-
         tempo = datetime.utcnow() + timedelta(seconds=duration)
         guild = await ctx.get_guild()
+
         await user.modify(communication_disabled_until=tempo.isoformat(), guild_id=guild.id, reason=reason)
         await ctx.send(f"{user.mention} a été exclu pendant **{duration} secondes** pour **{reason}**.", ephemeral=True)
 
         # Partie Logs
 
         if os.path.exists(f"./Database/{guild.id}.db") is False:
-            return await ctx.send("Ce serveur n'est pas encore configuré.", ephemeral=True)
+            return
 
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
@@ -120,14 +120,13 @@ class Mod(interactions.Extension):
     @interactions.option("Raison pour retirer l'exclusion.", required=False)
     async def untimeout(self, ctx: interactions.CommandContext, user: interactions.User, reason: str = "Aucune raison"):
         """Pour annuler l'exclusion temporaire d'un membre."""
-
         guild = await ctx.get_guild()
 
         await user.modify(communication_disabled_until=None, guild_id=guild.id, reason=reason)
         await ctx.send(f"L'exclusion de {user.mention} a été annulé pour **{reason}**.", ephemeral=True)
 
         if os.path.exists(f"./Database/{guild.id}.db") is False:
-            return await ctx.send("Ce serveur n'est pas encore configuré.", ephemeral=True)
+            return
 
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()

@@ -25,8 +25,7 @@ class OnUserJoin(interactions.Extension):
 
         if c.execute("SELECT status FROM plugins WHERE name = 'auto-role'").fetchone()[0] == 'true':
             role = await interactions.get(self.bot, interactions.Role,
-                                          object_id=c.execute("SELECT id FROM roles WHERE type = 'Default'").fetchone()[
-                                              0])
+                                          object_id=c.execute("SELECT id FROM roles WHERE type = 'Default'").fetchone()[0])
             await member.add_role(role)
 
         elif c.execute("SELECT status FROM plugins WHERE name = 'verif'").fetchone()[0] == 'true':

@@ -2,6 +2,7 @@ import sqlite3
 import interactions
 from datetime import datetime
 from const import DATA
+from message_config import ErrorMessage
 from src.listeners.suggestion.components.deny import modal_deny
 
 
@@ -19,7 +20,7 @@ class SuggestionDenied(interactions.Extension):
                 or c.execute("SELECT id FROM roles WHERE type = 'Owner'".format(ctx.author.id)).fetchone()[0] in ctx.author.roles:
             await ctx.popup(modal_deny())
         else:
-            await ctx.send("Vous n'avez pas la permission de refuser une suggestion.", ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
 
         conn.close()
 

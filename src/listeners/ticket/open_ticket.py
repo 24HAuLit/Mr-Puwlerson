@@ -4,6 +4,7 @@ import interactions
 from datetime import datetime
 from src.listeners.ticket.components.claim import ticket_claim
 from src.listeners.ticket.components.close import ticket_close_reason, ticket_close
+from message_config import ErrorMessage
 
 
 class OpenTicket(interactions.Extension):
@@ -15,7 +16,7 @@ class OpenTicket(interactions.Extension):
         guild = await ctx.get_guild()
 
         if os.path.exists(f'./Database/{guild.id}.db') is False:
-            return
+            return await ctx.send(ErrorMessage.database_not_found(guild.id), ephemeral=True)
 
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()

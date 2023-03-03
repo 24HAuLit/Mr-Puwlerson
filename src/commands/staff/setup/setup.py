@@ -2,6 +2,7 @@ import os
 import interactions
 import sqlite3
 from const import plugins_list
+from message_config import ErrorMessage
 
 
 class Setup(interactions.Extension):
@@ -24,7 +25,7 @@ class Setup(interactions.Extension):
         if ctx.author.id == ctx.guild.owner_id:
             pass
         else:
-            await ctx.send("Vous n'avez pas la permissions d'executer cette commande.", ephemeral=True)
+            await ctx.send(ErrorMessage.OwnerOnly(), ephemeral=True)
             return interactions.StopCommand()
 
     @setup.subcommand()
@@ -36,6 +37,7 @@ class Setup(interactions.Extension):
     async def select(self, ctx: interactions.ComponentContext, choice: list[str]):
         if choice[0] == "main":
             guild = await ctx.get_guild()
+
             conn = sqlite3.connect(f"./Database/{guild.id}.db")
             c = conn.cursor()
 

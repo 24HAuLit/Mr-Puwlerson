@@ -4,7 +4,7 @@ import sqlite3
 import interactions
 from interactions.ext.transcript import get_transcript
 from datetime import datetime
-from const import DATA
+from message_config import ErrorMessage
 
 
 class CloseReasonTicket(interactions.Extension):
@@ -17,6 +17,8 @@ class CloseReasonTicket(interactions.Extension):
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
         if c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles or c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles:
+            conn.close()
+
             modal = interactions.Modal(
                 title="Raison",
                 custom_id="close_reason",
@@ -30,15 +32,17 @@ class CloseReasonTicket(interactions.Extension):
                     )
                 ]
             )
+
             await ctx.popup(modal)
         else:
-            await ctx.send(":x: Vous n'avez pas la permission de faire ceci.", ephemeral=True)
-        conn.close()
+            conn.close()
+            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
 
     @interactions.extension_modal("close_reason")
     async def on_modal_finish(self, ctx, reason: str):
         channel = await ctx.get_channel()
         guild = await ctx.get_guild()
+
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 

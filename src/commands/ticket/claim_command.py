@@ -1,5 +1,7 @@
+import os
 import sqlite3
 import interactions
+from message_config import ErrorMessage
 
 
 class ClaimCommand(interactions.Extension):
@@ -9,8 +11,11 @@ class ClaimCommand(interactions.Extension):
     @interactions.extension_command(dm_permission=False)
     async def claim(self, ctx: interactions.CommandContext):
         """Pour pouvoir revendiquer un ticket."""
-
         guild = await ctx.get_guild()
+
+        if os.path.exists(f'./Database/{guild.id}.db') is False:
+            return await ctx.send(ErrorMessage.database_not_found(guild.id), ephemeral=True)
+
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 
@@ -41,9 +46,9 @@ class ClaimCommand(interactions.Extension):
                 else:
                     await ctx.send(f"<@{row[2]}> a déjà pris en charge ce ticket.", ephemeral=True)
             else:
-                await ctx.send("Vous ne pouvez pas utiliser cette commande dans ce salon.", ephemeral=True)
+                await ctx.send(ErrorMessage.ChannelError(), ephemeral=True)
         else:
-            await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
             interactions.StopCommand()
 
         conn.close()

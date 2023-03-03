@@ -2,6 +2,7 @@ import os
 import sqlite3
 import interactions
 from datetime import datetime
+from message_config import ErrorMessage
 
 
 class Help(interactions.Extension):
@@ -11,16 +12,17 @@ class Help(interactions.Extension):
     @interactions.extension_command(dm_permission=False)
     async def help(self, ctx: interactions.CommandContext):
         """Pour avoir toutes les commandes à porter de main."""
-
         guild = await ctx.get_guild()
 
         if os.path.exists(f"./Database/{guild.id}.db") is False:
-            return await ctx.send(":x: | **Le serveur n'a pas encore été configuré.**", ephemeral=True)
+            return await ctx.send(ErrorMessage.database_not_found(guild.id), ephemeral=True)
 
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
         if ctx.author.id == ctx.guild.owner_id or c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles:
+            conn.close()
+
             em = interactions.Embed(
                 title="📑 Liste des commandes",
                 color=0x00FFEE,
@@ -58,6 +60,8 @@ class Help(interactions.Extension):
             return await ctx.send(embeds=em, ephemeral=True)
 
         if c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0] in ctx.author.roles:
+            conn.close()
+
             em1 = interactions.Embed(
                 title="📑 Liste des commandes",
                 color=0x00FFEE,
@@ -90,6 +94,8 @@ class Help(interactions.Extension):
             return await ctx.send(embeds=em1, ephemeral=True)
 
         elif c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles:
+            conn.close()
+
             em2 = interactions.Embed(
                 title="📑 Liste des commandes",
                 color=0x00FFEE,
@@ -118,6 +124,8 @@ class Help(interactions.Extension):
 
         else:
             suggest = c.execute("SELECT id FROM channels WHERE type = 'suggest'").fetchone()[0]
+            conn.close()
+
             em3 = interactions.Embed(
                 title="📑 Liste des commandes",
                 description="• help | **Permet de connaître toutes les commandes du serveur.**\n• ping | "
@@ -130,10 +138,8 @@ class Help(interactions.Extension):
                 icon_url=ctx.member.user.avatar_url,
                 text="Le bot utilise les slash-commands, donc il faut mettre un / a chaque début."
             )
-            await ctx.send(embeds=em3, ephemeral=True)
 
-        conn.close()
-
+            return await ctx.send(embeds=em3, ephemeral=True)
 
 def setup(bot):
     Help(bot)

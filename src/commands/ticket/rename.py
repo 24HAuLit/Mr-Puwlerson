@@ -1,5 +1,7 @@
+import os
 import sqlite3
 import interactions
+from message_config import ErrorMessage
 
 
 class Rename(interactions.Extension):
@@ -10,8 +12,11 @@ class Rename(interactions.Extension):
     @interactions.option("Nouveau nom pour le ticket")
     async def rename(self, ctx: interactions.CommandContext, nom: str):
         """Pour pouvoir renommer un ticket."""
-
         guild = await ctx.get_guild()
+
+        if os.path.exists(f"./Database/{guild.id}.db") is False:
+            return await ctx.send(ErrorMessage.database_not_found(guild.id), ephemeral=True)
+
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
@@ -26,9 +31,9 @@ class Rename(interactions.Extension):
                 await ctx.channel.modify(name=nom)
                 await ctx.send(f"Le ticket vient d'être renommé **{nom}**.", ephemeral=True)
             else:
-                await ctx.send("Vous ne pouvez pas utiliser cette commande dans ce salon.", ephemeral=True)
+                await ctx.send(ErrorMessage.ChannelError(), ephemeral=True)
         else:
-            await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
             interactions.StopCommand()
 
         conn.close()

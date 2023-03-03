@@ -1,7 +1,7 @@
 import os
 import sqlite3
-
 import interactions
+from message_config import ErrorMessage
 
 
 class Plugins(interactions.Extension):
@@ -34,10 +34,10 @@ class Plugins(interactions.Extension):
     async def plugins(self, ctx: interactions.CommandContext, plugin: str, status: str):
         """Permet d'activer/désactiver les plugins."""
         if ctx.author.id != ctx.guild.owner_id:
-            return await ctx.send(":x: | **Seul le propriétaire du serveur peut utiliser cette commande.**", ephemeral=True)
+            return await ctx.send(ErrorMessage.OwnerOnly(), ephemeral=True)
 
         if os.path.exists(f"./Database/{ctx.guild.id}.db") is False:
-            return
+            return await ctx.send(ErrorMessage.database_not_found(ctx.guild.id), ephemeral=True)
 
         conn = sqlite3.connect(f"./Database/{ctx.guild.id}.db")
         c = conn.cursor()

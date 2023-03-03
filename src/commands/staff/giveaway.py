@@ -5,6 +5,7 @@ import interactions
 from random import choice
 from time import time
 from const import DATA
+from message_config import ErrorMessage
 
 
 class Giveaway(interactions.Extension):
@@ -24,8 +25,9 @@ class Giveaway(interactions.Extension):
     async def giveaway(self, ctx: interactions.CommandContext, gift: str, seconds: int):
         """Crée un giveaway."""
         guild = await ctx.get_guild()
+
         if os.path.exists(f'./Database/{guild.id}.db') is False:
-            return await ctx.send("Ce serveur n'est pas configuré !", ephemeral=True)
+            return await ctx.send(ErrorMessage.database_not_found(guild.id), ephemeral=True)
 
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
@@ -86,7 +88,7 @@ class Giveaway(interactions.Extension):
             self.dic.clear()
             self.check = False
         else:
-            await ctx.send("Vous n'avez pas la permission de faire cela !", ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
             return interactions.StopCommand()
 
         conn.close()

@@ -3,6 +3,7 @@ import os
 import sqlite3
 import interactions
 from datetime import datetime
+from message_config import ErrorMessage
 
 
 class Nuke(interactions.Extension):
@@ -27,7 +28,7 @@ class Nuke(interactions.Extension):
         guild = await ctx.get_guild()
 
         if os.path.exists(f"./Database/{guild.id}.db") is False:
-            return await ctx.send("Ce serveur n'est pas encore configuré.", ephemeral=True)
+            return await ctx.send(ErrorMessage.database_not_found(guild.id), ephemeral=True)
 
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
@@ -37,8 +38,8 @@ class Nuke(interactions.Extension):
             await ctx.send("Voulez-vous vraiment détruire ce salon ? **Cette action est irréversible.**",
                            components=[self.confirm_button, self.refused_button], ephemeral=True)
         else:
-            await ctx.send(":x: Vous n'avez pas la permission d'utiliser cette commande.", ephemeral=True)
-            interactions.StopCommand()
+            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
+            return interactions.StopCommand()
 
         conn.close()
         try:
@@ -81,7 +82,13 @@ class Nuke(interactions.Extension):
         await new.send(embeds=embed3)
 
         # Partie Logs
+        guild = await ctx.get_guild()
+        conn = sqlite3.connect(f'./Database/{guild.id}.db')
+        c = conn.cursor()
+
         logs_nuke = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'blacklist'").fetchone()[0])
+
+        conn.close()
 
         em2 = interactions.Embed(title="**💣 Nouveau nuke**", description=f"Un channel a été nuke.",
                                  color=0xFF0000,

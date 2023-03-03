@@ -1,13 +1,13 @@
-import interactions
+from interactions import Extension, Client, extension_command, CommandContext
 
 
-class Ping(interactions.Extension):
+class Ping(Extension):
 
     def __init__(self, bot):
-        self.bot: interactions.Client = bot
+        self.bot: Client = bot
 
-    @interactions.extension_command()
-    async def ping(self, ctx: interactions.CommandContext):
+    @extension_command()
+    async def ping(self, ctx: CommandContext):
         """Pong!"""
         await ctx.send(f"Pong!\nLa latence du bot est de **{abs(round(self.bot.latency))}ms**.", ephemeral=True)
 
