@@ -52,7 +52,7 @@ class Blacklist(interactions.Extension):
             await user.send(embeds=em_dm)
 
         else:
-            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
             return interactions.StopCommand()
 
 

@@ -37,7 +37,7 @@ class Giveaway(interactions.Extension):
                 c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0] in ctx.author.roles:
             # Check si un giveaway est déjà en cours
             if self.check:
-                return await ctx.send("Un giveaway est déjà en cours !", ephemeral=True)
+                return await ctx.send(ErrorMessage.giveaway_already_started(guild.id), ephemeral=True)
 
             timestamp = time() + seconds
             channel = await interactions.get(self.bot, interactions.Channel, object_id=DATA["main"]["giveaway"])
@@ -88,7 +88,7 @@ class Giveaway(interactions.Extension):
             self.dic.clear()
             self.check = False
         else:
-            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
             return interactions.StopCommand()
 
         conn.close()

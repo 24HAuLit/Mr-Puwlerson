@@ -46,9 +46,9 @@ class CmdCloseReason(interactions.Extension):
                 await ctx.popup(modal)
             else:
                 conn.close()
-                return await ctx.send(ErrorMessage.ChannelError(), ephemeral=True)
+                return await ctx.send(ErrorMessage.ChannelError(guild.id), ephemeral=True)
         else:
-            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
             conn.close()
             return interactions.StopCommand()
 

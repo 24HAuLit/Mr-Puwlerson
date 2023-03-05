@@ -27,7 +27,7 @@ class ClaimTicket(interactions.Extension):
             )
             await ctx.send(embeds=em)
         else:
-            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
 
         conn.commit()
         conn.close()

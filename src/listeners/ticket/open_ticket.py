@@ -29,7 +29,7 @@ class OpenTicket(interactions.Extension):
             pass
         else:
             if count is not None and count[0] == 0:
-                return await ctx.send("Vous avez atteint la limite de ticket", ephemeral=True)
+                return await ctx.send(ErrorMessage.ticket_limit(guild.id), ephemeral=True)
 
             c.execute(
                 """INSERT OR REPLACE INTO ticket_count (user_id, count) VALUES (?, COALESCE((SELECT count FROM 

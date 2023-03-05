@@ -25,18 +25,18 @@ class Mod(interactions.Extension):
         elif c.execute(f"SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles:
             pass
         else:
-            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
             return interactions.StopCommand()
 
         conn.close()
 
     @mod.subcommand()
     @interactions.option(
-        description="Nombre de message à supprimer. Par défaut : 5",
+        description="Message to delete. Default : 5",
         required=False
     )
     async def clear(self, ctx: CommandContext, number: int = 5):
-        """Supprime X message(x) du chat."""
+        """Delete X message(s) from chat."""
         guild = await ctx.get_guild()
 
         if os.path.exists(f"./Database/{guild.id}.db") is False:
@@ -75,14 +75,11 @@ class Mod(interactions.Extension):
         await logs_clear.send(embeds=em2)
 
     @mod.subcommand()
-    @interactions.option("Utilisateur à exclure.")
-    @interactions.option("Temps de l'exclusion (en secondes).")
-    @interactions.option(
-        description="Raison de l'exclusion.",
-        required=False
-    )
+    @interactions.option("User to timeout.")
+    @interactions.option("Duration (in seconds).")
+    @interactions.option(description="Reason.", required=False)
     async def timeout(self, ctx: interactions.CommandContext, user: interactions.User, duration: int, reason: str = "Aucune raison"):
-        """Pour exclure temporairement un membre. Si vous pensez qu'il mérite une pause."""
+        """To timeout a user for X seconds. If you think he/ she needs to rest."""
         tempo = datetime.utcnow() + timedelta(seconds=duration)
         guild = await ctx.get_guild()
 
@@ -90,7 +87,6 @@ class Mod(interactions.Extension):
         await ctx.send(f"{user.mention} a été exclu pendant **{duration} secondes** pour **{reason}**.", ephemeral=True)
 
         # Partie Logs
-
         if os.path.exists(f"./Database/{guild.id}.db") is False:
             return
 
@@ -117,9 +113,9 @@ class Mod(interactions.Extension):
 
     @mod.subcommand()
     @interactions.option("User to untimeout.")
-    @interactions.option("Raison pour retirer l'exclusion.", required=False)
+    @interactions.option("Reason", required=False)
     async def untimeout(self, ctx: interactions.CommandContext, user: interactions.User, reason: str = "Aucune raison"):
-        """Pour annuler l'exclusion temporaire d'un membre."""
+        """To cancel user's timeout."""
         guild = await ctx.get_guild()
 
         await user.modify(communication_disabled_until=None, guild_id=guild.id, reason=reason)

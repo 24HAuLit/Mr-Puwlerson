@@ -53,11 +53,11 @@ class AddMember(interactions.Extension):
                     em = interactions.Embed(description=f"{role.mention} a été ajouter au ticket.", color=0x2ECC70)
                     await ctx.send(embeds=em)
                 else:
-                    await ctx.send(ErrorMessage.MissingRequiredArgument("User/ Role"), ephemeral=True)
+                    await ctx.send(ErrorMessage.MissingRequiredArgument(guild.id, "User/ Role"), ephemeral=True)
             else:
-                await ctx.send(ErrorMessage.ChannelError(), ephemeral=True)
+                await ctx.send(ErrorMessage.ChannelError(guild.id), ephemeral=True)
         else:
-            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
             interactions.StopCommand()
 
         conn.close()

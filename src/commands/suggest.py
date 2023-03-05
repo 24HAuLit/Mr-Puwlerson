@@ -16,8 +16,7 @@ class Suggestion(interactions.Extension):
     counter = 0
 
     async def cooldown_err(self, ctx, amount):
-        return await ctx.send(f"Tu dois encore attendre **{amount}** minutes avant de pouvoir réutiliser cette commande.",
-                              ephemeral=True)
+        return await ctx.send(ErrorMessage.cooldown(ctx.guild_id, amount), ephemeral=True)
 
     @interactions.extension_command(dm_permission=False)
     @cooldown(minutes=10, error=cooldown_err, type="user")
@@ -34,13 +33,13 @@ class Suggestion(interactions.Extension):
 
         c.execute(f"SELECT status FROM plugins WHERE name = 'suggestion'")
         if c.fetchone()[0] == 'false':
-            return await ctx.send(ErrorMessage.PluginError('suggestion'), ephemeral=True)
+            return await ctx.send(ErrorMessage.PluginError(guild.id, 'suggestion'), ephemeral=True)
 
         c.execute(f'SELECT * from blacklist WHERE user_id = {int(ctx.author.id)}')
         row = c.fetchone()
 
         if row is not None:
-            await ctx.send(ErrorMessage.BlacklistError(), ephemeral=True)
+            await ctx.send(ErrorMessage.BlacklistError(guild.id), ephemeral=True)
         else:
             channel = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM channels WHERE type = 'suggest'").fetchone()[0])
             self.counter += 1

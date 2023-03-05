@@ -46,9 +46,9 @@ class ClaimCommand(interactions.Extension):
                 else:
                     await ctx.send(f"<@{row[2]}> a déjà pris en charge ce ticket.", ephemeral=True)
             else:
-                await ctx.send(ErrorMessage.ChannelError(), ephemeral=True)
+                await ctx.send(ErrorMessage.ChannelError(guild.id), ephemeral=True)
         else:
-            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
             interactions.StopCommand()
 
         conn.close()

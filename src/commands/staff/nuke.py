@@ -38,7 +38,7 @@ class Nuke(interactions.Extension):
             await ctx.send("Voulez-vous vraiment détruire ce salon ? **Cette action est irréversible.**",
                            components=[self.confirm_button, self.refused_button], ephemeral=True)
         else:
-            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
             return interactions.StopCommand()
 
         conn.close()

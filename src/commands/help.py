@@ -20,7 +20,8 @@ class Help(interactions.Extension):
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
-        if ctx.author.id == ctx.guild.owner_id or c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles:
+        if ctx.author.id == ctx.guild.owner_id or c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0]\
+                in ctx.author.roles:
             conn.close()
 
             em = interactions.Embed(
@@ -140,6 +141,7 @@ class Help(interactions.Extension):
             )
 
             return await ctx.send(embeds=em3, ephemeral=True)
+
 
 def setup(bot):
     Help(bot)

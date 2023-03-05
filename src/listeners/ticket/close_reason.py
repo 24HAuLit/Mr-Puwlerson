@@ -36,7 +36,7 @@ class CloseReasonTicket(interactions.Extension):
             await ctx.popup(modal)
         else:
             conn.close()
-            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
 
     @interactions.extension_modal("close_reason")
     async def on_modal_finish(self, ctx, reason: str):

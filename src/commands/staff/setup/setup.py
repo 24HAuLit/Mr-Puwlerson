@@ -25,7 +25,7 @@ class Setup(interactions.Extension):
         if ctx.author.id == ctx.guild.owner_id:
             pass
         else:
-            await ctx.send(ErrorMessage.OwnerOnly(), ephemeral=True)
+            await ctx.send(ErrorMessage.OwnerOnly(ctx.guild_id), ephemeral=True)
             return interactions.StopCommand()
 
     @setup.subcommand()
@@ -66,6 +66,17 @@ class Setup(interactions.Extension):
                 for plugin in plugins_list:
                     c.execute("""INSERT INTO plugins VALUES (?, ?)""", (plugin, 'false'))
                 await ctx.send("**Plugins** table created.", ephemeral=True)
+
+            c.execute("""SELECT count(name) FROM sqlite_master WHERE type='table' AND name='locale'""")
+            if c.fetchone()[0] == 1:
+                await ctx.send("**Locale** table already created.", ephemeral=True)
+            else:
+                c.execute("""CREATE TABLE locale
+                    (
+                        locale      text not null default 'en'
+                    )""")
+                c.execute("""INSERT INTO locale VALUES (?)""", ('en',))
+                await ctx.send("**Locale** table created.", ephemeral=True)
 
             await ctx.send("Configuration du serveur principal terminée. Vous pouvez désormais configurer les "
                            "channels et les roles", ephemeral=True)

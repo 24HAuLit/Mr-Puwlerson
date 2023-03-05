@@ -25,7 +25,7 @@ class Report(interactions.Extension):
 
         if channel.type == interactions.ChannelType.DM:
             if row is not None:
-                await channel.send(ErrorMessage.BlacklistError())
+                await channel.send(ErrorMessage.BlacklistError(None))
             else:
                 confirm_message = await channel.send(
                     "Êtes-vous sur de vouloir faire ce report ? **Tout abus se verra sanctionné d'un blacklist "

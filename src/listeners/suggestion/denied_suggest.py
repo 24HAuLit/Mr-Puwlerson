@@ -20,7 +20,7 @@ class SuggestionDenied(interactions.Extension):
                 or c.execute("SELECT id FROM roles WHERE type = 'Owner'".format(ctx.author.id)).fetchone()[0] in ctx.author.roles:
             await ctx.popup(modal_deny())
         else:
-            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
 
         conn.close()
 

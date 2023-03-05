@@ -49,11 +49,11 @@ class RemoveMember(interactions.Extension):
                     em = interactions.Embed(description=f"{role.mention} a été retiré du ticket.", color=0xFF5A5A)
                     await ctx.send(embeds=em)
                 else:
-                    await ctx.send(ErrorMessage.MissingRequiredArgument("User/ Role"), ephemeral=True)
+                    await ctx.send(ErrorMessage.MissingRequiredArgument(guild.id, "User/ Role"), ephemeral=True)
             else:
-                await ctx.send(ErrorMessage.ChannelError(), ephemeral=True)
+                await ctx.send(ErrorMessage.ChannelError(guild.id), ephemeral=True)
         else:
-            await ctx.send(ErrorMessage.MissingPermissions(), ephemeral=True)
+            await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
             interactions.StopCommand()
 
         conn.close()
