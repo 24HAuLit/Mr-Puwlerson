@@ -46,7 +46,7 @@ class Help(interactions.Extension):
             )
             em.add_field(
                 name="**Owner**",
-                value="```• setup server\n• setup roles\n• setup channels\n• setup tickets\n• setup max_ticket```",
+                value="```• setup server\n• setup roles\n• setup channels\n• setup tickets\n• setup max_ticket\n• locale\n• update```",
                 inline=True
             )
             em.add_field(
