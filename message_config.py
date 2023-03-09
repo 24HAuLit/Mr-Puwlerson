@@ -17,7 +17,7 @@ class ErrorMessage:
         """Send a message when the user doesn't have the permission to use the command/ component.
         :param guild_id:"""
         if exists(f"./Database/{guild_id}.db") is False:
-            return
+            return ErrorMessage.database_not_found(guild_id)
         else:
             conn = connect(f'./Database/{guild_id}.db')
             c = conn.cursor()
@@ -96,7 +96,7 @@ class ErrorMessage:
         :param guild_id:
         :param plugin_name: The plugin name."""
         if exists(f"./Database/{guild_id}.db") is False:
-            return
+            return ErrorMessage.database_not_found(guild_id)
         else:
             conn = connect(f'./Database/{guild_id}.db')
             c = conn.cursor()
@@ -115,7 +115,7 @@ class ErrorMessage:
         """Send a message when the user is in the blacklist.
         :param guild_id:"""
         if exists(f"./Database/{guild_id}.db") is False:
-            return
+            return ErrorMessage.database_not_found(guild_id)
         else:
             conn = connect(f'./Database/{guild_id}.db')
             c = conn.cursor()
@@ -134,7 +134,7 @@ class ErrorMessage:
         """Send a message when the user has reached the limit of tickets.
         :param guild_id:"""
         if exists(f"./Database/{guild_id}.db") is False:
-            return
+            return ErrorMessage.database_not_found(guild_id)
         else:
             conn = connect(f'./Database/{guild_id}.db')
             c = conn.cursor()
@@ -153,7 +153,7 @@ class ErrorMessage:
         """Send a message when the giveaway is already started.
         :param guild_id:"""
         if exists(f"./Database/{guild_id}.db") is False:
-            return
+            return ErrorMessage.database_not_found(guild_id)
         else:
             conn = connect(f'./Database/{guild_id}.db')
             c = conn.cursor()
@@ -173,7 +173,7 @@ class ErrorMessage:
         :param guild_id:
         :param time: The cooldown time."""
         if exists(f"./Database/{guild_id}.db") is False:
-            return
+            return ErrorMessage.database_not_found(guild_id)
         else:
             conn = connect(f'./Database/{guild_id}.db')
             c = conn.cursor()
