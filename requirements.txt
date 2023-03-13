@@ -1,0 +1,5 @@
+python-dotenv~=1.0.0
+
+discord-py-interactions~=4.4.0 # pip install -U discord-py-interactions
+interactions-transcript~=0.0.4 # pip install interactions-transcript
+enhanced~=4.0.1 # pip install -U enhanced
