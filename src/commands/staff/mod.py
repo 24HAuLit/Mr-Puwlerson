@@ -6,6 +6,10 @@ from datetime import datetime, timedelta
 from message_config import ErrorMessage
 
 
+def check_pinned(message):
+    return not message.pinned
+
+
 class Mod(interactions.Extension):
     def __init__(self, bot):
         self.bot: interactions.Client = bot
@@ -46,7 +50,7 @@ class Mod(interactions.Extension):
         c = conn.cursor()
 
         channel = ctx.channel
-        await channel.purge(amount=number)
+        await channel.purge(amount=number, check=check_pinned)
 
         em = Embed(
             description=f"🧹・**{number}** messages supprimés.",
