@@ -73,7 +73,13 @@ PLUGINS = [
 ]
 
 
-plugins_list = ['auto_role', 'suggestion', 'report', 'verif']
+plugins_list = ['auto_role', 'suggestion', 'report', 'verif', 'giveaway']
+commands_list = [
+            "ping", "pileface", "suggest", "mod clear", "mod timeout", "mod untimemout", "nuke",
+            "blacklist", "unblacklist", "giveaway", "setup server", "setup roles", "setup channels",
+            "setup tickets", "setup max_ticket", "locale", "update", "add", "remove", "rename", "close",
+            "close_reason"
+        ]
 
 TOKEN = os.getenv("TOKEN_OFFICIAL")
 

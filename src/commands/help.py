@@ -2,7 +2,8 @@ import os
 import sqlite3
 import interactions
 from datetime import datetime
-from message_config import ErrorMessage
+from message_config import ErrorMessage, HelpMessage
+from const import commands_list
 
 
 class Help(interactions.Extension):
@@ -10,7 +11,17 @@ class Help(interactions.Extension):
         self.bot: interactions.Client = bot
 
     @interactions.extension_command(dm_permission=False)
-    async def help(self, ctx: interactions.CommandContext):
+    @interactions.option(
+        name="command",
+        description="La commande que vous voulez avoir plus d'informations.",
+        type=interactions.OptionType.STRING,
+        choices=[
+            interactions.Choice(name=command, value=command)
+            for command in commands_list
+        ],
+        required=False
+    )
+    async def help(self, ctx: interactions.CommandContext, command: str = None):
         """Pour avoir toutes les commandes à porter de main."""
         guild = await ctx.get_guild()
 
@@ -20,7 +31,51 @@ class Help(interactions.Extension):
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
-        if ctx.author.id == ctx.guild.owner_id or c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0]\
+        if command == "ping":
+            return await ctx.send(embeds=HelpMessage.ping(ctx, guild.id), ephemeral=True)
+
+        elif command == "pileface":
+            return await ctx.send(embeds=HelpMessage.pileface(ctx, guild.id), ephemeral=True)
+
+        elif command == "suggest":
+            return await ctx.send(embeds=HelpMessage.suggestions(ctx, guild.id), ephemeral=True)
+
+        elif command == "mod clear":
+            staff_id = c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0]
+            staff_name = await interactions.get(self.bot, interactions.Role, object_id=staff_id)
+            return await ctx.send(embeds=HelpMessage.clear(ctx, staff_name.name, guild.id), ephemeral=True)
+
+        elif command == "mod timeout":
+            staff_id = c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0]
+            staff_name = await interactions.get(self.bot, interactions.Role, object_id=staff_id)
+            return await ctx.send(embeds=HelpMessage.timeout(ctx, staff_name.name, guild.id), ephemeral=True)
+
+        elif command == "mod untimemout":
+            staff_id = c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0]
+            staff_name = await interactions.get(self.bot, interactions.Role, object_id=staff_id)
+            return await ctx.send(embeds=HelpMessage.untimeout(ctx, staff_name.name, guild.id), ephemeral=True)
+
+        elif command == "nuke":
+            staff_id = c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0]
+            staff_name = await interactions.get(self.bot, interactions.Role, object_id=staff_id)
+            return await ctx.send(embeds=HelpMessage.nuke(ctx, staff_name.name, guild.id), ephemeral=True)
+
+        elif command == "blacklist":
+            staff_id = c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0]
+            staff_name = await interactions.get(self.bot, interactions.Role, object_id=staff_id)
+            return await ctx.send(embeds=HelpMessage.blacklist(ctx, staff_name.name, guild.id), ephemeral=True)
+
+        elif command == "unblacklist":
+            staff_id = c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0]
+            staff_name = await interactions.get(self.bot, interactions.Role, object_id=staff_id)
+            return await ctx.send(embeds=HelpMessage.unblacklist(ctx, staff_name.name, guild.id), ephemeral=True)
+
+        elif command == "giveaway":
+            staff_id = c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0]
+            staff_name = await interactions.get(self.bot, interactions.Role, object_id=staff_id)
+            return await ctx.send(embeds=HelpMessage.giveaway(ctx, staff_name.name, guild.id), ephemeral=True)
+
+        if ctx.author.id == ctx.guild.owner_id or c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] \
                 in ctx.author.roles:
             conn.close()
 
