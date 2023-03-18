@@ -10,6 +10,7 @@ class SelfRole(interactions.Extension):
         self.bot: interactions.Client = bot
         self.reaction = None
         self.role = None
+        self.message_id = None
 
     @interactions.extension_command()
     @interactions.option("Message's ID", required=True)
@@ -53,6 +54,7 @@ class SelfRole(interactions.Extension):
 
         self.reaction = emoji_snowflake
         self.role = role
+        self.message_id = message_id
 
         await message.create_reaction(self.reaction)
         await ctx.send(f"L'émoji {self.reaction.format} a bien été ajouté au message `{message.id}` !", ephemeral=True)
@@ -65,20 +67,23 @@ class SelfRole(interactions.Extension):
         if self.reaction is None:
             return
 
-        if reaction.emoji.id == self.reaction.id:
+        if reaction.message_id == self.message_id:
+            if reaction.emoji.id == self.reaction.id:
 
-            message = await interactions.get(self.bot, interactions.Message, object_id=reaction.message_id)
-            user = await interactions.get(self.bot, interactions.User, object_id=reaction.user_id)
-            guild = await interactions.get(self.bot, interactions.Guild, object_id=reaction.guild_id)
+                message = await interactions.get(self.bot, interactions.Message, object_id=reaction.message_id)
+                user = await interactions.get(self.bot, interactions.User, object_id=reaction.user_id)
+                guild = await interactions.get(self.bot, interactions.Guild, object_id=reaction.guild_id)
 
-            await message.remove_reaction_from(self.reaction, reaction.member)
+                await message.remove_reaction_from(self.reaction, reaction.member)
 
-            if self.role.id in reaction.member.roles:
-                await reaction.member.remove_role(self.role)
-                return await user.send(f"Le role **{self.role.name}** a bien été retiré sur le serveur **{guild.name}** !")
-            else:
-                await reaction.member.add_role(self.role)
-                return await user.send(f"Le role **{self.role.name}** a bien été ajouté sur le serveur **{guild.name}** !")
+                if self.role.id in reaction.member.roles:
+                    await reaction.member.remove_role(self.role)
+                    return await user.send(f"Le role **{self.role.name}** a bien été retiré sur le serveur **{guild.name}** !")
+                else:
+                    await reaction.member.add_role(self.role)
+                    return await user.send(f"Le role **{self.role.name}** a bien été ajouté sur le serveur **{guild.name}** !")
+        else:
+            return
 
 
 def setup(bot):
