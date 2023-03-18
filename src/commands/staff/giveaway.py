@@ -22,7 +22,8 @@ class Giveaway(interactions.Extension):
     @interactions.extension_command(dm_permission=False)
     @interactions.option(description="Quel sera le cadeau ?")
     @interactions.option(description="Combien de temps durera le giveaway ? (en secondes)")
-    async def giveaway(self, ctx: interactions.CommandContext, gift: str, seconds: int):
+    @interactions.option(description="Nombre de gagnants ?", required=False)
+    async def giveaway(self, ctx: interactions.CommandContext, prize: str, seconds: int, winners: int = 1):
         """Crée un giveaway."""
         guild = await ctx.get_guild()
 
@@ -31,6 +32,9 @@ class Giveaway(interactions.Extension):
 
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
+
+        if c.execute("SELECT status FROM plugins WHERE name = 'giveaway'").fetchone()[0] == "false":
+            return await ctx.send(ErrorMessage.PluginError(guild.id, "giveaway"), ephemeral=True)
 
         # Permission check
         if c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles or \
@@ -49,28 +53,41 @@ class Giveaway(interactions.Extension):
                 description=f"Un giveaway a été lancé par {ctx.author.mention} !\n*Cliquez sur le bouton ci-dessous pour participer.*",
                 color=0x00FFC8
             )
-            em.add_field(name="Gain", value=gift)
+            em.add_field(name="Gain", value=prize)
+            em.add_field(name="Nombre de gagnants", value=winners)
             em.add_field(name="Date de fin", value=f"<t:{int(timestamp)}:R>")
             await ctx.send("Le giveaway a bien été lancé !", ephemeral=True)
             message = await channel.send(embeds=em, components=[self.button])
 
             # Giveaway ending
             await asyncio.sleep(seconds)
-            winner = choice(list(self.dic.keys()))
-            user = await interactions.get(self.bot, interactions.User, object_id=winner)
+
+            winner = []
+            for _ in range(winners):
+                winner_choice = choice(list(self.dic.keys()))
+                if winner_choice not in winner:
+                    winner.append(winner_choice)
+
+            user = [await interactions.get(self.bot, interactions.User, object_id=winner[i]) for i in range(len(winner))]
 
             em_end = interactions.Embed(
                 title="Nouveau Giveaway ! 🎊",
                 description=f"Le giveaway lancé par {ctx.author.mention} est terminé ! ",
                 color=0x75FD75
             )
-            em_end.add_field(name="Gain", value=gift, inline=True)
-            em_end.add_field(name="Gagnant", value=user.mention, inline=True)
+            em_end.add_field(name="Gain", value=prize, inline=True)
+            if winners == 1:
+                em_end.add_field(name="Gagnant", value=user[0].mention, inline=True)
+            else:
+                em_end.add_field(name="Gagnant", value=", ".join([user[i].mention for i in range(len(user))]), inline=True)
             em_end.add_field(name="Nombre de participants", value=len(self.dic), inline=True)
 
             await message.edit(embeds=em_end, components=[])
 
-            await channel.send(f"Le giveaway est terminé ! Le gagnant est {user.mention} !")
+            if winners == 1:
+                await channel.send(f"Le giveaway est terminé ! Le gagnant est {user[0].mention} !")
+            else:
+                await channel.send(f"Le giveaway est terminé ! Les gagnants sont {', '.join([user[i].mention for i in range(len(user))])} !")
 
             logs_id = c.execute("SELECT id FROM logs_channels WHERE name = 'giveaway'").fetchone()[0]
             channel = await interactions.get(self.bot, interactions.Channel, object_id=logs_id)
@@ -80,8 +97,11 @@ class Giveaway(interactions.Extension):
                 description=f"Le giveaway lancé par {ctx.author.mention} est terminé !",
                 color=0x75FD75
             )
-            em.add_field(name="Gain", value=gift, inline=True)
-            em.add_field(name="Gagnant", value=user.mention, inline=True)
+            em.add_field(name="Gain", value=prize, inline=True)
+            if winners == 1:
+                em.add_field(name="Gagnant", value=user[0].mention, inline=True)
+            else:
+                em.add_field(name="Gagnant", value=", ".join([user[i].mention for i in range(len(user))]), inline=True)
             em.add_field(name="Nombre de participants", value=len(self.dic), inline=True)
             await channel.send(embeds=em)
 

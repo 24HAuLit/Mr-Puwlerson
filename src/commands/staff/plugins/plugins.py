@@ -19,6 +19,7 @@ class Plugins(interactions.Extension):
             interactions.Choice(name="Suggestion", value="suggestion"),
             interactions.Choice(name="Report", value="report"),
             interactions.Choice(name="Verification", value="verif"),
+            interactions.Choice(name="Giveaway", value="giveaway"),
         ]
     )
     @interactions.option(
@@ -34,7 +35,7 @@ class Plugins(interactions.Extension):
     async def plugins(self, ctx: interactions.CommandContext, plugin: str, status: str):
         """Permet d'activer/désactiver les plugins."""
         if ctx.author.id != ctx.guild.owner_id:
-            return await ctx.send(ErrorMessage.OwnerOnly(), ephemeral=True)
+            return await ctx.send(ErrorMessage.OwnerOnly(ctx.guild.id), ephemeral=True)
 
         if os.path.exists(f"./Database/{ctx.guild.id}.db") is False:
             return await ctx.send(ErrorMessage.database_not_found(ctx.guild.id), ephemeral=True)
