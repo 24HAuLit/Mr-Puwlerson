@@ -57,11 +57,13 @@ class Mod(interactions.Extension):
             color=0xFF5A5A,
             timestamp=datetime.utcnow()
         )
-        em.set_footer(icon_url=ctx.member.user.avatar_url, text=f"Commande demandé par {ctx.author.name}#{ctx.author.discriminator}.")
+        em.set_footer(icon_url=ctx.member.user.avatar_url,
+                      text=f"Commande demandé par {ctx.author.name}#{ctx.author.discriminator}.")
 
         await ctx.send(embeds=em, ephemeral=True)
 
-        logs_clear = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'clear'").fetchone()[0])
+        logs_clear = await interactions.get(self.bot, interactions.Channel, object_id=
+        c.execute("SELECT id FROM logs_channels WHERE name = 'clear'").fetchone()[0])
 
         conn.close()
 
@@ -82,13 +84,56 @@ class Mod(interactions.Extension):
     @interactions.option("User to timeout.")
     @interactions.option("Duration (in seconds).")
     @interactions.option(description="Reason.", required=False)
-    async def timeout(self, ctx: interactions.CommandContext, user: interactions.User, duration: int, reason: str = "Aucune raison"):
+    async def timeout(self, ctx: interactions.CommandContext, user: interactions.User, duration: int,
+                      reason: str = "Aucune raison"):
         """To timeout a user for X seconds. If you think he/ she needs to rest."""
         tempo = datetime.utcnow() + timedelta(seconds=duration)
+
+        if duration < 60:
+            duration = f"{duration} secondes"
+        elif duration < 3600:
+            if duration % 60 == 0:
+                duration = f"{duration // 60} minutes"
+            else:
+                duration = f"{duration // 60} minutes et {duration % 60} secondes"
+        elif duration < 86400:
+            if duration % 3600 == 0:
+                duration = f"{duration // 3600} heures"
+            else:
+                if duration % 60 == 0:
+                    duration = f"{duration // 3600} heures et {duration % 3600 // 60} minutes"
+                else:
+                    duration = f"{duration // 3600} heures, {duration % 3600 // 60} minutes et {duration % 60} secondes"
+        elif duration < 604800:
+            if duration % 86400 == 0:
+                duration = f"{duration // 86400} jours"
+            else:
+                if duration % 3600 == 0:
+                    duration = f"{duration // 86400} jours et {duration % 86400 // 3600} heures"
+                else:
+                    if duration % 60 == 0:
+                        duration = f"{duration // 86400} jours, {duration % 86400 // 3600} heures et {duration % 3600 // 60} minutes"
+                    else:
+                        duration = f"{duration // 86400} jours, {duration % 86400 // 3600} heures, {duration % 3600 // 60} minutes et {duration % 60} secondes"
+        elif duration < 2592000:
+            if duration % 604800 == 0:
+                duration = f"{duration // 604800} semaines"
+            else:
+                if duration % 86400 == 0:
+                    duration = f"{duration // 604800} semaines et {duration % 604800 // 86400} jours"
+                else:
+                    if duration % 3600 == 0:
+                        duration = f"{duration // 604800} semaines, {duration % 604800 // 86400} jours et {duration % 86400 // 3600} heures"
+                    else:
+                        if duration % 60 == 0:
+                            duration = f"{duration // 604800} semaines, {duration % 604800 // 86400} jours, {duration % 86400 // 3600} heures et {duration % 3600 // 60} minutes"
+                        else:
+                            duration = f"{duration // 604800} semaines, {duration % 604800 // 86400} jours, {duration % 86400 // 3600} heures, {duration % 3600 // 60} minutes et {duration % 60} secondes"
+
         guild = await ctx.get_guild()
 
         await user.modify(communication_disabled_until=tempo.isoformat(), guild_id=guild.id, reason=reason)
-        await ctx.send(f"{user.mention} a été exclu pendant **{duration} secondes** pour **{reason}**.", ephemeral=True)
+        await ctx.send(f"{user.mention} a été exclu pendant **{duration}** pour **{reason}**.", ephemeral=True)
 
         # Partie Logs
         if os.path.exists(f"./Database/{guild.id}.db") is False:
@@ -97,7 +142,8 @@ class Mod(interactions.Extension):
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
-        logs_timeout = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'timeout'").fetchone()[0])
+        logs_timeout = await interactions.get(self.bot, interactions.Channel, object_id=
+        c.execute("SELECT id FROM logs_channels WHERE name = 'timeout'").fetchone()[0])
 
         conn.close()
 
@@ -109,7 +155,7 @@ class Mod(interactions.Extension):
         )
         em.add_field(name="__Staff :__", value=f"{ctx.author.username}#{ctx.author.discriminator}", inline=True)
         em.add_field(name="__Membre :__", value=f"{user.username}#{user.discriminator}", inline=True)
-        em.add_field(name="__Durée de l'exclusion :__", value=f"{duration} secondes", inline=True)
+        em.add_field(name="__Durée de l'exclusion :__", value=f"{duration}", inline=True)
         em.add_field(name="__Raison :__", value=reason)
         em.set_footer(text=f"Staff ID : {ctx.author.id} | Member ID : {user.id}")
 
@@ -131,7 +177,8 @@ class Mod(interactions.Extension):
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
-        logs_untimeout = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'timeout'").fetchone()[0])
+        logs_untimeout = await interactions.get(self.bot, interactions.Channel, object_id=
+        c.execute("SELECT id FROM logs_channels WHERE name = 'timeout'").fetchone()[0])
 
         conn.close()
 
