@@ -62,6 +62,9 @@ class SelfRole(interactions.Extension):
         if reaction.user_id == self.bot.me.id:
             return
 
+        if self.reaction is None:
+            return
+
         if reaction.emoji.id == self.reaction.id:
 
             message = await interactions.get(self.bot, interactions.Message, object_id=reaction.message_id)
