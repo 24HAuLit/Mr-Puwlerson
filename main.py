@@ -15,8 +15,8 @@ class Main:
     def setup(self):
         # Partie commandes
         [self.bot.load(f"src.commands.{ext}") for ext in COMMANDS]
-        [self.bot.load(f"src.commands.staff.{ext}") for ext in COMMANDS_STAFF]
         [self.bot.load(f"src.commands.ticket.{ext}") for ext in COMMANDS_TICKET]
+        [self.bot.load(f"src.commands.staff.{ext}") for ext in COMMANDS_STAFF]
         [self.bot.load(f"src.commands.staff.setup.{ext}") for ext in COMMANDS_SETUP]
         [self.bot.load(f"src.commands.staff.setup.roles.{ext}") for ext in SETUP_ROLES]
         [self.bot.load(f"src.commands.staff.setup.channels.{ext}") for ext in SETUP_CHANNELS]
