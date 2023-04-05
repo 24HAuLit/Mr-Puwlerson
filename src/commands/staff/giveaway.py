@@ -39,12 +39,16 @@ class Giveaway(interactions.Extension):
         # Permission check
         if c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles or \
                 c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0] in ctx.author.roles:
+
             # Check si un giveaway est déjà en cours
             if self.check:
                 return await ctx.send(ErrorMessage.giveaway_already_started(guild.id), ephemeral=True)
 
             timestamp = time() + seconds
-            channel = await interactions.get(self.bot, interactions.Channel, object_id=DATA["main"]["giveaway"])
+            channel = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM "
+                                                                                                 "channels WHERE type"
+                                                                                                 " = "
+                                                                                                 "'Giveaway'").fetchone()[0])
 
             # Giveaway starting
             self.check = True
