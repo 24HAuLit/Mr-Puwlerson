@@ -246,19 +246,7 @@ class Setup(interactions.Extension):
                 c.execute(
                     """INSERT INTO channels VALUES ('{}', '{}', '{}', '{}')""".format(guild.name, guild.id, "guild", 0))
 
-        banned_channels = interactions.SelectMenu(
-            custom_id="banned_channels",
-            placeholder="Sélectionnez les channels qui seront cachés dans les logs.",
-            max_values=len(channels),
-            min_values=1,
-            options=[
-                interactions.SelectOption(label=channels[x].name, value=str(channels[x].id), default=False)
-                for x in range(len(channels))
-            ]
-        )
-
-        await ctx.send("Sélectionnez les channels qui seront cachés dans les logs.", components=banned_channels,
-                       ephemeral=True)
+        await ctx.send("`Channels` database updated.", ephemeral=True)
 
         conn.commit()
         conn.close()
