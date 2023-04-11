@@ -25,7 +25,6 @@ class Message(interactions.Extension):
         logs_create = await interactions.get(self.bot, interactions.Channel, object_id=
         c.execute("SELECT id FROM logs_channels WHERE name = 'new'").fetchone()[0])
         is_hidden = c.execute(f"SELECT hidden FROM channels WHERE id = {channel.id}").fetchone()[0]
-        print(is_hidden)
 
         conn.close()
 
