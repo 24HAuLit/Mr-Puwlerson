@@ -29,6 +29,8 @@ class OnUserJoin(interactions.Extension):
             await member.add_role(role)
 
         elif c.execute("SELECT status FROM plugins WHERE name = 'verif'").fetchone()[0] == 'true':
+            if member.bot is True:
+                return conn.close()
 
             self.guild = await interactions.get(self.bot, interactions.Guild, object_id=member.guild_id)
 

@@ -45,7 +45,7 @@ class Message(interactions.Extension):
                     em.add_field(name="**Message : **", value=content)
                 if message.attachments is not None:
                     i: int = 0
-                    for j in message.attachments:
+                    for _ in message.attachments:
                         em.add_field(name=f"**Attachment {i + 1} (type : {message.attachments[i].content_type}): **",
                                      value=message.attachments[i].url)
                         i += 1
