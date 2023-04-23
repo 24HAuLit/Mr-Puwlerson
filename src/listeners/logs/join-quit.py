@@ -18,7 +18,7 @@ class JoinQuit(interactions.Extension):
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 
-        join = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'join'").fetchone()[0])
+        logs = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'join-quit'").fetchone()[0])
 
         em = interactions.Embed(
             title="🛬・Un utilisateur a rejoint un serveur",
@@ -27,7 +27,7 @@ class JoinQuit(interactions.Extension):
             timestamp=datetime.utcnow()
         )
         em.set_footer(text=f"Server ID : {guild.id} | User ID : {user.id}")
-        await join.send(embeds=em)
+        await logs.send(embeds=em)
 
         conn.close()
 
@@ -41,7 +41,7 @@ class JoinQuit(interactions.Extension):
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 
-        quit = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'quit'").fetchone()[0])
+        logs = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'join-quit'").fetchone()[0])
 
         em = interactions.Embed(
             title="🛫・Un utilisateur a quitté un serveur",
@@ -50,8 +50,7 @@ class JoinQuit(interactions.Extension):
             timestamp=datetime.utcnow()
         )
         em.set_footer(text=f"Server ID : {guild.id} | User ID : {user.id}")
-
-        await quit.send(embeds=em)
+        await logs.send(embeds=em)
 
         conn.close()
 
