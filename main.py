@@ -29,6 +29,7 @@ class Main:
         [self.bot.load(f"src.listeners.report.{ext}") for ext in LISTENERS_REPORT]
         [self.bot.load(f"src.listeners.suggestion.{ext}") for ext in LISTENERS_SUGGEST]
         [self.bot.load(f"src.listeners.ticket.{ext}") for ext in LISTENERS_TICKET]
+        [self.bot.load(f"src.listeners.update_db.{ext}") for ext in UPDATE_DB]
 
 
 if __name__ == '__main__':

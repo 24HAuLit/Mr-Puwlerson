@@ -71,6 +71,11 @@ PLUGINS = [
     for file in os.listdir(f"{src_path}/src/commands/staff/plugins")
     if file.endswith(".py")
 ]
+UPDATE_DB = [
+    file.replace(".py", "")
+    for file in os.listdir(f"{src_path}/src/listeners/update_db")
+    if file.endswith(".py")
+]
 
 
 plugins_list = ['auto_role', 'suggestion', 'report', 'verif', 'giveaway']
