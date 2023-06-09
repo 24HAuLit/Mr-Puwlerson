@@ -3,6 +3,7 @@ import sqlite3
 import interactions
 from message_config import ErrorMessage
 
+
 class UnClaimCommand(interactions.Extension):
     def __init__(self, bot):
         self.bot: interactions.Client = bot
@@ -20,7 +21,8 @@ class UnClaimCommand(interactions.Extension):
 
         channels = interactions.search_iterable(await guild.get_all_channels(),
                                                 lambda f: f.parent_id == c.execute(
-                                                    "SELECT id FROM channels WHERE type = 'ticket_parent'").fetchone()[0])
+                                                    "SELECT id FROM channels WHERE type = 'ticket_parent'").fetchone()[
+                                                    0])
         channel = await ctx.get_channel()
 
         if c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles or \

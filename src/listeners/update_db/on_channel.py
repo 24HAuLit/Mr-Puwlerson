@@ -77,7 +77,7 @@ class OnChannel(interactions.Extension):
         type = self.type[channel.type]
 
         em = interactions.Embed(
-            title="📝・Nouveau salon",
+            title="🗑️・Suppression de salon",
             description=f"Un salon vient d'être supprimé sur **{guild.name}** ({guild.id})",
             color=0xFF5A5A
         )

@@ -34,13 +34,22 @@ class Message(interactions.Extension):
         if (is_hidden == 1) or (channel.type == interactions.ChannelType.DM):
             return
         else:
-            em = interactions.Embed(
-                title="🖊️・Nouveau message",
-                url=message.url,
-                description=f"**{message.author.username}#{message.author.discriminator}** vient d'envoyer un message sur **{guild.name}** ({guild.id}) dans le salon **{channel.name}** ({channel.id})",
-                color=0x4CFF4C,
-                timestamp=datetime.utcnow()
-            )
+            if message.author.discriminator == "0":
+                em = interactions.Embed(
+                    title="🖊️・Nouveau message",
+                    url=message.url,
+                    description=f"**{message.author.username}** vient d'envoyer un message sur **{guild.name}** ({guild.id}) dans le salon **{channel.name}** ({channel.id})",
+                    color=0x4CFF4C,
+                    timestamp=datetime.utcnow()
+                )
+            else:
+                em = interactions.Embed(
+                    title="🖊️・Nouveau message",
+                    url=message.url,
+                    description=f"**{message.author.username}#{message.author.discriminator}** vient d'envoyer un message sur **{guild.name}** ({guild.id}) dans le salon **{channel.name}** ({channel.id})",
+                    color=0x4CFF4C,
+                    timestamp=datetime.utcnow()
+                )
             if message.content != '':
                 em.add_field(name="**Message : **", value=content)
             if message.attachments is not None:
@@ -79,13 +88,22 @@ class Message(interactions.Extension):
         if (is_hidden == 1) or (channel.type == interactions.ChannelType.DM):
             return
         else:
-            em2 = interactions.Embed(
-                title="📝・Modification de message",
-                url=after.url,
-                description=f"**{after.author.username}#{after.author.discriminator}** vient de modifier un message sur **{guild.name}** ({guild.id}) dans le salon **{channel.name}** ({channel.id})",
-                color=0xFFFF00,
-                timestamp=datetime.utcnow()
-            )
+            if after.author.discriminator == "0":
+                em2 = interactions.Embed(
+                    title="📝・Modification de message",
+                    url=after.url,
+                    description=f"**{after.author.username}** vient de modifier un message sur **{guild.name}** ({guild.id}) dans le salon **{channel.name}** ({channel.id})",
+                    color=0xFFFF00,
+                    timestamp=datetime.utcnow()
+                )
+            else:
+                em2 = interactions.Embed(
+                    title="📝・Modification de message",
+                    url=after.url,
+                    description=f"**{after.author.username}#{after.author.discriminator}** vient de modifier un message sur **{guild.name}** ({guild.id}) dans le salon **{channel.name}** ({channel.id})",
+                    color=0xFFFF00,
+                    timestamp=datetime.utcnow()
+                )
             if after.content != '':
                 if old_content == '':
                     em2.add_field(name="**Ancien Message : **", value="Aucun message", inline=False)
@@ -136,12 +154,20 @@ class Message(interactions.Extension):
             if (is_hidden == 1) or (channel.type == interactions.ChannelType.DM):
                 return
             else:
-                em = interactions.Embed(
-                    title="🗑️・Message supprimé",
-                    description=f"Le message de **{user.username}#{user.discriminator}** dans le salon **{channel.name}** ({channel.id}) sur **{guild.name}** ({guild.id}) vient d'être supprimé.",
-                    color=0xFF5A5A,
-                    timestamp=datetime.utcnow()
-                )
+                if user.discriminator == "0":
+                    em = interactions.Embed(
+                        title="🗑️・Message supprimé",
+                        description=f"Le message de **{user.username}** dans le salon **{channel.name}** ({channel.id}) sur **{guild.name}** ({guild.id}) vient d'être supprimé.",
+                        color=0xFF5A5A,
+                        timestamp=datetime.utcnow()
+                    )
+                else:
+                    em = interactions.Embed(
+                        title="🗑️・Message supprimé",
+                        description=f"Le message de **{user.username}#{user.discriminator}** dans le salon **{channel.name}** ({channel.id}) sur **{guild.name}** ({guild.id}) vient d'être supprimé.",
+                        color=0xFF5A5A,
+                        timestamp=datetime.utcnow()
+                    )
                 if message.content != '':
                     em.add_field(name="**Message : **", value=content)
                 if message.attachments is not None:

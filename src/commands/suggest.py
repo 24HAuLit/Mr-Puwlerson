@@ -41,7 +41,8 @@ class Suggestion(interactions.Extension):
         if row is not None:
             await ctx.send(ErrorMessage.BlacklistError(guild.id), ephemeral=True)
         else:
-            channel = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM channels WHERE type = 'suggest'").fetchone()[0])
+            channel = await interactions.get(self.bot, interactions.Channel, object_id=
+            c.execute("SELECT id FROM channels WHERE type = 'suggest'").fetchone()[0])
             self.counter += 1
             em = interactions.Embed(
                 title="Nouvelle suggestion #%d" % self.counter,
@@ -49,10 +50,13 @@ class Suggestion(interactions.Extension):
                 color=0xFFF000,
                 timestamp=datetime.utcnow()
             )
-            em.set_footer(
-                icon_url=ctx.member.user.avatar_url,
-                text=f"Suggestion proposé par {ctx.author.username}#{ctx.author.discriminator}."
-            )
+            if ctx.author.discriminator == "0":
+                em.set_footer(icon_url=ctx.member.user.avatar_url, text=f"Suggestion proposé par {ctx.author.username}.")
+            else:
+                em.set_footer(
+                    icon_url=ctx.member.user.avatar_url,
+                    text=f"Suggestion proposé par {ctx.author.username}#{ctx.author.discriminator}."
+                )
 
             await ctx.send(f"Votre suggestion a bien été posté dans {channel.mention}", ephemeral=True)
             message = await channel.send(embeds=em, components=[suggest_accept(), suggest_deny()])

@@ -20,14 +20,24 @@ class JoinQuit(interactions.Extension):
 
         logs = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'join-quit'").fetchone()[0])
 
-        em = interactions.Embed(
-            title="🛬・Un utilisateur a rejoint un serveur",
-            description=f"**{user.username}#{user.discriminator}** a rejoint **{guild.name}**",
-            color=0x4CFF4C,
-            timestamp=datetime.utcnow()
-        )
-        em.set_footer(text=f"Server ID : {guild.id} | User ID : {user.id}")
-        await logs.send(embeds=em)
+        if user.discriminator == "0":
+            em = interactions.Embed(
+                title="🛬・Un utilisateur a rejoint un serveur",
+                description=f"**{user.username}** a rejoint **{guild.name}**",
+                color=0x4CFF4C,
+                timestamp=datetime.utcnow()
+            )
+            em.set_footer(text=f"Server ID : {guild.id} | User ID : {user.id}")
+            await logs.send(embeds=em)
+        else:
+            em = interactions.Embed(
+                title="🛬・Un utilisateur a rejoint un serveur",
+                description=f"**{user.username}#{user.discriminator}** a rejoint **{guild.name}**",
+                color=0x4CFF4C,
+                timestamp=datetime.utcnow()
+            )
+            em.set_footer(text=f"Server ID : {guild.id} | User ID : {user.id}")
+            await logs.send(embeds=em)
 
         conn.close()
 
@@ -43,14 +53,24 @@ class JoinQuit(interactions.Extension):
 
         logs = await interactions.get(self.bot, interactions.Channel, object_id=c.execute("SELECT id FROM logs_channels WHERE name = 'join-quit'").fetchone()[0])
 
-        em = interactions.Embed(
-            title="🛫・Un utilisateur a quitté un serveur",
-            description=f"**{user.username}#{user.discriminator}** a quitté **{guild.name}**",
-            color=0xFF5A5A,
-            timestamp=datetime.utcnow()
-        )
-        em.set_footer(text=f"Server ID : {guild.id} | User ID : {user.id}")
-        await logs.send(embeds=em)
+        if user.discriminator == "0":
+            em = interactions.Embed(
+                title="🛫・Un utilisateur a quitté un serveur",
+                description=f"**{user.username}** a quitté **{guild.name}**",
+                color=0xFF5A5A,
+                timestamp=datetime.utcnow()
+            )
+            em.set_footer(text=f"Server ID : {guild.id} | User ID : {user.id}")
+            await logs.send(embeds=em)
+        else:
+            em = interactions.Embed(
+                title="🛫・Un utilisateur a quitté un serveur",
+                description=f"**{user.username}#{user.discriminator}** a quitté **{guild.name}**",
+                color=0xFF5A5A,
+                timestamp=datetime.utcnow()
+            )
+            em.set_footer(text=f"Server ID : {guild.id} | User ID : {user.id}")
+            await logs.send(embeds=em)
 
         conn.close()
 

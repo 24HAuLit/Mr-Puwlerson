@@ -46,10 +46,16 @@ class Report(interactions.Extension):
                         description=content,
                         timestamp=datetime.utcnow()
                     )
-                    em_report.set_footer(
-                        icon_url=message.author.avatar_url,
-                        text=f"Report envoyé par {message.author}#{message.author.discriminator} | ID : {message.author.id}"
-                    )
+                    if message.author.discriminator == "0":
+                        em_report.set_footer(
+                            icon_url=message.author.avatar_url,
+                            text=f"Report envoyé par {message.author.username} | ID : {message.author.id}"
+                        )
+                    else:
+                        em_report.set_footer(
+                            icon_url=message.author.avatar_url,
+                            text=f"Report envoyé par {message.author.username}#{message.author.discriminator} | ID : {message.author.id}"
+                        )
                     await confirm_message.edit(components=[])
                     await button_ctx.send(
                         "Votre report a bien été transmis aux staff, ces derniers vont s'en occuper dans les plus bref délais.")

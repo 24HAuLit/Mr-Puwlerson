@@ -73,12 +73,21 @@ class OpenTicket(interactions.Extension):
                                                   "SELECT id FROM logs_channels WHERE name = 'create'").fetchone()[0])
 
         logs_create = await interactions.get(self.bot, interactions.Channel, object_id=channel_logs.id)
-        em2 = interactions.Embed(
-            title="Nouveau ticket",
-            description=f"**{ctx.author.username}#{ctx.author.discriminator}** a crée un nouveau ticket (**{channel.name}**).",
-            color=0x2ECC70,
-            timestamp=datetime.utcnow()
-        )
+
+        if ctx.author.discriminator == "0":
+            em2 = interactions.Embed(
+                title="Nouveau ticket",
+                description=f"**{ctx.author.username}** a crée un nouveau ticket (**{channel.name}**).",
+                color=0x2ECC70,
+                timestamp=datetime.utcnow()
+            )
+        else:
+            em2 = interactions.Embed(
+                title="Nouveau ticket",
+                description=f"**{ctx.author.username}#{ctx.author.discriminator}** a crée un nouveau ticket (**{channel.name}**).",
+                color=0x2ECC70,
+                timestamp=datetime.utcnow()
+            )
         em2.set_footer(text=f"Author ID : {ctx.author.id} | Ticket ID : {c.lastrowid}")
         await logs_create.send(embeds=em2)
 

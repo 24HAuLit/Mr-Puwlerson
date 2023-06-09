@@ -35,8 +35,13 @@ class SuggestionAccepted(interactions.Extension):
         )
         em.add_field(name=f"__**Suggestion : **__", value=ctx.message.embeds[0].description, inline=False)
         em.add_field(name="__**Raison : **__", value=f"{response}", inline=False)
-        em.set_footer(icon_url=ctx.member.user.avatar_url,
-                      text=f"Suggestion accepté par {ctx.author.name}#{ctx.author.discriminator}.")
+
+        if ctx.author.discriminator == "0":
+            em.set_footer(icon_url=ctx.member.user.avatar_url,
+                          text=f"Suggestion accepté par {ctx.author.username} pour la raison {response}.")
+        else:
+            em.set_footer(icon_url=ctx.member.user.avatar_url,
+                          text=f"Suggestion accepté par {ctx.author.username}#{ctx.author.discriminator}.")
 
         em1 = interactions.Embed(
             title=ctx.message.embeds[0].title,

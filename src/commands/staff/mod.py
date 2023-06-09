@@ -57,8 +57,10 @@ class Mod(interactions.Extension):
             color=0xFF5A5A,
             timestamp=datetime.utcnow()
         )
-        em.set_footer(icon_url=ctx.member.user.avatar_url,
-                      text=f"Commande demandé par {ctx.author.name}#{ctx.author.discriminator}.")
+        if ctx.author.discriminator == "0":
+            em.set_author(name=f"{ctx.author.username}", icon_url=ctx.author.avatar_url)
+        else:
+            em.set_author(name=f"{ctx.author.username}#{ctx.author.discriminator}", icon_url=ctx.author.avatar_url)
 
         await ctx.send(embeds=em, ephemeral=True)
 
@@ -73,7 +75,7 @@ class Mod(interactions.Extension):
             color=0xFF5A5A,
             timestamp=datetime.utcnow()
         )
-        em2.set_author(name=ctx.author.name, icon_url=ctx.member.user.avatar_url, url=ctx.member.user.avatar_url)
+        em2.set_author(name=ctx.author.username, icon_url=ctx.member.user.avatar_url, url=ctx.member.user.avatar_url)
         em2.add_field(name="**Channel : **", value=f"ID : {channel.id} | Name : {channel.name} ({channel.mention})",
                       inline=False)
         em2.set_footer(text=f"Author ID : {ctx.author.id} | Name : {ctx.author.name}.")
@@ -153,8 +155,16 @@ class Mod(interactions.Extension):
             color=0xFF5A5A,
             timestamp=datetime.utcnow()
         )
-        em.add_field(name="__Staff :__", value=f"{ctx.author.username}#{ctx.author.discriminator}", inline=True)
-        em.add_field(name="__Membre :__", value=f"{user.username}#{user.discriminator}", inline=True)
+
+        if ctx.author.discriminator == "0":
+            em.add_field(name="__Staff :__", value={ctx.author.username}, inline=True)
+        else:
+            em.add_field(name="__Staff :__", value=f"{ctx.author.username}#{ctx.author.discriminator}", inline=True)
+        if user.discriminator == "0":
+            em.add_field(name="__Membre :__", value={user.username}, inline=True)
+        else:
+            em.add_field(name="__Membre :__", value=f"{user.username}#{user.discriminator}", inline=True)
+
         em.add_field(name="__Durée de l'exclusion :__", value=f"{duration}", inline=True)
         em.add_field(name="__Raison :__", value=reason)
         em.set_footer(text=f"Staff ID : {ctx.author.id} | Member ID : {user.id}")
@@ -190,8 +200,16 @@ class Mod(interactions.Extension):
             color=0x4CFF4C,
             timestamp=datetime.utcnow()
         )
-        em.add_field(name="__Staff :__", value=f"{ctx.author.username}#{ctx.author.discriminator}", inline=True)
-        em.add_field(name="__Membre :__", value=f"{user.username}#{user.discriminator}", inline=True)
+
+        if ctx.author.discriminator == "0":
+            em.add_field(name="__Staff :__", value={ctx.author.username}, inline=True)
+        else:
+            em.add_field(name="__Staff :__", value=f"{ctx.author.username}#{ctx.author.discriminator}", inline=True)
+        if user.discriminator == "0":
+            em.add_field(name="__Membre :__", value={user.username}, inline=True)
+        else:
+            em.add_field(name="__Membre :__", value=f"{user.username}#{user.discriminator}", inline=True)
+
         em.add_field(name="__Raison :__", value=reason)
         em.set_footer(text=f"Staff ID : {ctx.author.id} | Member ID : {user.id}")
 

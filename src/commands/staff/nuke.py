@@ -63,14 +63,14 @@ class Nuke(interactions.Extension):
         embed1 = interactions.Embed(description=f"Ce salon va disparaitre dans **{count}** secondes.",
                                     color=0xFF0000,
                                     timestamp=datetime.utcnow())
-        embed1.set_footer(icon_url=ctx.member.user.avatar_url, text=f"Commande demandé par {ctx.author}.")
+        embed1.set_footer(icon_url=ctx.member.user.avatar_url, text=f"Commande demandé par {ctx.author.username}.")
         await ctx.send(embeds=embed1)
 
         for i in range(5):
             embed2 = interactions.Embed(description=f"Ce salon va disparaitre dans **{count}** secondes.",
                                         color=0xFF0000,
                                         timestamp=datetime.utcnow())
-            embed2.set_footer(icon_url=ctx.member.user.avatar_url, text=f"Commande demandé par {ctx.author}.")
+            embed2.set_footer(icon_url=ctx.member.user.avatar_url, text=f"Commande demandé par {ctx.author.username}.")
             count -= 1
             await ctx.message.edit(embeds=embed2)
             await asyncio.sleep(1)
@@ -95,7 +95,7 @@ class Nuke(interactions.Extension):
                                  timestamp=datetime.utcnow())
         em2.add_field(name="**Ancien channel : **", value=f"Nom : {actual} | ID : {actual.id}")
         em2.add_field(name="**Nouveau channel : **", value=f"Nom : {new} ({new.mention}) | ID : {new.id}")
-        em2.set_footer(icon_url=ctx.member.user.avatar_url, text=f"Author ID : {ctx.author.id} | Name : {ctx.author}.")
+        em2.set_footer(icon_url=ctx.member.user.avatar_url, text=f"Author ID : {ctx.author.id} | Name : {ctx.author.username}.")
 
         await logs_nuke.send(embeds=em2)
 

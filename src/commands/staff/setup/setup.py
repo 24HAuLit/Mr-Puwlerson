@@ -71,8 +71,7 @@ class Setup(interactions.Extension):
             if c.fetchone()[0] == 1:
                 await ctx.send("**Locale** table already created.", ephemeral=True)
             else:
-                c.execute("""CREATE TABLE locale
-                    (
+                c.execute("""CREATE TABLE locale (
                         locale      text not null default 'en'
                     )""")
                 c.execute("""INSERT INTO locale VALUES (?)""", ('en',))
