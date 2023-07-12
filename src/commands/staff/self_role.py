@@ -44,8 +44,7 @@ class SelfRole(interactions.Extension):
         if int(message_id) not in test:
             return await ctx.send(ErrorMessage.MessageNotFound(ctx.guild.id, message_id), ephemeral=True)
 
-        message = await interactions.get(self.bot, interactions.Message, object_id=int(message_id),
-                                         channel_id=ctx.channel.id)
+        message = await interactions.get(self.bot, interactions.Message, object_id=int(message_id), channel_id=ctx.channel.id)
 
         partial_emoji = PartialEmoji.from_str(emoji)
         emoji_id = partial_emoji.id
