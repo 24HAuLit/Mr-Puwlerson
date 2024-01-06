@@ -2,7 +2,7 @@ import asyncio
 import os
 import sqlite3
 import interactions
-from message_config import ErrorMessage
+from src.utils.message_config import ErrorMessage
 
 
 class Survey(interactions.Extension):

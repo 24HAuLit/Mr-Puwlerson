@@ -1,46 +1,39 @@
-import sqlite3
 import interactions
-from datetime import datetime
-from const import DATA
+from src.utils.checks import database_exists, is_admin
+from src.utils.const import DATA
 from src.listeners.suggestion.components.accept import modal_accept
-from message_config import ErrorMessage
 
 
 class SuggestionAccepted(interactions.Extension):
     def __init__(self, bot):
         self.bot: interactions.Client = bot
 
-    @interactions.extension_component("accept")
-    async def button_accept(self, ctx):
-        guild = await ctx.get_guild()
-        conn = sqlite3.connect(f"./Database/{guild.id}.db")
-        c = conn.cursor()
+    @interactions.component_callback("accept")
+    async def button_accept(self, ctx: interactions.ComponentContext):
+        if await database_exists(ctx) is not True:
+            return
 
-        if c.execute("SELECT id FROM roles WHERE type = 'Admin'".format(ctx.author.id)).fetchone()[0] in ctx.author.roles\
-                or c.execute("SELECT id FROM roles WHERE type = 'Owner'".format(ctx.author.id)).fetchone()[0] in ctx.author.roles:
-            await ctx.popup(modal_accept())
-        else:
-            await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
+        if await is_admin(ctx) is not True:
+            return
 
-        conn.close()
+        await ctx.send_modal(modal_accept())
 
-    @interactions.extension_modal("accept_reason")
-    async def modal_accept(self, ctx, response: str):
-        result = await interactions.get(self.bot, interactions.Channel, object_id=DATA["main"]["suggest_result"])
+    @interactions.modal_callback("accept_reason")
+    async def modal_accept(self, ctx: interactions.ModalContext, acc_short_response: str):
+        result = self.bot.get_channel(DATA["main"]["suggest_result"])
         em = interactions.Embed(
             title="Suggestion accepté",
-            url=ctx.message.url,
+            url=ctx.message.jump_url,
             color=0x00FF00,
-            timestamp=datetime.utcnow()
+            timestamp=interactions.Timestamp.utcnow()
         )
         em.add_field(name=f"__**Suggestion : **__", value=ctx.message.embeds[0].description, inline=False)
-        em.add_field(name="__**Raison : **__", value=f"{response}", inline=False)
+        em.add_field(name="__**Raison : **__", value=f"{acc_short_response}", inline=False)
 
         if ctx.author.discriminator == "0":
-            em.set_footer(icon_url=ctx.member.user.avatar_url,
-                          text=f"Suggestion accepté par {ctx.author.username} pour la raison {response}.")
+            em.set_footer(icon_url=ctx.member.avatar.url, text=f"Suggestion accepté par {ctx.author.username}.")
         else:
-            em.set_footer(icon_url=ctx.member.user.avatar_url,
+            em.set_footer(icon_url=ctx.member.avatar.url,
                           text=f"Suggestion accepté par {ctx.author.username}#{ctx.author.discriminator}.")
 
         em1 = interactions.Embed(
@@ -55,6 +48,3 @@ class SuggestionAccepted(interactions.Extension):
         await ctx.send("Vous avez accepté la suggestion.", ephemeral=True)
         await result.send(embeds=em)
 
-
-def setup(bot):
-    SuggestionAccepted(bot)

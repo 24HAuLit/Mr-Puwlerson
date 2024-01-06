@@ -1,8 +1,9 @@
 from datetime import datetime
 from os.path import exists
 from sqlite3 import connect
-
 import interactions
+
+from src.utils.time_converter import time_to_readable
 
 
 class ErrorMessage:
@@ -11,7 +12,7 @@ class ErrorMessage:
 
     @staticmethod
     def database_not_found(guild_id):
-        """Send a message when the database is not found for the guild ID.
+        """Send a message when the Database is not found for the guild ID.
         :param guild_id: The guild ID."""
         return f"Database not found for ID `{guild_id}`. This server is not configured yet."
 
@@ -19,13 +20,13 @@ class ErrorMessage:
     def MissingPermissions(guild_id):
         """Send a message when the user doesn't have the permission to use the command/ component.
         :param guild_id:"""
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -38,13 +39,13 @@ class ErrorMessage:
     def OwnerOnly(guild_id):
         """Send a message when the user doesn't have the permission to use the command only for guild owner.
         :param guild_id: """
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -59,13 +60,13 @@ class ErrorMessage:
         """Send a message when the user doesn't specify the required argument.
         :param guild_id:
         :param arguments: The arguments name."""
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -78,33 +79,33 @@ class ErrorMessage:
     def ChannelError(guild_id):
         """Send a message when the user use the command in a wrong channel
         :param guild_id: """
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
             if locale == 'fr':
                 return ":x: Vous ne pouvez pas utiliser cette commande dans ce salon."
             elif locale == 'en':
-                return ":x: You can't use this command in this channel."
+                return ":x: You cannot use this command in this channel."
 
     @staticmethod
     def PluginError(guild_id, plugin_name: str):
         """Send a message when the plugin is disabled.
         :param guild_id:
         :param plugin_name: The plugin name."""
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -117,32 +118,51 @@ class ErrorMessage:
     def BlacklistError(guild_id):
         """Send a message when the user is in the blacklist.
         :param guild_id:"""
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
             if locale == 'fr':
                 return ":x: Désolé, mais vous êtes blacklist. Vous ne pouvez donc pas effectuer cette action."
             elif locale == 'en':
-                return ":x: Sorry, but you are blacklist. You can't do this action."
+                return ":x: Sorry, but you are blacklist. You cannot do this action."
+
+    @staticmethod
+    def already_blacklisted(guild_id):
+        """Send a message when user is already in the blacklist.
+        :param guild_id:"""
+        if exists(f"Database/{guild_id}.db") is False:
+            return ErrorMessage.database_not_found(guild_id)
+        else:
+            conn = connect(f"./Database/{guild_id}.db")
+            c = conn.cursor()
+
+            c.execute("SELECT locale FROM config")
+            locale = c.fetchone()[0]
+            conn.close()
+
+            if locale == 'fr':
+                return ":x: Désolé, mais cet utilisateur est déjà blacklist."
+            elif locale == 'en':
+                return ":x: Sorry, but this user is already blacklist."
 
     @staticmethod
     def ticket_limit(guild_id):
         """Send a message when the user has reached the limit of tickets.
         :param guild_id:"""
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -155,13 +175,13 @@ class ErrorMessage:
     def giveaway_already_started(guild_id):
         """Send a message when the giveaway is already started.
         :param guild_id:"""
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -175,20 +195,20 @@ class ErrorMessage:
         """Send a message when the user is in cooldown.
         :param guild_id:
         :param time: The cooldown time."""
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
             if locale == 'fr':
-                return f":x: Vous êtes en cooldown. Veuillez patienter encore {time} minutes."
+                return f":x: Vous êtes en cooldown. Veuillez patienter encore {time_to_readable(guild_id, time)}."
             elif locale == 'en':
-                return f":x: You are in cooldown. Please wait {time} minutes."
+                return f":x: You are in cooldown. Please wait {time_to_readable(guild_id, time)}."
 
     @staticmethod
     def MessageNotFound(guild_id, message_id):
@@ -196,13 +216,13 @@ class ErrorMessage:
         :param guild_id:
         :param message_id: The message id."""
 
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -212,6 +232,75 @@ class ErrorMessage:
             elif locale == 'en':
                 return f":x: The message with the ID `{message_id}` does not exist in this channel. Please check " \
                        f"that the message is in this channel or if it exists."
+
+    @staticmethod
+    def UserNotFound(user, guild_id):
+        """
+        Send a message when the user is not found.
+        :param user:
+        :param guild_id:
+        :return:
+        """
+        if exists(f"Database/{guild_id}.db") is False:
+            return ErrorMessage.database_not_found(guild_id)
+        else:
+            conn = connect(f"./Database/{guild_id}.db")
+            c = conn.cursor()
+
+            c.execute("SELECT locale FROM config")
+            locale = c.fetchone()[0]
+            conn.close()
+
+            if locale == 'fr':
+                return f":x: L'utilisateur `{user}` n'existe pas ou n'est pas sur le serveur. Veuillez verifier que l'utilisateur est bien sur ce serveur."
+            elif locale == 'en':
+                return f":x: The user `{user}` does not exist or is not on the server. Please check that the user is on this server."
+
+    @staticmethod
+    def UserAlreadyInTicket(user, guild_id):
+        """
+        Send a message when the user is already in the ticket.
+        :param user:
+        :param guild_id:
+        :return:
+        """
+        if exists(f"Database/{guild_id}.db") is False:
+            return ErrorMessage.database_not_found(guild_id)
+        else:
+            conn = connect(f"./Database/{guild_id}.db")
+            c = conn.cursor()
+
+            c.execute("SELECT locale FROM config")
+            locale = c.fetchone()[0]
+            conn.close()
+
+            if locale == 'fr':
+                return f":x: L'utilisateur `{user}` est déjà dans ce ticket."
+            elif locale == 'en':
+                return f":x: The user `{user}` is already in this ticket."
+
+    @staticmethod
+    def RoleNotFound(role, guild_id):
+        """
+        Send a message when the role is not found.
+        :param role:
+        :param guild_id:
+        :return:
+        """
+        if exists(f"Database/{guild_id}.db") is False:
+            return ErrorMessage.database_not_found(guild_id)
+        else:
+            conn = connect(f"./Database/{guild_id}.db")
+            c = conn.cursor()
+
+            c.execute("SELECT locale FROM config")
+            locale = c.fetchone()[0]
+            conn.close()
+
+            if locale == 'fr':
+                return f":x: Le role `{role}` n'existe pas sur le serveur. Veuillez verifier que le role existe bien sur ce serveur."
+            elif locale == 'en':
+                return f":x: The role `{role}` does not exist  on the server. Please check that the role exists on this server."
 
 
 class HelpMessage:
@@ -223,13 +312,13 @@ class HelpMessage:
         """Send the ping command help message.
         :param context:
         :param guild_id:"""
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -285,13 +374,13 @@ class HelpMessage:
         """Send the pileface command help message.
         :param context:
         :param guild_id:"""
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -346,13 +435,13 @@ class HelpMessage:
         """Send the suggestions command help message.
         :param context:
         :param guild_id:"""
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -409,13 +498,13 @@ class HelpMessage:
         :param permission_role_name:
         :param guild_id:"""
 
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -470,13 +559,13 @@ class HelpMessage:
         :param context:
         :param permission_role_name:
         :param guild_id:"""
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -531,13 +620,13 @@ class HelpMessage:
         :param context:
         :param permission_role_name:
         :param guild_id:"""
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -592,13 +681,13 @@ class HelpMessage:
         :param context:
         :param permission_role_name:
         :param guild_id:"""
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -653,13 +742,13 @@ class HelpMessage:
         :param context:
         :param permission_role_name:
         :param guild_id:"""
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -714,13 +803,13 @@ class HelpMessage:
         :param context:
         :param permission_role_name:
         :param guild_id:"""
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -775,13 +864,13 @@ class HelpMessage:
         :param context:
         :param permission_role_name:
         :param guild_id:"""
-        if exists(f"./Database/{guild_id}.db") is False:
+        if exists(f"Database/{guild_id}.db") is False:
             return ErrorMessage.database_not_found(guild_id)
         else:
-            conn = connect(f'./Database/{guild_id}.db')
+            conn = connect(f'Database/{guild_id}.db')
             c = conn.cursor()
 
-            c.execute("SELECT locale FROM locale")
+            c.execute("SELECT locale FROM config")
             locale = c.fetchone()[0]
             conn.close()
 
@@ -822,6 +911,67 @@ class HelpMessage:
                 em.add_field(
                     name="**Usage**",
                     value="```\n• /giveaway <prize> <number of winners> <time>\n```\n • The time is in seconds",
+                    inline=True
+                )
+                em.set_footer(
+                    icon_url=context.member.user.avatar_url,
+                    text="This bot uses slash-commands, so you have to put a / at the beginning of each one."
+                )
+                return em
+
+    @staticmethod
+    async def setup_server(context, permission_role_name, guild_id):
+        """Send the setup server command help message.
+        :param context:
+        :param permission_role_name:
+        :param guild_id:"""
+        if exists(f"Database/{guild_id}.db") is False:
+            return ErrorMessage.database_not_found(guild_id)
+        else:
+            conn = connect(f'Database/{guild_id}.db')
+            c = conn.cursor()
+
+            c.execute("SELECT locale FROM config")
+            locale = c.fetchone()[0]
+            conn.close()
+
+            if locale == 'fr':
+                em = interactions.Embed(
+                    title="Commande `setup_server`",
+                    description="Permet de configurer les bases de données du serveur.",
+                    color=0x00FFEE,
+                    timestamp=datetime.utcnow()
+                )
+                em.add_field(
+                    name="**Permission**",
+                    value=f"```\n• Rôle {permission_role_name}\n```",
+                    inline=True
+                )
+                em.add_field(
+                    name="**Utilisation**",
+                    value="```\n• /setup_server\n```",
+                    inline=True
+                )
+                em.set_footer(
+                    icon_url=context.member.user.avatar_url,
+                    text="Le bot utilise les slash-commands, donc il faut mettre un / a chaque début."
+                )
+                return em
+            elif locale == 'en':
+                em = interactions.Embed(
+                    title="`setup_server` Command",
+                    description="Allows you to configure databases of the server.",
+                    color=0x00FFEE,
+                    timestamp=datetime.utcnow()
+                )
+                em.add_field(
+                    name="**Permission**",
+                    value=f"```\n• {permission_role_name} role\n```",
+                    inline=True
+                )
+                em.add_field(
+                    name="**Usage**",
+                    value="```\n• /setup_server\n```",
                     inline=True
                 )
                 em.set_footer(

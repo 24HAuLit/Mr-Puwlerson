@@ -3,7 +3,7 @@ import sqlite3
 import interactions
 from datetime import datetime
 from src.listeners.report.components.components import confirm, cancel
-from message_config import ErrorMessage
+from src.utils.message_config import ErrorMessage
 
 
 class Report(interactions.Extension):

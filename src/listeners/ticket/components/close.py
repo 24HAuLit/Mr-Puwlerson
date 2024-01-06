@@ -17,6 +17,14 @@ def confirm_close():
     )
 
 
+def confirm_close_cmd():
+    return interactions.Button(
+        style=interactions.ButtonStyle.DANGER,
+        label="🔒 Confirmer la fermeture",
+        custom_id="confirm_close_cmd",
+    )
+
+
 def ticket_close_reason():
     return interactions.Button(
         style=interactions.ButtonStyle.DANGER,

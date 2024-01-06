@@ -11,15 +11,12 @@ def suggest_accept():
 
 def modal_accept():
     return interactions.Modal(
+        interactions.ParagraphText(
+            label="Raison",
+            placeholder="Pour quelle raison avez-vous accepté ?",
+            custom_id="acc_short_response",
+            max_length=100
+        ),
         title="Raison",
         custom_id="accept_reason",
-        components=[
-            interactions.TextInput(
-                style=interactions.TextStyleType.SHORT,
-                label="Pour quelle raison avez-vous accepté ?",
-                custom_id="text_input_accept_response",
-                min_length=1,
-                max_length=100
-            )
-        ]
     )

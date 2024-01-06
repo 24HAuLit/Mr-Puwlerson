@@ -1,66 +1,76 @@
-import os
-import sqlite3
 import interactions
-from message_config import ErrorMessage
+from src.commands.ticket.tickets import Tickets
+from interactions import LocalizedDesc
+from src.utils.checks import is_staff, database_exists, ticket_parent
+from src.utils.message_config import ErrorMessage
 
 
 class AddMember(interactions.Extension):
     def __init__(self, bot):
         self.bot: interactions.Client = bot
 
-    @interactions.extension_command(dm_permission=False)
-    @interactions.option(
-        type=interactions.OptionType.USER,
-        name="user",
-        description="Pour ajouter un membre au ticket",
-        required=False
+    @Tickets.ticket.subcommand(
+        sub_cmd_description=LocalizedDesc(english_us="To add someone or a role to the ticket.", french="Pour pouvoir ajouter quelqu'un ou un role au ticket.")
     )
-    @interactions.option(
-        type=interactions.OptionType.ROLE,
-        name="role",
-        description="Pour ajouter un role au ticket",
-        required=False
+    @interactions.slash_option(
+        name="option",
+        description=LocalizedDesc(english_us="To add a user or a role to the ticket.", french="Pour ajouter un utilisateur ou un role au ticket."),
+        opt_type=interactions.OptionType.MENTIONABLE,
+        choices=[
+            interactions.SlashCommandChoice(name="user", value="user"),
+            interactions.SlashCommandChoice(name="role", value="role")
+        ],
+        required=True
     )
-    async def add(self, ctx: interactions.CommandContext, user: interactions.User = None,
-                  role: interactions.Role = None):
-        """Pour pouvoir ajouter quelqu'un ou un role au ticket."""
-        guild = await ctx.get_guild()
+    async def add(self, ctx: interactions.SlashContext, option: interactions.Member | interactions.Role):
 
-        if os.path.exists(f'./Database/{guild.id}.db') is False:
-            return await ctx.send(ErrorMessage.database_not_found(guild.id), ephemeral=True)
+        if await database_exists(ctx) is not True:
+            return
 
-        conn = sqlite3.connect(f'./Database/{guild.id}.db')
-        c = conn.cursor()
+        if await is_staff(ctx) is not True:
+            return
 
-        if c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles or \
-                c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles:
+        if await ticket_parent(ctx) is not True:
+            return
 
-            channels = interactions.search_iterable(await guild.get_all_channels(),
-                                                    lambda f: f.parent_id == c.execute("SELECT id FROM channels WHERE "
-                                                                                       "type = "
-                                                                                       "'ticket_parent'").fetchone()[0])
-            if ctx.channel in channels:
-                if user is not None:
-                    new_perms = [interactions.Overwrite(id=int(user.id), type=1,
-                                                        allow=64 | 1024 | 2048 | 32768 | 65536 | 262144 | 2147483648)]
-                    await ctx.channel.modify(permission_overwrites=ctx.channel.permission_overwrites + new_perms)
-                    em = interactions.Embed(description=f"{user.mention} a été ajouter au ticket.", color=0x2ECC70)
-                    await ctx.send(embeds=em)
-                elif role is not None:
-                    new_perms = [interactions.Overwrite(id=int(role.id), type=0,
-                                                        allow=64 | 1024 | 2048 | 32768 | 65536 | 262144 | 2147483648)]
-                    await ctx.channel.modify(permission_overwrites=ctx.channel.permission_overwrites + new_perms)
-                    em = interactions.Embed(description=f"{role.mention} a été ajouter au ticket.", color=0x2ECC70)
-                    await ctx.send(embeds=em)
-                else:
-                    await ctx.send(ErrorMessage.MissingRequiredArgument(guild.id, "User/ Role"), ephemeral=True)
-            else:
-                await ctx.send(ErrorMessage.ChannelError(guild.id), ephemeral=True)
-        else:
-            await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
-            interactions.StopCommand()
+        guild = ctx.guild
 
-        conn.close()
+        user = option if isinstance(option, interactions.Member) else None
+        role = option if isinstance(option, interactions.Role) else None
+
+        if user is not None:
+            if guild.get_member(user.id) is None:
+                return await ctx.send(ErrorMessage.UserNotFound(user.username, guild.id), ephemeral=True)
+
+            for member in ctx.channel.members:
+                if member.id == user.id:
+                    return await ctx.send(ErrorMessage.UserAlreadyInTicket(user.username, guild.id), ephemeral=True)
+
+            new_perms = [interactions.PermissionOverwrite(id=int(user.id), type=1,
+                                                          allow=64 | 1024 | 2048 | 32768 | 65536 | 262144 | 2147483648)]
+            await ctx.channel.edit(permission_overwrites=ctx.channel.permission_overwrites + new_perms)
+
+            em = interactions.Embed(description=f"{user.mention} a été ajouter au ticket.", color=0x2ECC70)
+            return await ctx.send(embeds=em)
+
+        elif role is not None:
+            if guild.get_role(role.id) is None:
+                return await ctx.send(ErrorMessage.RoleNotFound(role, guild.id), ephemeral=True)
+
+            print(ctx.channel.permissions_for(role))
+
+            if ctx.channel.permissions_for(role).VIEW_CHANNEL is True:
+                return await ctx.send("test", ephemeral=True)
+
+            # for role in ctx.channel.roles:
+            #     if role.id == role.id:
+            #         return await ctx.send(ErrorMessage.RoleAlreadyInTicket(role.name, guild.id), ephemeral=True)
+
+            new_perms = [interactions.PermissionOverwrite(id=int(role.id), type=0,
+                                                          allow=64 | 1024 | 2048 | 32768 | 65536 | 262144 | 2147483648)]
+            await ctx.channel.edit(permission_overwrites=ctx.channel.permission_overwrites + new_perms)
+            em = interactions.Embed(description=f"{role.mention} a été ajouter au ticket.", color=0x2ECC70)
+            return await ctx.send(embeds=em)
 
 
 def setup(bot):

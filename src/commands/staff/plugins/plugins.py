@@ -1,44 +1,46 @@
-import os
 import sqlite3
 import interactions
-from message_config import ErrorMessage
+from interactions import LocalizedDesc
+from src.utils.checks import is_owner, database_exists
 
 
 class Plugins(interactions.Extension):
     def __init__(self, bot):
         self.bot: interactions.Client = bot
 
-    @interactions.extension_command()
-    @interactions.option(
-        type=interactions.OptionType.STRING,
+    @interactions.slash_command(
+        description=LocalizedDesc(english_us="Activate or deactivate plugins", french="Active ou désactive des plugins"),
+        dm_permission=False
+    )
+    @interactions.slash_option(
+        opt_type=interactions.OptionType.STRING,
         name="plugin",
         description="Plugin a activer/désactiver",
         required=True,
         choices=[
-            interactions.Choice(name="Auto-role", value="auto-role"),
-            interactions.Choice(name="Suggestion", value="suggestion"),
-            interactions.Choice(name="Report", value="report"),
-            interactions.Choice(name="Verification", value="verif"),
-            interactions.Choice(name="Giveaway", value="giveaway"),
+            interactions.SlashCommandChoice(name="Auto-role", value="auto-role"),
+            interactions.SlashCommandChoice(name="Suggestion", value="suggestion"),
+            interactions.SlashCommandChoice(name="Report", value="report"),
+            interactions.SlashCommandChoice(name="Verification", value="verif"),
+            interactions.SlashCommandChoice(name="Giveaway", value="giveaway"),
         ]
     )
-    @interactions.option(
-        type=interactions.OptionType.STRING,
+    @interactions.slash_option(
+        opt_type=interactions.OptionType.STRING,
         name="status",
         description="Status du plugin",
         required=True,
         choices=[
-            interactions.Choice(name="Activer", value="true"),
-            interactions.Choice(name="Désactiver", value="false")
+            interactions.SlashCommandChoice(name="Activer", value="true"),
+            interactions.SlashCommandChoice(name="Désactiver", value="false")
         ]
     )
-    async def plugins(self, ctx: interactions.CommandContext, plugin: str, status: str):
-        """Permet d'activer/désactiver les plugins."""
-        if ctx.author.id != ctx.guild.owner_id:
-            return await ctx.send(ErrorMessage.OwnerOnly(ctx.guild.id), ephemeral=True)
+    async def plugins(self, ctx: interactions.SlashContext, plugin: str, status: str):
+        if await database_exists(ctx) is not True:
+            return
 
-        if os.path.exists(f"./Database/{ctx.guild.id}.db") is False:
-            return await ctx.send(ErrorMessage.database_not_found(ctx.guild.id), ephemeral=True)
+        if await is_owner(ctx) is not True:
+            return
 
         conn = sqlite3.connect(f"./Database/{ctx.guild.id}.db")
         c = conn.cursor()
@@ -48,15 +50,13 @@ class Plugins(interactions.Extension):
             conn.close()
             return await ctx.send(f"Le plugin `{plugin}` est déjà `{status}` !", ephemeral=True)
 
-        elif plugin == 'auto-role' and c.execute("SELECT status FROM plugins WHERE name = 'verif'").fetchone()[
-            0] == 'true':
+        elif plugin == 'auto-role' and c.execute("SELECT status FROM plugins WHERE name = 'verif'").fetchone()[0] == 'true':
             conn.close()
             return await ctx.send("Le plugin `Verification` est déjà activé, vous ne pouvez pas activer le plugin "
                                   "`Auto-role`. Si vous voulez activer le plugin `Auto-role`, désactivez le plugin "
                                   "`Verification`.", ephemeral=True)
 
-        elif plugin == 'verif' and c.execute("SELECT status FROM plugins WHERE name = 'auto-role'").fetchone()[
-            0] == 'true':
+        elif plugin == 'verif' and c.execute("SELECT status FROM plugins WHERE name = 'auto-role'").fetchone()[0] == 'true':
             conn.close()
             return await ctx.send("Le plugin `Auto-role` est déjà activé, vous ne pouvez pas activer le plugin "
                                   "`Verification`. Si vous voulez activer le plugin `Verification`, désactivez le "
@@ -68,8 +68,7 @@ class Plugins(interactions.Extension):
                     title="Choix du salon",
                     custom_id="giveaway_channel",
                     components=[
-                        interactions.TextInput(
-                            style=interactions.TextStyleType.SHORT,
+                        interactions.ShortText(
                             label="Veuillez entrer l'ID du salon",
                             custom_id="giveaway_channel_text",
                             min_length=1,
@@ -77,7 +76,7 @@ class Plugins(interactions.Extension):
                         )
                     ]
                 )
-                await ctx.popup(choice_modal)
+                await ctx.send_modal(choice_modal)
             else:
                 c.execute(f"UPDATE plugins SET status = '{status}' WHERE name = '{plugin}'")
                 conn.commit()
@@ -95,15 +94,15 @@ class Plugins(interactions.Extension):
 
         conn.close()
 
-    @interactions.extension_modal("giveaway_channel")
-    async def giveaway_channel(self, ctx: interactions.ComponentContext, response: int):
-        # if type(response) is not int:
+    @interactions.modal_callback("giveaway_channel")
+    async def giveaway_channel(self, ctx: interactions.ComponentContext, giveaway_channel_text: int):
+        # if type(giveaway_channel_text) is not int:
         #     return await ctx.send("Veuillez entrer un ID valable !", ephemeral=True)
 
         conn = sqlite3.connect(f"./Database/{ctx.guild.id}.db")
         c = conn.cursor()
 
-        channel = await interactions.get(self.bot, interactions.Channel, object_id=int(response))
+        channel = self.bot.get_channel(giveaway_channel_text)
 
         c.execute(f"UPDATE plugins SET status = 'true' WHERE name = 'giveaway'")
 
