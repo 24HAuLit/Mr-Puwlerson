@@ -25,7 +25,6 @@ class Main:
         # Partie commandes
         self.bot.load_extension("src.commands.staff.self_role")
         self.bot.load_extension("src.commands.staff.setup.setup")
-        self.bot.load_extension("src.commands.mudae.auto_rolls")
         [self.bot.load_extension(f"src.commands.{ext}") for ext in COMMANDS]
         [self.bot.load_extension(f"src.commands.ticket.{ext}") for ext in COMMANDS_TICKET]
         # [self.bot.load(f"src.commands.staff.{ext}") for ext in COMMANDS_STAFF]

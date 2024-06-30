@@ -24,7 +24,7 @@ class Setup(interactions.Extension):
         conn = sqlite3.connect(f'./Database/{ctx.guild.id}.db')
         c = conn.cursor()
 
-        buttons = buttons = [
+        buttons = [
             Button(style=ButtonStyle.PRIMARY, label="Previous", custom_id="previous"),
             Button(style=ButtonStyle.PRIMARY, label="Next", custom_id="next")
         ]

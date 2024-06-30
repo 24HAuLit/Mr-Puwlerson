@@ -25,6 +25,7 @@ class Blacklist(interactions.Extension):
         required=True
     )
     async def blacklist(self, ctx: interactions.SlashContext, user: interactions.User, reason: str):
+        """Blacklist a user from the bot."""
         if await database_exists(ctx) is not True:
             return
 
