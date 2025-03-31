@@ -34,7 +34,7 @@ def time_to_readable(guild_id, time):
     conn = sqlite3.connect(f"./Database/{guild_id}.db")
     c = conn.cursor()
 
-    locale = c.execute("SELECT locale from locale").fetchone()[0]
+    locale = c.execute("SELECT locale FROM config").fetchone()[0]
     conn.close()
 
     if locale == "fr":

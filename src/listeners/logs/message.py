@@ -29,7 +29,7 @@ class Message(interactions.Extension):
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 
-        ticket_parent = get_all(guild.channels, parent_id=c.execute("SELECT id FROM channels WHERE type = 'ticket_parent'").fetchone()[0])
+        ticket_parent = get_all(guild.channels, parent_id=c.execute("SELECT ticket_parent FROM config").fetchone()[0])
 
         if channel in ticket_parent:
             return conn.close()
@@ -95,7 +95,7 @@ class Message(interactions.Extension):
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 
-        ticket_parent = get_all(guild.channels, parent_id=c.execute("SELECT id FROM channels WHERE type = 'ticket_parent'").fetchone()[0])
+        ticket_parent = get_all(guild.channels, parent_id=c.execute("SELECT ticket_parent FROM config").fetchone()[0])
 
         if channel in ticket_parent:
             return conn.close()
@@ -172,7 +172,7 @@ class Message(interactions.Extension):
         if message.author.bot:
             return
 
-        ticket_parent = get_all(guild.channels, parent_id=c.execute("SELECT id FROM channels WHERE type = 'ticket_parent'").fetchone()[0])
+        ticket_parent = get_all(guild.channels, parent_id=c.execute("SELECT ticket_parent FROM config").fetchone()[0])
 
         if channel in ticket_parent:
             return conn.close()

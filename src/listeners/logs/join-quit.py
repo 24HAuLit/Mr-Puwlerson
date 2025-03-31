@@ -16,9 +16,6 @@ class JoinQuit(interactions.Extension):
         conn = sqlite3.connect(f'./Database/{user.guild.id}.db')
         c = conn.cursor()
 
-        if user.guild.id == c.execute("SELECT id FROM main.logs_channels WHERE name='server'").fetchone()[0]:
-            return
-
         logs = self.bot.get_channel(c.execute("SELECT id FROM logs_channels WHERE name = 'join-quit'").fetchone()[0])
 
         if user.member.discriminator == "0":

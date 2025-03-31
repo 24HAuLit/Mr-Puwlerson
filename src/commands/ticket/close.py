@@ -3,7 +3,7 @@ import io
 import sqlite3
 import interactions
 from interactions import Extension, Client, LocalizedName, LocalizedDesc, SlashContext
-from interactions.ext.transcript import get_transcript
+# from interactions.ext.transcript import get_transcript
 from src.listeners.ticket.components.close import confirm_close_cmd
 from src.commands.ticket.tickets import Tickets
 from src.utils.checks import is_staff, database_exists, ticket_parent

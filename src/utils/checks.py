@@ -7,23 +7,28 @@ from src.utils.message_config import ErrorMessage
 async def database_exists(ctx):
     """Check if the database exists
     :param ctx: interaction Context
-    :return: True | Error message"""
-    if type(ctx) == interactions.events.discord.MessageReactionAdd:
-        ctx = ctx.message
-    elif type(ctx) == interactions.events.discord.MessageCreate:
-        ctx = ctx.message
-    elif type(ctx) == interactions.events.discord.MessageDelete:
+    :return: Bool | Error message"""
+    if (isinstance(ctx, interactions.events.discord.MessageReactionAdd)
+            or isinstance(ctx, interactions.events.discord.MessageReactionRemove)
+            or isinstance(ctx, interactions.events.discord.MessageReactionRemoveAll)
+            or isinstance(ctx, interactions.events.discord.MessageReactionRemoveEmoji)
+            or isinstance(ctx, interactions.events.discord.MessageCreate)
+            or isinstance(ctx, interactions.events.discord.MessageUpdate)
+            or isinstance(ctx, interactions.events.discord.MessageDelete)):
         ctx = ctx.message
 
     guild = ctx.guild
 
-    if type(ctx) == interactions.models.internal.SlashContext:
+    if isinstance(ctx, interactions.models.internal.SlashContext):
         if not exists(f"./Database/{guild.id}.db"):
             return await ctx.message.reply(ErrorMessage.database_not_found(guild.id), ephemeral=True)
         else:
             return True
-    elif type(ctx) == interactions.models.discord.BaseMessage:
-        return False
+    elif isinstance(ctx, interactions.models.discord.components.InteractiveComponent):
+        if not exists(f"./Database/{guild.id}.db"):
+            return False
+        else:
+            return True
     else:
         if not exists(f"./Database/{guild.id}.db"):
             return await ctx.reply(ErrorMessage.database_not_found(guild.id), ephemeral=True)
@@ -39,10 +44,10 @@ async def is_staff(ctx):
     conn = connect(f"./Database/{guild.id}.db")
     c = conn.cursor()
 
-    owner_role = c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0]
-    staff_role = c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0]
+    owner_role = c.execute("SELECT owner_role FROM config").fetchone()[0]
+    staff_role = c.execute("SELECT staff_role FROM config").fetchone()[0]
 
-    if owner_role in ctx.author.roles or staff_role in ctx.author.roles or ctx.guild.is_owner():
+    if owner_role in ctx.author.roles or staff_role in ctx.author.roles or ctx.guild.is_owner(ctx.author):
         conn.close()
         return True
     else:
@@ -58,10 +63,10 @@ async def is_admin(ctx):
     conn = connect(f"./Database/{guild.id}.db")
     c = conn.cursor()
 
-    owner_role = c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0]
-    admin_role = c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0]
+    owner_role = c.execute("SELECT owner_role FROM config").fetchone()[0]
+    admin_role = c.execute("SELECT admin_role FROM config").fetchone()[0]
 
-    if owner_role in ctx.author.roles or admin_role in ctx.author.roles or ctx.guild.is_owner():
+    if owner_role in ctx.author.roles or admin_role in ctx.author.roles or ctx.guild.is_owner(ctx.author):
         conn.close()
         return True
     else:
@@ -70,14 +75,14 @@ async def is_admin(ctx):
 
 
 async def is_owner(ctx):
-    """Check if the user is owner
+    """Check if the user is owner of the guild
     :param ctx: interaction Context
     :return: True | Error message"""
     guild = ctx.guild
     conn = connect(f"./Database/{guild.id}.db")
     c = conn.cursor()
 
-    if c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles or ctx.guild.is_owner():
+    if c.execute("SELECT owner_role FROM config").fetchone()[0] in ctx.author.roles or ctx.guild.is_owner(ctx.author):
         conn.close()
         return True
     else:
@@ -93,7 +98,7 @@ async def ticket_parent(ctx):
     conn = connect(f"./Database/{guild.id}.db")
     c = conn.cursor()
 
-    if ctx.channel.parent_id == c.execute("SELECT id FROM channels WHERE type = 'ticket_parent'").fetchone()[0]:
+    if ctx.channel.parent_id == c.execute("SELECT ticket_parent FROM config").fetchone()[0]:
         conn.close()
         return True
     else:
@@ -136,16 +141,15 @@ async def is_blacklist(ctx, author_id: int):
         return False
 
 
-async def is_cooldown(ctx, category: str):
+async def is_cooldown(ctx):
     """Check if there is a cooldown
     :param ctx: interaction Context
-    :param category: category name
     :return: bool | Error message"""
     guild = ctx.guild
 
     conn = connect(f"./Database/{guild.id}.db")
     c = conn.cursor()
-    timestamp = c.execute(f"SELECT {category} FROM cooldown WHERE user = {ctx.author.id}").fetchone()[0]
+    timestamp = c.execute(f"SELECT timestamp FROM cooldown WHERE user = {ctx.author.id}").fetchone()[0]
 
     if timestamp >= int(interactions.Timestamp.utcnow().timestamp()):
         conn.close()

@@ -53,7 +53,7 @@ class Giveaway(interactions.Extension):
         if await is_admin(ctx) is not True:
             return
 
-        if is_plugin(ctx, "giveaway") is not True:
+        if await is_plugin(ctx, "giveaway") is not True:
             return
 
         guild = ctx.guild

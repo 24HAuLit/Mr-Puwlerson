@@ -1,7 +1,7 @@
+import interactions
 from datetime import datetime
 from os.path import exists
 from sqlite3 import connect
-import interactions
 
 from src.utils.time_converter import time_to_readable
 

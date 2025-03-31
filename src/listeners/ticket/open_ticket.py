@@ -38,7 +38,7 @@ class OpenTicket(interactions.Extension):
         # Partie création ticket
         channel = await guild.create_text_channel(
             name=f"ticket-{ctx.user.username}",
-            category=c.execute("SELECT id FROM channels WHERE type = 'ticket_parent'").fetchone()[0],
+            category=c.execute("SELECT ticket_parent FROM config").fetchone()[0],
             permission_overwrites=[
                 interactions.PermissionOverwrite(
                     id=c.execute("SELECT id FROM roles WHERE name = '@everyone'").fetchone()[0],
@@ -46,7 +46,7 @@ class OpenTicket(interactions.Extension):
                 interactions.PermissionOverwrite(id=int(ctx.author.id), type=1,
                                                  allow=64 | 1024 | 2048 | 32768 | 65536 | 262144 | 2147483648),
                 interactions.PermissionOverwrite(
-                    id=c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0], type=0,
+                    id=c.execute("SELECT staff_role FROM config").fetchone()[0], type=0,
                     allow=64 | 1024 | 2048 | 8192 | 32768 | 65536 | 262144 | 2147483648)
             ]
         )

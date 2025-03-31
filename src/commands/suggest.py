@@ -38,19 +38,19 @@ class Suggestion(interactions.Extension):
         if await is_blacklist(ctx, ctx.author.id) is True:
             return
 
-        if c.execute("SELECT * FROM cooldown").fetchone() is None:
+        if c.execute(f"SELECT timestamp FROM cooldown WHERE user = {ctx.author.id}").fetchone() is None:
             c.execute("INSERT INTO cooldown VALUES ('{}', '{}')".format(ctx.author.id, 0))
             conn.commit()
 
-        if await is_cooldown(ctx, "suggestion"):
+        if await is_cooldown(ctx):
             return
 
         timestamp = int(interactions.Timestamp.utcnow().timestamp()) + c.execute("SELECT suggestion_cooldown FROM config").fetchone()[0]
 
-        c.execute(f"UPDATE cooldown SET suggestion = {timestamp} WHERE user = {ctx.author.id}")
+        c.execute(f"UPDATE cooldown SET timestamp = {timestamp} WHERE user = {ctx.author.id}")
         conn.commit()
 
-        channel = self.bot.get_channel(c.execute("SELECT id FROM channels WHERE type = 'suggest'").fetchone()[0])
+        channel = self.bot.get_channel(c.execute("SELECT suggest_channel FROM config").fetchone()[0])
         self.counter += 1
         em = interactions.Embed(
             title="Nouvelle suggestion #%d" % self.counter,

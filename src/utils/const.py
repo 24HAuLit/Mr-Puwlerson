@@ -88,7 +88,6 @@ UPDATE_DB = [
     if file.endswith(".py")
 ]
 
-plugins_list = ['auto_role', 'suggestion', 'report', 'verif', 'giveaway']
 commands_list = [
     "ping", "pileface", "suggest", "mod clear", "mod timeout", "mod untimemout", "nuke",
     "blacklist", "unblacklist", "giveaway", "setup server", "setup roles", "setup channels",
@@ -97,15 +96,10 @@ commands_list = [
 ]
 
 TOKEN = os.getenv("TOKEN_OFFICIAL")
-SENTRY_TOKEN = os.getenv("SENTRY_TOKEN")
 
-TICKET_MAXIMUM = 3
 DATA = {
     "main": {
         "suggestion": 1011704888679477369,
-        "suggest_result": 1011705768002727987,
-        "giveaway": 1071516154109120602,
-        "bda_waiting": 1046381499143950356,
-        "ticket": 1027647411495129109
+        "suggest_result": 1011705768002727987
     }
 }

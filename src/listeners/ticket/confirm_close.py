@@ -2,7 +2,7 @@ import sqlite3
 import io
 import asyncio
 import interactions
-from interactions.ext.transcript import get_transcript
+# from interactions.ext.transcript import get_transcript
 
 
 class ConfirmClose(interactions.Extension):

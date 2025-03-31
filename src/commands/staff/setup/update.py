@@ -8,8 +8,8 @@ class Update(interactions.Extension):
     def __init__(self, bot):
         self.bot: interactions.Client = bot
 
-    @interactions.extension_command()
-    async def update(self, ctx: interactions.CommandContext):
+    @interactions.slash_command()
+    async def update(self, ctx: interactions.SlashContext):
         """Mise à jour de la base de données du serveur si nécessaire."""
         if ctx.author.id == ctx.guild.owner_id:
             pass

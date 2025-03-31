@@ -18,10 +18,8 @@ class Plugins(interactions.Extension):
         description="Plugin a activer/désactiver",
         required=True,
         choices=[
-            interactions.SlashCommandChoice(name="Auto-role", value="auto-role"),
             interactions.SlashCommandChoice(name="Suggestion", value="suggestion"),
             interactions.SlashCommandChoice(name="Report", value="report"),
-            interactions.SlashCommandChoice(name="Verification", value="verif"),
             interactions.SlashCommandChoice(name="Giveaway", value="giveaway"),
         ]
     )
@@ -50,31 +48,17 @@ class Plugins(interactions.Extension):
             conn.close()
             return await ctx.send(f"Le plugin `{plugin}` est déjà `{status}` !", ephemeral=True)
 
-        elif plugin == 'auto-role' and c.execute("SELECT status FROM plugins WHERE name = 'verif'").fetchone()[0] == 'true':
-            conn.close()
-            return await ctx.send("Le plugin `Verification` est déjà activé, vous ne pouvez pas activer le plugin "
-                                  "`Auto-role`. Si vous voulez activer le plugin `Auto-role`, désactivez le plugin "
-                                  "`Verification`.", ephemeral=True)
-
-        elif plugin == 'verif' and c.execute("SELECT status FROM plugins WHERE name = 'auto-role'").fetchone()[0] == 'true':
-            conn.close()
-            return await ctx.send("Le plugin `Auto-role` est déjà activé, vous ne pouvez pas activer le plugin "
-                                  "`Verification`. Si vous voulez activer le plugin `Verification`, désactivez le "
-                                  "plugin `auto-role`.", ephemeral=True)
-
         elif plugin == 'giveaway':
             if status == 'true':
                 choice_modal = interactions.Modal(
+                    interactions.ShortText(
+                        label="Veuillez entrer l'ID du salon",
+                        custom_id="giveaway_channel_text",
+                        min_length=1,
+                        max_length=100
+                    ),
                     title="Choix du salon",
-                    custom_id="giveaway_channel",
-                    components=[
-                        interactions.ShortText(
-                            label="Veuillez entrer l'ID du salon",
-                            custom_id="giveaway_channel_text",
-                            min_length=1,
-                            max_length=100
-                        )
-                    ]
+                    custom_id="giveaway_channel"
                 )
                 await ctx.send_modal(choice_modal)
             else:

@@ -27,7 +27,7 @@ class OnChannel(interactions.Extension):
     @interactions.listen(ChannelCreate)
     async def new_channel(self, base_channel: ChannelCreate):
         if base_channel.channel.guild.id is None:
-            return interactions.Task.stop()
+            return
 
         guild = self.bot.get_guild(base_channel.channel.guild.id)
         if os.path.exists(f'./Database/{guild.id}.db') is False:
@@ -36,7 +36,7 @@ class OnChannel(interactions.Extension):
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 
-        if base_channel.channel.parent_id == c.execute("SELECT id FROM channels WHERE type = 'ticket_parent'").fetchone()[0]:
+        if base_channel.channel.parent_id == c.execute("SELECT ticket_parent FROM config").fetchone()[0]:
             return conn.close()
 
         c.execute("INSERT INTO channels VALUES ('{}', '{}', NULL, '{}')".format(base_channel.channel.name, base_channel.channel.id, 0))
@@ -75,7 +75,7 @@ class OnChannel(interactions.Extension):
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 
-        if base_channel.channel.parent_id == c.execute("SELECT id FROM channels WHERE type = 'ticket_parent'").fetchone()[0]:
+        if base_channel.channel.parent_id == c.execute("SELECT ticket_parent FROM config").fetchone()[0]:
             return conn.close()
 
         c.execute(f"DELETE FROM channels WHERE id = {base_channel.channel.id}")

@@ -18,15 +18,15 @@ class OnUserJoin(interactions.Extension):
         conn = sqlite3.connect(f"./Database/{member.guild.id}.db")
         c = conn.cursor()
 
-        if c.execute("SELECT id FROM channels WHERE type = 'guild'").fetchone()[0] != member.guild.id:
-            return conn.close()
+        # if c.execute("SELECT id FROM channels WHERE type = 'guild'").fetchone()[0] != member.guild.id:  # Je sais pas a quoi sa sert gamberge plus tard
+        #     return conn.close()
 
-        if c.execute("SELECT status FROM plugins WHERE name = 'auto-role'").fetchone()[0] == 'true':
-            id = c.execute("SELECT id FROM roles WHERE type = 'Default'").fetchone()[0]
+        if c.execute("SELECT auto_role FROM config").fetchone()[0] == 1:
+            id = c.execute("SELECT default_role FROM config").fetchone()[0]
             role = member.guild.get_role(id)
             await member.member.add_role(role)
 
-        elif c.execute("SELECT status FROM plugins WHERE name = 'verif'").fetchone()[0] == 'true':
+        elif c.execute("SELECT auto_role FROM config").fetchone()[0] == 2:
             if member.bot is True:
                 return conn.close()
 
@@ -97,7 +97,7 @@ class OnUserJoin(interactions.Extension):
             await ctx.ctx.message.edit(components=[])
             await ctx.ctx.send("Vous avez appuyé sur le bon boutton. Vous êtes donc vérifié !")
 
-            role = await guild.fetch_role(c.execute("SELECT id FROM roles WHERE type = 'Default'").fetchone()[0])
+            role = await guild.fetch_role(c.execute("SELECT default_role FROM config").fetchone()[0])
 
             member = await self.bot.fetch_member(ctx.ctx.user.id, guild.id)
 

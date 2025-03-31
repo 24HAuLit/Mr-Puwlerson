@@ -45,46 +45,46 @@ class Help(interactions.Extension):
             return await ctx.send(embeds=HelpMessage.suggestions(ctx, guild.id), ephemeral=True)
 
         elif command == "mod clear":
-            staff_role_id = c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0]
+            staff_role_id = c.execute("SELECT staff_role FROM config").fetchone()[0]
             staff_role = guild.get_role(staff_role_id)
             return await ctx.send(embeds=HelpMessage.clear(ctx, staff_role.name, guild.id), ephemeral=True)
 
         elif command == "mod timeout":
-            staff_role_id = c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0]
+            staff_role_id = c.execute("SELECT staff_role FROM config").fetchone()[0]
             staff_role = guild.get_role(staff_role_id)
             return await ctx.send(embeds=HelpMessage.timeout(ctx, staff_role.name, guild.id), ephemeral=True)
 
         elif command == "mod untimemout":
-            staff_role_id = c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0]
+            staff_role_id = c.execute("SELECT staff_role FROM config").fetchone()[0]
             staff_role = guild.get_role(staff_role_id)
             return await ctx.send(embeds=HelpMessage.untimeout(ctx, staff_role.name, guild.id), ephemeral=True)
 
         elif command == "nuke":
-            staff_role_id = c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0]
+            staff_role_id = c.execute("SELECT admin_role FROM config").fetchone()[0]
             staff_role = guild.get_role(staff_role_id)
             return await ctx.send(embeds=HelpMessage.nuke(ctx, staff_role.name, guild.id), ephemeral=True)
 
         elif command == "blacklist":
-            staff_role_id = c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0]
+            staff_role_id = c.execute("SELECT admin_role FROM config").fetchone()[0]
             staff_role = guild.get_role(staff_role_id)
             return await ctx.send(embeds=HelpMessage.blacklist(ctx, staff_role.name, guild.id), ephemeral=True)
 
         elif command == "unblacklist":
-            staff_role_id = c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0]
+            staff_role_id = c.execute("SELECT admin_role FROM config").fetchone()[0]
             staff_role = guild.get_role(staff_role_id)
             return await ctx.send(embeds=HelpMessage.unblacklist(ctx, staff_role.name, guild.id), ephemeral=True)
 
         elif command == "giveaway":
-            staff_role_id = c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0]
+            staff_role_id = c.execute("SELECT admin_role FROM config").fetchone()[0]
             staff_role = guild.get_role(staff_role_id)
             return await ctx.send(embeds=HelpMessage.giveaway(ctx, staff_role.name, guild.id), ephemeral=True)
 
         elif command == "setup server":
-            staff_role_id = c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0]
+            staff_role_id = c.execute("SELECT owner_role FROM config").fetchone()[0]
             staff_role = guild.get_role(staff_role_id)
             return await ctx.send(embeds=HelpMessage.setup_server(ctx, staff_role.name, guild.id), ephemeral=True)
 
-        if ctx.guild.is_owner(ctx.author.id) or c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] \
+        if ctx.guild.is_owner(ctx.author.id) or c.execute("SELECT owner_role FROM config").fetchone()[0] \
                 in ctx.author.roles:
             conn.close()
 
@@ -124,7 +124,7 @@ class Help(interactions.Extension):
             )
             return await ctx.send(embeds=em, ephemeral=True)
 
-        if c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0] in ctx.author.roles:
+        if c.execute("SELECT admin_role FROM config").fetchone()[0] in ctx.author.roles:
             conn.close()
 
             em1 = interactions.Embed(
@@ -158,7 +158,7 @@ class Help(interactions.Extension):
             )
             return await ctx.send(embeds=em1, ephemeral=True)
 
-        elif c.execute("SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles:
+        elif c.execute("SELECT staff_role FROM config").fetchone()[0] in ctx.author.roles:
             conn.close()
 
             em2 = interactions.Embed(
@@ -188,7 +188,7 @@ class Help(interactions.Extension):
             return await ctx.send(embeds=em2, ephemeral=True)
 
         else:
-            suggest = c.execute("SELECT id FROM channels WHERE type = 'suggest'").fetchone()[0]
+            suggest = c.execute("SELECT suggest_channel FROM config").fetchone()[0]
             conn.close()
 
             em3 = interactions.Embed(
