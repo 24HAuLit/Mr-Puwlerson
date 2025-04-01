@@ -7,9 +7,6 @@ from src.utils.time_converter import time_to_readable
 
 
 class ErrorMessage:
-    def __init__(self):
-        pass
-
     @staticmethod
     def database_not_found(guild_id):
         """Send a message when the Database is not found for the guild ID.
