@@ -3,6 +3,7 @@ import sqlite3
 import interactions
 from interactions import LocalizedDesc
 from src.utils.checks import database_exists, is_admin
+from src.utils.message_config import ErrorMessage
 
 
 class Nuke(interactions.Extension):
@@ -35,8 +36,8 @@ class Nuke(interactions.Extension):
         if await database_exists(ctx) is not True:
             return
 
-        if await is_admin(ctx) is not True:
-            return
+        if await is_admin(ctx) is False:
+            return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
         await ctx.send("Voulez-vous vraiment détruire ce salon ? **Cette action est irréversible.**",
                        components=[self.confirm_button, self.refused_button], ephemeral=True)
@@ -78,15 +79,15 @@ class Nuke(interactions.Extension):
         c = conn.cursor()
 
         logs_nuke = self.bot.get_channel(
-            c.execute("SELECT id FROM logs_channels WHERE name = 'blacklist'").fetchone()[0])
+            c.execute("SELECT id FROM logs_channels WHERE name = 'nuke'").fetchone()[0])
 
         conn.close()
 
         em2 = interactions.Embed(title="**💣 Nouveau nuke**", description=f"Un channel a été nuke.",
                                  color=0xFF0000,
                                  timestamp=interactions.Timestamp.utcnow())
-        em2.add_field(name="**Ancien channel : **", value=f"Nom : {actual} | ID : {actual.id}")
-        em2.add_field(name="**Nouveau channel : **", value=f"Nom : {new} ({new.mention}) | ID : {new.id}")
+        em2.add_field(name="**Ancien channel : **", value=f"Nom : {actual.name} | ID : {actual.id}")
+        em2.add_field(name="**Nouveau channel : **", value=f"Nom : {new.name} ({new.mention}) | ID : {new.id}")
         em2.set_footer(icon_url=ctx.member.user.avatar.url,
                        text=f"Author ID : {ctx.author.id} | Name : {ctx.author.username}.")
 
