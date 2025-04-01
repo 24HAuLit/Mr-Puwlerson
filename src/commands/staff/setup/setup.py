@@ -59,7 +59,7 @@ class Setup(interactions.Extension):
         )
         page1.add_field(
             name="Nombre de tickets par utilisateur",
-            value=c.execute("SELECT ticket_count FROM config").fetchone()[0],
+            value=c.execute("SELECT ticket_limit FROM config").fetchone()[0],
             inline=True
         )
         page1.add_field(
