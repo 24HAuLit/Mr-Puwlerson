@@ -1,6 +1,7 @@
 import interactions
 from src.utils.checks import database_exists, is_staff
 from src.listeners.ticket.components.close import confirm_close_cmd
+from src.utils.message_config import ErrorMessage
 
 
 class CloseTicket(interactions.Extension):
@@ -13,6 +14,6 @@ class CloseTicket(interactions.Extension):
             return
 
         if await is_staff(ctx) is not True:
-            return
+            return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
         await ctx.send("Êtes-vous sur de vouloir fermer ce ticket ?", components=confirm_close_cmd(), ephemeral=True)

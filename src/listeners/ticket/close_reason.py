@@ -2,6 +2,7 @@ import asyncio
 import sqlite3
 import interactions
 from src.utils.checks import is_staff, database_exists
+from src.utils.message_config import ErrorMessage
 
 
 class CloseReasonTicket(interactions.Extension):
@@ -14,7 +15,7 @@ class CloseReasonTicket(interactions.Extension):
             return
 
         if await is_staff(ctx) is not True:
-            return
+            return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
         modal = interactions.Modal(
             interactions.ParagraphText(

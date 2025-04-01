@@ -28,7 +28,7 @@ class AddMember(interactions.Extension):
             return
 
         if await is_staff(ctx) is not True:
-            return
+            return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
         if await ticket_parent(ctx) is not True:
             return

@@ -7,6 +7,7 @@ from interactions import Extension, Client, LocalizedName, LocalizedDesc, SlashC
 from src.listeners.ticket.components.close import confirm_close_cmd
 from src.commands.ticket.tickets import Tickets
 from src.utils.checks import is_staff, database_exists, ticket_parent
+from src.utils.message_config import ErrorMessage
 
 
 class CloseTicketCommand(Extension):
@@ -30,7 +31,7 @@ class CloseTicketCommand(Extension):
             return
 
         if await is_staff(ctx) is not True:
-            return
+            return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
         if await ticket_parent(ctx) is not True:
             return
@@ -49,7 +50,7 @@ class CloseTicketCommand(Extension):
         c.execute(f'SELECT * from ticket WHERE channel_id = {int(channel.id)}')
         result = c.fetchone()
 
-        c.execute("UPDATE ticket_count SET count = count+1 WHERE user_id = '{}'".format(result[1]))
+        c.execute("UPDATE ticket_count SET count = count-1 WHERE user_id = '{}'".format(result[1]))
         conn.commit()
 
         # Partie transcript // HS pour l'instant

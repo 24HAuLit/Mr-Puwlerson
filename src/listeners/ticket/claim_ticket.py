@@ -15,7 +15,7 @@ class ClaimTicket(interactions.Extension):
             return
 
         if await is_staff(ctx) is not True:
-            return
+            return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
         channel = ctx.channel
         id_staff = ctx.author.id

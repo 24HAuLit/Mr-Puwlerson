@@ -3,6 +3,7 @@ import interactions
 from interactions import LocalizedDesc
 from src.commands.ticket.tickets import Tickets
 from src.utils.checks import is_staff, database_exists, ticket_parent
+from src.utils.message_config import ErrorMessage
 
 
 class ClaimCommand(interactions.Extension):
@@ -19,7 +20,7 @@ class ClaimCommand(interactions.Extension):
             return
 
         if await is_staff(ctx) is not True:
-            return
+            return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
         if await ticket_parent(ctx) is not True:
             return

@@ -25,15 +25,19 @@ class OpenTicket(interactions.Extension):
         c.execute(f"SELECT count FROM ticket_count WHERE user_id = {int(ctx.author.id)}")
         count = c.fetchone()
 
-        if await is_staff(ctx) is not True:
-            if count is not None and count[0] == 0:
-                return await ctx.send(ErrorMessage.ticket_limit(guild.id), ephemeral=True)
+        c.execute(f"SELECT ticket_limit FROM config")
+        ticket_limit = c.fetchone()[0]
 
-            c.execute(
-                """INSERT OR REPLACE INTO ticket_count (user_id, count) VALUES (?, COALESCE((SELECT count FROM 
-                ticket_count WHERE user_id=?), 0) - 1)""",
-                (int(ctx.author.id), int(ctx.author.id)))
-            conn.commit()
+        if await is_staff(ctx) is False:
+            if count is None:
+                c.execute("INSERT INTO ticket_count (user_id, count) VALUES (?, 1)", (int(ctx.author.id),))
+                conn.commit()
+            else:
+                if count[0] == ticket_limit:
+                    return await ctx.send(ErrorMessage.ticket_limit(guild.id), ephemeral=True)
+
+                c.execute(f"UPDATE ticket_count SET count = count + 1 WHERE user_id = {int(ctx.author.id)}")
+                conn.commit()
 
         # Partie création ticket
         channel = await guild.create_text_channel(

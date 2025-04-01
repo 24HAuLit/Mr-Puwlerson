@@ -21,7 +21,7 @@ class ConfirmClose(interactions.Extension):
         c.execute(f'SELECT * from ticket WHERE channel_id = {int(channel.id)}')
         result = c.fetchone()
 
-        c.execute("UPDATE ticket_count SET count = count+1 WHERE user_id = '{}'".format(result[1]))
+        c.execute("UPDATE ticket_count SET count = count-1 WHERE user_id = '{}'".format(result[1]))
         conn.commit()
 
         # Partie transcript // HS pour l'instant
