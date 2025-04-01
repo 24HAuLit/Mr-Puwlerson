@@ -1,9 +1,6 @@
 import sqlite3
 import interactions
-
 from src.utils.checks import database_exists, is_owner
-from src.utils.message_config import ErrorMessage
-from os.path import exists
 
 
 class Locale(interactions.Extension):
