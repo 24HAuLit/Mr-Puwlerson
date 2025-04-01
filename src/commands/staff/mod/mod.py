@@ -4,6 +4,8 @@ import sqlite3
 import interactions
 from interactions import SlashContext, Embed, LocalizedName, LocalizedDesc
 from datetime import timedelta
+
+from src.utils.checks import is_staff, database_exists
 from src.utils.message_config import ErrorMessage
 from src.utils.time_converter import time_to_readable
 
@@ -18,23 +20,11 @@ class Mod(interactions.Extension):
 
     @interactions.slash_command(dm_permission=False)
     async def mod(self, ctx: SlashContext):
-        guild = ctx.guild
+        if database_exists(ctx) is not True:
+            return
 
-        if os.path.exists(f"./Database/{guild.id}.db") is False:
-            return await ctx.send(ErrorMessage.database_not_found(guild.id), ephemeral=True)
-
-        conn = sqlite3.connect(f"./Database/{guild.id}.db")
-        c = conn.cursor()
-
-        if ctx.author.has_permission(interactions.Permissions.ALL):
-            pass
-        elif c.execute(f"SELECT id FROM roles WHERE type = 'Staff'").fetchone()[0] in ctx.author.roles:
-            pass
-        else:
-            await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
-            return conn.close()
-
-        conn.close()
+        if await is_staff(ctx) is False:
+            return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
     @mod.subcommand()
     @interactions.slash_option(
@@ -45,11 +35,6 @@ class Mod(interactions.Extension):
     )
     async def clear(self, ctx: SlashContext, number: int = 5):
         guild = ctx.guild
-
-        if os.path.exists(f"./Database/{guild.id}.db") is False:
-            return await ctx.send(ErrorMessage.database_not_found(guild.id), ephemeral=True)
-
-        print("test")
 
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
@@ -84,30 +69,32 @@ class Mod(interactions.Extension):
                       inline=False)
         em2.set_footer(text=f"Author ID : {ctx.author.id} | Name : {ctx.author.username}.")
 
-        f_path = f"./src/utils/clear_log/temp_clear_log_{ctx.guild.id}.txt"
+        # Transcript
+        # f_path = f"./src/utils/clear_log/temp_clear_log_{ctx.guild.id}.txt"
+        #
+        # with open(f_path, "w") as f:
+        #     if ctx.author.discriminator == "0":
+        #         f.write(f"Clear log from {ctx.channel.name} ({ctx.channel.id}) | Server : {ctx.guild.name} ({ctx.guild.id})\nAuthor : {ctx.author.username} ({ctx.author.id})\n\n")
+        #     else:
+        #         f.write(f"Clear log from {ctx.channel.name} ({ctx.channel.id}) | Server : {ctx.guild.name} ({ctx.guild.id})\nAuthor : {ctx.author.username}#{ctx.author.discriminator} ({ctx.author.id})\n\n")
+        #
+        #     for message in deleted:
+        #         if message.attachments:
+        #             for attachment in message.attachments:
+        #                 f.write(f"{message.timestamp.now().strftime('%m/%d/%Y, %H:%M:%S')} | {message.author} : {message.content} + {attachment.url}\n")
+        #         else:
+        #             f.write(f"{message.timestamp.now().strftime('%m/%d/%Y, %H:%M:%S')} | {message.author} : {message.content}\n")
+        #
+        # txt = io.FileIO(f_path, "r")
+        #
+        # file = interactions.File(file_name=f"clear-log.txt", file=txt)
+        #
+        # txt.close()
+        # os.remove(f_path)
 
-        with open(f_path, "w") as f:
-            if ctx.author.discriminator == "0":
-                f.write(f"Clear log from {ctx.channel.name} ({ctx.channel.id}) | Server : {ctx.guild.name} ({ctx.guild.id})\nAuthor : {ctx.author.username} ({ctx.author.id})\n\n")
-            else:
-                f.write(f"Clear log from {ctx.channel.name} ({ctx.channel.id}) | Server : {ctx.guild.name} ({ctx.guild.id})\nAuthor : {ctx.author.username}#{ctx.author.discriminator} ({ctx.author.id})\n\n")
-
-            for message in deleted:
-                if message.attachments:
-                    for attachment in message.attachments:
-                        f.write(f"{message.timestamp.now().strftime('%m/%d/%Y, %H:%M:%S')} | {message.author} : {message.content} + {attachment.url}\n")
-                else:
-                    f.write(f"{message.timestamp.now().strftime('%m/%d/%Y, %H:%M:%S')} | {message.author} : {message.content}\n")
-
-        txt = io.FileIO(f_path, "r")
-
-        file = interactions.File(file_name=f"clear-log.txt", file=txt)
-
-        await logs_clear.send(embeds=em2, files=file)
-
-        txt.close()
-
-        os.remove(f_path)
+        await logs_clear.send(embeds=em2,
+                              # files=file
+                              )
 
     @mod.subcommand(
         sub_cmd_description=LocalizedDesc(
@@ -143,9 +130,6 @@ class Mod(interactions.Extension):
         await ctx.send(f"{user.mention} a été exclu pendant **{time_to_readable(guild.id, duration)}** pour **{reason}**.", ephemeral=True)
 
         # Partie Logs
-        if os.path.exists(f"./Database/{guild.id}.db") is False:
-            return
-
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
@@ -199,9 +183,6 @@ class Mod(interactions.Extension):
         await user.edit(communication_disabled_until=None, reason=reason)
         await ctx.send(f"L'exclusion de {user.mention} a été annulé pour **{reason}**.", ephemeral=True)
 
-        if os.path.exists(f"./Database/{guild.id}.db") is False:
-            return
-
         conn = sqlite3.connect(f"./Database/{guild.id}.db")
         c = conn.cursor()
 
@@ -210,7 +191,6 @@ class Mod(interactions.Extension):
         conn.close()
 
         # Partie Logs
-
         em = Embed(
             title="🟢・Fin d'exclusion temporaire",
             description=f"Un staff vient de retirer l'exclusion temporaire d'un membre sur **{guild.name}**.",
