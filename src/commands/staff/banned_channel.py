@@ -2,6 +2,7 @@ import sqlite3
 import interactions
 from interactions import LocalizedDesc, LocalizedName
 from src.utils.checks import database_exists, is_owner
+from src.utils.message_config import ErrorMessage
 
 
 class BannedChannels(interactions.Extension):
@@ -22,7 +23,7 @@ class BannedChannels(interactions.Extension):
             return
 
         if await is_owner(ctx) is not True:
-            return
+            return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
         conn = sqlite3.connect(f"./Database/{ctx.guild.id}.db")
         c = conn.cursor()

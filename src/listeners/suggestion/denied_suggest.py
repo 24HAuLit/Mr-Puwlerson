@@ -2,6 +2,7 @@ import interactions
 from src.utils.checks import database_exists, is_admin
 from src.utils.const import DATA
 from src.listeners.suggestion.components.deny import modal_deny
+from src.utils.message_config import ErrorMessage
 
 
 class SuggestionDenied(interactions.Extension):
@@ -14,7 +15,7 @@ class SuggestionDenied(interactions.Extension):
             return
 
         if await is_admin(ctx) is not True:
-            return
+            return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
         await ctx.send_modal(modal_deny())
 

@@ -50,8 +50,8 @@ class Giveaway(interactions.Extension):
         if await database_exists(ctx) is not True:
             return
 
-        if await is_admin(ctx) is not True:
-            return
+        if await is_admin(ctx) is False:
+            return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
         if await is_plugin(ctx, "giveaway") is not True:
             return
@@ -144,8 +144,8 @@ class Giveaway(interactions.Extension):
         conn = sqlite3.connect(f'./Database/{guild.id}.db')
         c = conn.cursor()
 
-        if c.execute("SELECT id FROM roles WHERE type = 'Owner'").fetchone()[0] in ctx.author.roles or \
-                c.execute("SELECT id FROM roles WHERE type = 'Admin'").fetchone()[0] in ctx.author.roles:
+        if c.execute("SELECT owner_role FROM config").fetchone()[0] in ctx.author.roles or \
+                c.execute("SELECT admin_role FROM config").fetchone()[0] in ctx.author.roles:
             conn.close()
             return await ctx.send("Vous ne pouvez pas participer au giveaway !", ephemeral=True)
         if ctx.author.id not in self.dict:

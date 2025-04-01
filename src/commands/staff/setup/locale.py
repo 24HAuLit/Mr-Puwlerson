@@ -1,6 +1,7 @@
 import sqlite3
 import interactions
 from src.utils.checks import database_exists, is_owner
+from src.utils.message_config import ErrorMessage
 
 
 class Locale(interactions.Extension):
@@ -24,7 +25,7 @@ class Locale(interactions.Extension):
             return
 
         if not await is_owner(ctx):
-            return
+            return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
         conn = sqlite3.connect(f'./Database/{ctx.guild.id}.db')
         c = conn.cursor()

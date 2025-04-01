@@ -2,6 +2,7 @@ import sqlite3
 import interactions
 from interactions import LocalizedName, LocalizedDesc
 from src.utils.checks import database_exists, is_admin
+from src.utils.message_config import ErrorMessage
 
 
 class UnBlacklist(interactions.Extension):
@@ -28,8 +29,8 @@ class UnBlacklist(interactions.Extension):
         if await database_exists(ctx) is not True:
             return
 
-        if is_admin(ctx) is not True:
-            return
+        if is_admin(ctx) is False:
+            return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
         guild = ctx.guild
 

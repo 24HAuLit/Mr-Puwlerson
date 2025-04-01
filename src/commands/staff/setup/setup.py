@@ -4,6 +4,7 @@ from interactions import Button, ButtonStyle
 from interactions.ext import paginators
 from interactions import LocalizedDesc
 from src.utils.checks import database_exists, is_owner
+from src.utils.message_config import ErrorMessage
 
 
 class Setup(interactions.Extension):
@@ -19,7 +20,7 @@ class Setup(interactions.Extension):
         if await database_exists(ctx) is not True:
             return
         if await is_owner(ctx) is not True:
-            return
+            return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
         conn = sqlite3.connect(f'./Database/{ctx.guild.id}.db')
         c = conn.cursor()

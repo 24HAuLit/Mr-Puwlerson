@@ -2,6 +2,7 @@ import interactions
 from src.utils.checks import database_exists, is_admin
 from src.utils.const import DATA
 from src.listeners.suggestion.components.accept import modal_accept
+from src.utils.message_config import ErrorMessage
 
 
 class SuggestionAccepted(interactions.Extension):
@@ -14,7 +15,7 @@ class SuggestionAccepted(interactions.Extension):
             return
 
         if await is_admin(ctx) is not True:
-            return
+            return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
         await ctx.send_modal(modal_accept())
 

@@ -36,7 +36,7 @@ class SelfRole(interactions.Extension):
         if await database_exists(ctx) is not True:
             return
         if await is_admin(ctx) is not True:
-            return
+            return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
         test = [message.id async for message in ctx.channel.history(limit=100)]
 

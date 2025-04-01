@@ -36,10 +36,10 @@ async def database_exists(ctx):
             return True
 
 
-async def is_staff(ctx):
+async def is_staff(ctx) -> bool:
     """Check if the user is staff
     :param ctx: interaction Context
-    :return: True | Error message"""
+    :return bool"""
     guild = ctx.guild
     conn = connect(f"./Database/{guild.id}.db")
     c = conn.cursor()
@@ -52,13 +52,13 @@ async def is_staff(ctx):
         return True
     else:
         conn.close()
-        return await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
+        return False
 
 
-async def is_admin(ctx):
+async def is_admin(ctx) -> bool:
     """Check if the user is admin
     :param ctx: interaction Context
-    :return: True | Error message"""
+    :return: bool"""
     guild = ctx.guild
     conn = connect(f"./Database/{guild.id}.db")
     c = conn.cursor()
@@ -71,13 +71,13 @@ async def is_admin(ctx):
         return True
     else:
         conn.close()
-        return await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
+        return False
 
 
-async def is_owner(ctx):
+async def is_owner(ctx) -> bool:
     """Check if the user is owner of the guild
     :param ctx: interaction Context
-    :return: True | Error message"""
+    :return: bool"""
     guild = ctx.guild
     conn = connect(f"./Database/{guild.id}.db")
     c = conn.cursor()
@@ -87,7 +87,7 @@ async def is_owner(ctx):
         return True
     else:
         conn.close()
-        return await ctx.send(ErrorMessage.MissingPermissions(guild.id), ephemeral=True)
+        return False
 
 
 async def ticket_parent(ctx):
