@@ -68,6 +68,14 @@ class Nuke(interactions.Extension):
 
         await ctx.channel.delete(reason="Nuked")
 
+        conn = sqlite3.connect(f'./Database/{ctx.guild.id}.db')
+        c = conn.cursor()
+
+        c.execute("UPDATE channels SET id = ? WHERE id = ?", (new.id, actual.id))
+
+        conn.commit()
+        conn.close()
+
         embed3 = interactions.Embed(description="Salon tout neuf, rien que pour vous.", color=0x75FF75,
                                     timestamp=interactions.Timestamp.utcnow())
 
