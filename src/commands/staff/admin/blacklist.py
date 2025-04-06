@@ -1,4 +1,3 @@
-import os
 import sqlite3
 import interactions
 from interactions import LocalizedName, LocalizedDesc
@@ -45,62 +44,31 @@ class Blacklist(interactions.Extension):
 
         c.execute("INSERT INTO blacklist VALUES (NULL, '{}', '{}')".format(user.id, reason))
         conn.commit()
+
+        blacklist_id = c.execute("SELECT blacklist_id FROM blacklist WHERE user_id = ?", (user.id,)).fetchone()[0]
         conn.close()
 
         await ctx.send(f"{user.mention} ({user.id}) a bien été blacklist.", ephemeral=True)
 
-        if ctx.author.discriminator == "0":
-            if user.discriminator == "0":
-                em = interactions.Embed(
-                    title="🔒・Blacklist",
-                    description=f"Le membre **{user.username}** a été blacklist par **{ctx.author.username}**.",
-                    color=0xFF0000,
-                    timestamp=interactions.Timestamp.utcnow()
-                )
-            else:
-                em = interactions.Embed(
-                    title="🔒・Blacklist",
-                    description=f"Le membre **{user.username}#{user.discriminator}** a été blacklist par **{ctx.author.username}**.",
-                    color=0xFF0000,
-                    timestamp=interactions.Timestamp.utcnow()
-                )
-        else:
-            if user.discriminator == "0":
-                em = interactions.Embed(
-                    title="🔒・Blacklist",
-                    description=f"Le membre **{user.username}** a été blacklist par **{ctx.author.username}#{ctx.author.discriminator}**",
-                    color=0xFF0000,
-                    timestamp=interactions.Timestamp.utcnow()
-                )
-            else:
-                em = interactions.Embed(
-                    title="🔒・Blacklist",
-                    description=f"Le membre **{user.username}#{user.discriminator}** a été blacklist par **{ctx.author.username}#{ctx.author.discriminator}**",
-                    color=0xFF0000,
-                    timestamp=interactions.Timestamp.utcnow()
-                )
-        em.add_field(name="Raison", value=reason)
+        em = interactions.Embed(
+            title="🔒・Blacklist",
+            description=f"User **{user.username}** has been blacklisted by **{ctx.author.username}**.",
+            color=0xFF0000,
+            timestamp=interactions.Timestamp.utcnow()
+        )
+        em.add_field(name="Reason", value=reason)
+        em.add_field(name="Blacklist ID", value=blacklist_id)
         em.set_footer(text=f"Staff ID : {ctx.author.id} | User ID : {user.id}")
 
         await channel.send(embeds=em)
 
-        if ctx.author.discriminator == "0":
-            em_dm = interactions.Embed(
-                title="🔒・Blacklist",
-                description=f"Vous avez été blacklist par **{ctx.author.username}** pour **{reason}**.\nVous pourrez être unblacklist si vous êtes gentil ou après un certain temps.",
-                color=0xFF0000,
-                timestamp=interactions.Timestamp.utcnow()
-            )
-            em_dm.set_footer(icon_url=ctx.author.avatar.url,
-                             text=f"Staff : {ctx.author.username} ({ctx.author.id})")
-        else:
-            em_dm = interactions.Embed(
-                title="🔒・Blacklist",
-                description=f"Vous avez été blacklist par **{ctx.author.username}#{ctx.author.discriminator}** pour **{reason}**.\nVous pourrez être unblacklist si vous êtes gentil ou après un certain temps.",
-                color=0xFF0000,
-                timestamp=interactions.Timestamp.utcnow()
-            )
-            em_dm.set_footer(icon_url=ctx.author.avatar.url,
-                             text=f"Staff : {ctx.author.username}#{ctx.author.discriminator} ({ctx.author.id})")
+        em_dm = interactions.Embed(
+            title="🔒・Blacklist",
+            description=f"You have got blacklisted by **{ctx.author.username}** for **{reason}**.\n"
+                        "You will be unblacklisted if you are nice or after a certain time.",
+            color=0xFF0000,
+            timestamp=interactions.Timestamp.utcnow()
+        )
+        em_dm.set_footer(icon_url=ctx.author.avatar.url, text=f"Staff : {ctx.author.username} ({ctx.author.id}) | ID : {blacklist_id}")
 
         await user.send(embeds=em_dm)

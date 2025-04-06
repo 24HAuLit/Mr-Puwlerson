@@ -29,7 +29,7 @@ class UnBlacklist(interactions.Extension):
         if await database_exists(ctx) is not True:
             return
 
-        if is_admin(ctx) is False:
+        if await is_admin(ctx) is False:
             return await ctx.send(ErrorMessage.MissingPermissions(ctx.guild.id), ephemeral=True)
 
         guild = ctx.guild
@@ -41,48 +41,39 @@ class UnBlacklist(interactions.Extension):
         reason = reason
         channel = self.bot.get_channel(c.execute("SELECT id FROM logs_channels WHERE name = 'blacklist'").fetchone()[0])
 
+        if c.execute(f"SELECT user_id FROM blacklist WHERE user_id = {user_id}").fetchone() is None:
+            conn.close()
+            return await ctx.send("Sorry, but you can't unblacklist someone who is not blacklist.", ephemeral=True)
+
+        blacklist_id = c.execute(f"SELECT blacklist_id FROM blacklist WHERE user_id = {user_id}").fetchone()[0]
+
         c.execute("DELETE FROM blacklist WHERE user_id='{}'".format(user_id))
         conn.commit()
         conn.close()
 
-        await ctx.send(f"{user.mention} ({user.id}) a bien été unblacklist.", ephemeral=True)
+        await ctx.send(f"{user.mention} ({user.id}) is no longer blacklisted.", ephemeral=True)
 
-        if user.discriminator == "0":
-            em = interactions.Embed(
-                description=f"Le membre {user.username} a été unblacklist par {ctx.author.username}#{ctx.author.discriminator}",
-                color=0x00FF00,
-                timestamp=interactions.Timestamp.utcnow()
-            )
-        else:
-            em = interactions.Embed(
-                description=f"Le membre {user.username}#{user.discriminator} a été unblacklist par {ctx.author.username}#{ctx.author.discriminator}",
-                color=0x00FF00,
-                timestamp=interactions.Timestamp.utcnow()
-            )
+        em = interactions.Embed(
+            title="🔓・Unblacklist",
+            description=f"User **{user.username}** has been unblacklisted by **{ctx.author.username}**",
+            color=0x00FF00,
+            timestamp=interactions.Timestamp.utcnow()
+        )
+        em.add_field(name="Reason", value=reason)
+        em.add_field(name="Blacklist ID", value=blacklist_id)
         em.set_footer(text=f"Staff ID : {ctx.author.id} | User ID : {user.id}")
 
         await channel.send(embeds=em)
 
-        if ctx.author.discriminator == "0":
-            em_dm = interactions.Embed(
-                title="🔓・Unblacklist",
-                description=f"Vous avez été unblacklist par **{ctx.author.username}** pour **{reason}**.\nVous "
-                            f"avez été gentil, c'est bien, maintenant continuer sur cette voie.",
-                color=0x00FF00,
-                timestamp=interactions.Timestamp.utcnow()
-            )
-            em_dm.set_footer(icon_url=ctx.author.avatar_url, text=f"Staff : {ctx.author.username} ({ctx.author.id})")
-        else:
-            em_dm = interactions.Embed(
-                title="🔓・Unblacklist",
-                description=f"Vous avez été unblacklist par **{ctx.author.username}#{ctx.author.discriminator}** "
-                            f"pour **{reason}**.\nVous avez été gentil, c'est bien, maintenant continuer sur "
-                            f"cette voie.",
-                color=0x00FF00,
-                timestamp=interactions.Timestamp.utcnow()
-            )
-            em_dm.set_footer(icon_url=ctx.author.avatar_url,
-                             text=f"Staff : {ctx.author.username}#{ctx.author.discriminator} ({ctx.author.id})")
+        em_dm = interactions.Embed(
+            title="🔓・Unblacklist",
+            description=f"Vous have been unblacklisted by **{ctx.author.username}** for **{reason}**.\nYou "
+                        f"had been nice, it's good, now continue on this path.",
+            color=0x00FF00,
+            timestamp=interactions.Timestamp.utcnow()
+        )
+        em_dm.set_footer(icon_url=ctx.author.avatar_url, text=f"Staff : {ctx.author.username} ({ctx.author.id}) | "
+                                                              f"ID : {blacklist_id}")
 
         await user.send(embeds=em_dm)
 
