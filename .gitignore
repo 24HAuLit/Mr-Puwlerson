@@ -132,5 +132,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Database-local files (formerly in Database/.gitignore)
+/Database/sqlite.py
+/Database/*.db
+
 # Other
 /src/commands/staff/test.py
