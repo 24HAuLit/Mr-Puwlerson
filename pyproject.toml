@@ -1,0 +1,20 @@
+[project]
+name = "mr-puwlerson"
+version = "2.0.0"
+description = "General purpose discord bot"
+readme = "README.md"
+authors = [
+    { name = "24HAuLit" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "discord-py>=2.7.1",
+    "dotenv>=0.9.9",
+]
+
+[project.scripts]
+mr-puwlerson = "mr_puwlerson:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"

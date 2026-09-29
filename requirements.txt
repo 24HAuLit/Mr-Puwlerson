@@ -1,6 +1,0 @@
-python-dotenv~=1.0.0 # pip install python-dotenv
-
-discord-py-interactions # pip install -U discord-py-interactions
-interactions-transcript=0.0.4 # pip install interactions-transcript
-
-discord~=2.2.2 # pip install -U discord.py
