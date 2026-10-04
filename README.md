@@ -58,14 +58,33 @@ Discord login requires a trusted CA bundle. If Python has no default CA file, th
 
 ## Server configuration
 
-Guild data is stored in `Database/<guild-id>.db`. **New-guild database setup is not yet complete:** the join listener creates some tables but does not create and populate the `config` table required by several commands. Those commands require an already provisioned guild database; `/setup` does not currently initialize one. Ticket transcripts are also unavailable at present.
+Guild data is stored in `Database/<guild-id>.db`. On startup and when joining a new guild, the bot creates any missing tables, a default English `config` row, disabled plugin rows, and the shared `Database/temp_join.db` used for verification. Existing rows and settings are preserved. You can also initialize a guild database before starting the bot, from the repository root:
+
+```sh
+uv run python -m mr_puwlerson.database GUILD_ID
+```
+
+Replace `GUILD_ID` with the server ID. This restores **empty storage**, not lost ticket, blacklist, or report records. The old `Database/ddl/main/` SQL files are not the current authoritative schema; use the initializer instead.
+
+To set server-specific IDs, rerun the same command with options (replace every uppercase value with an actual Discord ID):
+
+```sh
+uv run python -m mr_puwlerson.database GUILD_ID \
+  --owner-role OWNER_ROLE_ID --staff-role STAFF_ROLE_ID \
+  --ticket-parent TICKET_CATEGORY_ID \
+  --log-channel create=LOG_CHANNEL_ID --log-channel close=LOG_CHANNEL_ID
+```
+
+Use `--help` for all settings, including `--admin-role`, `--default-role`, `--suggest-channel`, `--logs-server`, `--locale`, `--ticket-limit`, `--suggestion-cooldown`, and repeated `--log-channel NAME=ID`. Configure actual log channels for each feature you use (for example, `report`, `blacklist`, `clear`, `timeout`, and `nuke`); **no channel or role IDs are guessed**. Plugins start disabled and can be enabled with `/plugins` after their required channels are configured. The `/setup` command displays settings but does not fill missing IDs. Ticket transcripts are unavailable at present.
+
+These database files are ignored by Git. Set up automatic off-device SQLite backups before relying on the bot; the initializer cannot recover records deleted during a PC reset.
 
 ## Development
 
-Run the offline command-registration test with:
+Run the offline tests with:
 
 ```sh
 uv run python -m unittest discover -s tests -v
 ```
 
-This test checks extension loading, slash-command registration, and selected French localizations without connecting to Discord.
+The tests cover extension loading, slash-command registration, selected French localizations, and SQLite initialization without connecting to Discord.
