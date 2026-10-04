@@ -5,7 +5,6 @@ import sqlite3
 from contextlib import closing
 from pathlib import Path
 
-
 # Keep column order for tables used with positional INSERT statements.
 TABLES = {
     "config": """CREATE TABLE config (

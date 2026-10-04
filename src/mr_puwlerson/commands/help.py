@@ -9,7 +9,6 @@ from discord.ext import commands
 from mr_puwlerson.commands.coinflip import enable_french_localizations
 from mr_puwlerson.utils.const import commands_list
 
-
 # Title, description, usage (French and English) from the existing help messages.
 HELP_DETAILS = {
     "ping": ("ping", "Permet de voir le ping du bot.", "Allows you to see the bot's ping.",

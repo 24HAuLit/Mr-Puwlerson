@@ -12,7 +12,7 @@ class OnReady(commands.Cog):
         print('+------------------+')
         print(f'Logged in as {self.bot.user} (ID : {self.bot.user.id})')
         print(f'Connected to {len(self.bot.guilds)} guilds')
-        print(datetime.now().strftime('%d/%m/%Y %H:%M:%S'))
+        print(datetime.now().strftime('%d/%m/%Y %H:%M:%S'))  # noqa: DTZ005
         print('+------------------+')
 
 

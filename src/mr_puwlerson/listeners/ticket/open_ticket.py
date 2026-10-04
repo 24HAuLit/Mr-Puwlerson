@@ -1,12 +1,15 @@
 import sqlite3
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import discord
 from discord.ext import commands
 
 from mr_puwlerson.listeners import database_path, has_role, view
 from mr_puwlerson.listeners.ticket.components.claim import ticket_claim
-from mr_puwlerson.listeners.ticket.components.close import ticket_close, ticket_close_reason
+from mr_puwlerson.listeners.ticket.components.close import (
+    ticket_close,
+    ticket_close_reason,
+)
 
 
 class OpenTicket(commands.Cog):
@@ -51,12 +54,12 @@ class OpenTicket(commands.Cog):
             log_id = conn.execute("SELECT id FROM logs_channels WHERE name = 'create'").fetchone()[0]
 
         await interaction.response.send_message(f'Votre ticket a été créé {channel.mention}', ephemeral=True)
-        embed = discord.Embed(title='Nouveau ticket', description='Votre ticket a été ouvert.\n**Un Staff vous répondra sous peu.** Il est inutile de ping les staffs.', color=0x2ECC70, timestamp=datetime.now(timezone.utc))
+        embed = discord.Embed(title='Nouveau ticket', description='Votre ticket a été ouvert.\n**Un Staff vous répondra sous peu.** Il est inutile de ping les staffs.', color=0x2ECC70, timestamp=datetime.now(UTC))
         embed.set_footer(text=f'Author ID : {user.id} | Ticket ID : {ticket_id}')
         message = await channel.send(embed=embed, view=view(ticket_close(), ticket_close_reason(), ticket_claim()))
         await message.pin()
         logs = self.bot.get_channel(log_id)
-        log = discord.Embed(title='Nouveau ticket', description=f'**{user}** a crée un nouveau ticket (**{channel.name}**).', color=0x2ECC70, timestamp=datetime.now(timezone.utc))
+        log = discord.Embed(title='Nouveau ticket', description=f'**{user}** a crée un nouveau ticket (**{channel.name}**).', color=0x2ECC70, timestamp=datetime.now(UTC))
         log.set_footer(text=f'Author ID : {user.id} | Ticket ID : {ticket_id}')
         await logs.send(embed=log)
 

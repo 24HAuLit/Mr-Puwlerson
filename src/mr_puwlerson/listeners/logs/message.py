@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import discord
 from discord.ext import commands
@@ -31,7 +31,7 @@ class Message(commands.Cog):
         logs = self.log_channel(message, 'new')
         if logs is None:
             return
-        embed = discord.Embed(title='🖊️・Nouveau message', url=message.jump_url, description=f'**{message.author}** vient d\'envoyer un message sur **{message.guild.name}** ({message.guild.id}) dans le salon **{message.channel.name}** ({message.channel.id})', color=0x4CFF4C, timestamp=datetime.now(timezone.utc))
+        embed = discord.Embed(title='🖊️・Nouveau message', url=message.jump_url, description=f'**{message.author}** vient d\'envoyer un message sur **{message.guild.name}** ({message.guild.id}) dans le salon **{message.channel.name}** ({message.channel.id})', color=0x4CFF4C, timestamp=datetime.now(UTC))
         if message.content:
             embed.add_field(name='**Message : **', value=message.content[:1024])
         for i, attachment in enumerate(message.attachments):
@@ -46,7 +46,7 @@ class Message(commands.Cog):
         logs = self.log_channel(new, 'edit')
         if logs is None:
             return
-        embed = discord.Embed(title='📝・Modification de message', url=new.jump_url, description=f'**{new.author}** vient de modifier un message sur **{new.guild.name}** ({new.guild.id}) dans le salon **{new.channel.name}** ({new.channel.id})', color=0xFFFF00, timestamp=datetime.now(timezone.utc))
+        embed = discord.Embed(title='📝・Modification de message', url=new.jump_url, description=f'**{new.author}** vient de modifier un message sur **{new.guild.name}** ({new.guild.id}) dans le salon **{new.channel.name}** ({new.channel.id})', color=0xFFFF00, timestamp=datetime.now(UTC))
         if new.content:
             embed.add_field(name='**Ancien Message : **', value=(old.content or 'Aucun message')[:1024], inline=False)
             embed.add_field(name='**Nouveau Message : **', value=new.content[:1024], inline=False)
@@ -68,7 +68,7 @@ class Message(commands.Cog):
         logs = self.log_channel(message, 'delete')
         if logs is None:
             return
-        embed = discord.Embed(title='🗑️・Message supprimé', description=f'Le message de **{message.author}** dans le salon **{message.channel.name}** ({message.channel.id}) sur **{message.guild.name}** ({message.guild.id}) vient d\'être supprimé.', color=0xFF5A5A, timestamp=datetime.now(timezone.utc))
+        embed = discord.Embed(title='🗑️・Message supprimé', description=f'Le message de **{message.author}** dans le salon **{message.channel.name}** ({message.channel.id}) sur **{message.guild.name}** ({message.guild.id}) vient d\'être supprimé.', color=0xFF5A5A, timestamp=datetime.now(UTC))
         if message.content:
             embed.add_field(name='**Message : **', value=message.content[:1024])
         for i, attachment in enumerate(message.attachments):

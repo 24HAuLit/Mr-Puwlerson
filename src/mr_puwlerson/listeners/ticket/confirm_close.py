@@ -1,6 +1,6 @@
 import asyncio
 import sqlite3
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import discord
 from discord.ext import commands
@@ -22,7 +22,7 @@ async def close_ticket(bot, interaction: discord.Interaction, reason: str):
     await interaction.followup.send(embed=discord.Embed(description='Ce ticket va être fermé dans quelques instant...', color=0xFF0000))
     await asyncio.sleep(5)
     await channel.delete()
-    embed = discord.Embed(title='Fermeture de ticket', description='Un ticket a été fermé.', color=0xFF4646, timestamp=datetime.now(timezone.utc))
+    embed = discord.Embed(title='Fermeture de ticket', description='Un ticket a été fermé.', color=0xFF4646, timestamp=datetime.now(UTC))
     embed.add_field(name='__**Ticket ID**__', value=str(row[0]))
     embed.add_field(name='__**Ouvert par**__', value=f'<@{row[1]}>')
     embed.add_field(name='__**Fermé par**__', value=interaction.user.mention)
