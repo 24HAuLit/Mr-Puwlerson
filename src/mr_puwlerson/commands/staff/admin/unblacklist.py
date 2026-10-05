@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import discord
 from discord import app_commands
@@ -29,6 +29,8 @@ class UnBlacklist(commands.Cog):
             return
 
         guild = interaction.guild
+        if guild is None:
+            return
         with sqlite3.connect(f"./Database/{guild.id}.db") as conn:
             channel_id = conn.execute("SELECT id FROM logs_channels WHERE name = 'blacklist'").fetchone()[0]
             row = conn.execute("SELECT blacklist_id FROM blacklist WHERE user_id = ?", (user.id,)).fetchone()
@@ -45,18 +47,19 @@ class UnBlacklist(commands.Cog):
         em = discord.Embed(
             title="🔓・Unblacklist",
             description=f"User **{user.name}** has been unblacklisted by **{interaction.user.name}**",
-            color=0x00FF00, timestamp=datetime.now(timezone.utc),
+            color=0x00FF00, timestamp=datetime.now(UTC),
         )
         em.add_field(name="Reason", value=reason)
         em.add_field(name="Blacklist ID", value=str(blacklist_id))
         em.set_footer(text=f"Staff ID : {interaction.user.id} | User ID : {user.id}")
-        await channel.send(embed=em)
+        if isinstance(channel, (discord.TextChannel, discord.Thread)):
+            await channel.send(embed=em)
 
         em_dm = discord.Embed(
             title="🔓・Unblacklist",
             description=f"Vous have been unblacklisted by **{interaction.user.name}** for **{reason}**.\n"
                         "You had been nice, it's good, now continue on this path.",
-            color=0x00FF00, timestamp=datetime.now(timezone.utc),
+            color=0x00FF00, timestamp=datetime.now(UTC),
         )
         em_dm.set_footer(icon_url=interaction.user.display_avatar.url,
                          text=f"Staff : {interaction.user.name} ({interaction.user.id}) | ID : {blacklist_id}")

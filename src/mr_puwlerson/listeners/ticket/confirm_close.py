@@ -11,6 +11,8 @@ from mr_puwlerson.listeners import database_path, has_role
 async def close_ticket(bot, interaction: discord.Interaction, reason: str):
     channel = interaction.channel
     guild = interaction.guild
+    if guild is None or not isinstance(channel, discord.TextChannel):
+        return await interaction.response.send_message('Ticket introuvable.', ephemeral=True)
     with sqlite3.connect(database_path(guild.id)) as conn:
         row = conn.execute('SELECT * FROM ticket WHERE channel_id = ?', (channel.id,)).fetchone()
         if row is None:
@@ -22,10 +24,12 @@ async def close_ticket(bot, interaction: discord.Interaction, reason: str):
     await interaction.followup.send(embed=discord.Embed(description='Ce ticket va être fermé dans quelques instant...', color=0xFF0000))
     await asyncio.sleep(5)
     await channel.delete()
+
     embed = discord.Embed(title='Fermeture de ticket', description='Un ticket a été fermé.', color=0xFF4646, timestamp=datetime.now(UTC))
     embed.add_field(name='__**Ticket ID**__', value=str(row[0]))
     embed.add_field(name='__**Ouvert par**__', value=f'<@{row[1]}>')
     embed.add_field(name='__**Fermé par**__', value=interaction.user.mention)
+
     if row[2] is not None and row[2] != 'None':
         embed.add_field(name='__**Claim par**__', value=f'<@{row[2]}>')
     embed.add_field(name='__**Raison**__', value=reason)

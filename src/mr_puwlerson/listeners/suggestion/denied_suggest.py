@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import discord
 from discord.ext import commands
@@ -21,14 +21,14 @@ class SuggestionDenied(commands.Cog):
         if not database_path(interaction.guild_id).exists() or not has_role(interaction.user, 'admin_role'):
             return await interaction.response.send_message('Permissions insuffisantes.', ephemeral=True)
 
-        if interaction.message is None:
+        original = interaction.message
+        if original is None:
             return await interaction.response.send_message("Suggestion introuvable.", ephemeral=True)
 
         async def submit(modal_interaction):
-            original = interaction.message
             source = original.embeds[0]
             result = self.bot.get_channel(DATA['main']['suggest_result'])
-            embed = discord.Embed(title='Suggestion refusé', url=original.jump_url, color=0xFF3C3C, timestamp=datetime.now(timezone.utc))
+            embed = discord.Embed(title='Suggestion refusé', url=original.jump_url, color=0xFF3C3C, timestamp=datetime.now(UTC))
             embed.add_field(name='__**Suggestion : **__', value=source.description, inline=False)
             embed.add_field(name='__**Raison : **__', value=str(modal.reason), inline=False)
             embed.set_footer(icon_url=modal_interaction.user.display_avatar.url, text=f'Suggestion refusé par {modal_interaction.user}.')
