@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import discord
 from discord.ext import commands
@@ -19,7 +19,7 @@ class JoinQuit(commands.Cog):
             row = conn.execute("SELECT id FROM logs_channels WHERE name = 'join-quit'").fetchone()
         if row is None:
             return
-        embed = discord.Embed(title=title, description=f'**{member}** {verb} **{guild.name}**', color=color, timestamp=datetime.now(timezone.utc))
+        embed = discord.Embed(title=title, description=f'**{member}** {verb} **{guild.name}**', color=color, timestamp=datetime.now(UTC))
         embed.set_footer(text=f'Server ID : {guild.id} | User ID : {member.id}')
         await self.bot.get_channel(row[0]).send(embed=embed)
 

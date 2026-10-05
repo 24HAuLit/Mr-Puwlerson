@@ -29,7 +29,7 @@ class ReloadExtension(commands.Cog):
 
         try:
             await self.bot.reload_extension(extension)
-        except Exception as error:
+        except commands.ExtensionError as error:
             await interaction.response.send_message(
                 f"Cannot reload the extension **{extension}** : {error}", ephemeral=True
             )

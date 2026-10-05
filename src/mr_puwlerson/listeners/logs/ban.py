@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import discord
 from discord.ext import commands
@@ -23,7 +23,7 @@ class Ban(commands.Cog):
                 break
         else:
             return
-        embed = discord.Embed(title=title, description=description, color=color, timestamp=datetime.now(timezone.utc))
+        embed = discord.Embed(title=title, description=description, color=color, timestamp=datetime.now(UTC))
         embed.add_field(name='__Staff :__', value=entry.user.mention)
         embed.add_field(name='__Membre :__', value=user.mention)
         if action == discord.AuditLogAction.ban:
