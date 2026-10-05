@@ -75,7 +75,7 @@ uv run python -m mr_puwlerson.database GUILD_ID \
   --log-channel create=LOG_CHANNEL_ID --log-channel close=LOG_CHANNEL_ID
 ```
 
-Use `--help` for all settings, including `--admin-role`, `--default-role`, `--suggest-channel`, `--logs-server`, `--locale`, `--ticket-limit`, `--suggestion-cooldown`, and repeated `--log-channel NAME=ID`. Configure actual log channels for each feature you use (for example, `report`, `blacklist`, `clear`, `timeout`, and `nuke`); **no channel or role IDs are guessed**. Plugins start disabled and can be enabled with `/plugins` after their required channels are configured. The `/setup` command displays settings but does not fill missing IDs. Ticket transcripts are unavailable at present.
+Use `--help` for all settings, including `--admin-role`, `--default-role`, `--suggest-channel`, `--logs-server`, `--locale`, `--ticket-limit`, `--suggestion-cooldown`, and repeated `--log-channel NAME=ID`. You can also configure the server in Discord with `/setup server` (settings and main/log server selection), `/setup roles` (role assignments), `/setup channels` (channels hidden from logs), `/setup tickets` (ticket category), and `/setup max_ticket` (per-user ticket limit). Run the commands in the server being configured. The log-server selection asks for an already configured main server ID and creates its log categories and channels in the log server. Configure actual log channels for each feature you use (for example, `report`, `blacklist`, `clear`, `timeout`, and `nuke`); **no channel or role IDs are guessed**. Plugins start disabled and can be enabled with `/plugins` after their required channels are configured. Ticket transcripts are unavailable at present.
 
 These database files are ignored by Git. Set up automatic off-device SQLite backups before relying on the bot; the initializer cannot recover records deleted during a PC reset.
 
@@ -87,4 +87,4 @@ Run the offline tests with:
 uv run python -m unittest discover -s tests -v
 ```
 
-The tests cover extension loading, slash-command registration, selected French localizations, and SQLite initialization without connecting to Discord.
+The tests cover extension loading, slash-command registration, selected French localizations, SQLite initialization, and setup database updates without connecting to Discord.
