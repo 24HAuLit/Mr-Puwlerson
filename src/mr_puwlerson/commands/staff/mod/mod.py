@@ -11,6 +11,7 @@ from mr_puwlerson.commands.staff.banned_channel import (
     install_translator,
     localized,
 )
+from mr_puwlerson.listeners import database_path
 from mr_puwlerson.utils.time_converter import time_to_readable
 
 
@@ -32,6 +33,15 @@ class Mod(commands.Cog):
         if guild is None or not isinstance(channel, (discord.TextChannel, discord.Thread)):
             await interaction.response.send_message("Cette commande nécessite un salon textuel.", ephemeral=True)
             return
+        with sqlite3.connect(database_path(guild.id)) as conn:
+            row = conn.execute("SELECT id FROM logs_channels WHERE name = 'clear'").fetchone()
+        if row is None:
+            await interaction.response.send_message(
+                "Le salon de logs `clear` n'est pas configuré. Configurez le serveur de logs avec `/setup server`.",
+                ephemeral=True,
+            )
+            return
+        logs_id = row[0]
         # The interaction must be acknowledged before a potentially slow purge.
         await interaction.response.defer(ephemeral=True)
         deleted = await channel.purge(limit=number)
@@ -40,8 +50,6 @@ class Mod(commands.Cog):
         em.set_author(name=str(interaction.user), icon_url=interaction.user.display_avatar.url)
         await interaction.followup.send(embed=em, ephemeral=True)
 
-        with sqlite3.connect(f"./Database/{guild.id}.db") as conn:
-            logs_id = conn.execute("SELECT id FROM logs_channels WHERE name = 'clear'").fetchone()[0]
         logs_clear = self.bot.get_channel(logs_id) or await self.bot.fetch_channel(logs_id)
         em2 = discord.Embed(
             title="🧹・Nouveau clear",
@@ -74,13 +82,20 @@ class Mod(commands.Cog):
         guild = interaction.guild
         if guild is None:
             return
+        with sqlite3.connect(database_path(guild.id)) as conn:
+            row = conn.execute("SELECT id FROM logs_channels WHERE name = 'timeout'").fetchone()
+        if row is None:
+            await interaction.response.send_message(
+                "Le salon de logs `timeout` n'est pas configuré. Configurez le serveur de logs avec `/setup server`.",
+                ephemeral=True,
+            )
+            return
+        logs_id = row[0]
         await user.timeout(datetime.now(UTC) + timedelta(seconds=duration), reason=reason)
         await interaction.response.send_message(
             f"{user.mention} a été exclu pendant **{time_to_readable(guild.id, duration)}** pour **{reason}**.",
             ephemeral=True,
         )
-        with sqlite3.connect(f"./Database/{guild.id}.db") as conn:
-            logs_id = conn.execute("SELECT id FROM logs_channels WHERE name = 'timeout'").fetchone()[0]
         logs_timeout = self.bot.get_channel(logs_id) or await self.bot.fetch_channel(logs_id)
         em = discord.Embed(title="🟠・Nouvelle exclusion temporaire",
                            description=f"Un membre vient de se faire exclure temporairement de **{guild.name}**.",
@@ -105,12 +120,19 @@ class Mod(commands.Cog):
         guild = interaction.guild
         if guild is None:
             return
+        with sqlite3.connect(database_path(guild.id)) as conn:
+            row = conn.execute("SELECT id FROM logs_channels WHERE name = 'timeout'").fetchone()
+        if row is None:
+            await interaction.response.send_message(
+                "Le salon de logs `timeout` n'est pas configuré. Configurez le serveur de logs avec `/setup server`.",
+                ephemeral=True,
+            )
+            return
+        logs_id = row[0]
         await user.timeout(None, reason=reason)
         await interaction.response.send_message(
             f"L'exclusion de {user.mention} a été annulé pour **{reason}**.", ephemeral=True,
         )
-        with sqlite3.connect(f"./Database/{guild.id}.db") as conn:
-            logs_id = conn.execute("SELECT id FROM logs_channels WHERE name = 'timeout'").fetchone()[0]
         logs_untimeout = self.bot.get_channel(logs_id) or await self.bot.fetch_channel(logs_id)
         em = discord.Embed(title="🟢・Fin d'exclusion temporaire",
                            description=f"Un staff vient de retirer l'exclusion temporaire d'un membre sur **{guild.name}**.",
