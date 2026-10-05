@@ -4,7 +4,7 @@ from contextlib import closing
 import discord
 from discord.ext import commands
 
-from mr_puwlerson.commands.staff.setup._shared import database_path
+from mr_puwlerson.commands.staff.setup._shared import database_path, require_owner
 
 
 class SetupBannedChannels(commands.Cog):
@@ -14,7 +14,7 @@ class SetupBannedChannels(commands.Cog):
                 or interaction.data.get("custom_id") != "banned_channels"):
             return
         guild = interaction.guild
-        if guild is None:
+        if guild is None or not await require_owner(interaction):
             return
         messages = []
         with closing(sqlite3.connect(database_path(guild.id))) as conn, conn:

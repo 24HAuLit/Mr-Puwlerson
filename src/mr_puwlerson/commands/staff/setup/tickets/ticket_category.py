@@ -4,7 +4,7 @@ from contextlib import closing
 import discord
 from discord.ext import commands
 
-from mr_puwlerson.commands.staff.setup._shared import database_path
+from mr_puwlerson.commands.staff.setup._shared import database_path, require_owner
 
 
 class TicketCategory(commands.Cog):
@@ -16,12 +16,14 @@ class TicketCategory(commands.Cog):
         guild = interaction.guild
         if guild is None or not interaction.data.get("values"):
             return
+        if not await require_owner(interaction):
+            return
         values = interaction.data.get("values")
         if not values:
             return
         channel_id = int(values[0])
         channel = guild.get_channel(channel_id)
-        if channel is None:
+        if not isinstance(channel, discord.CategoryChannel):
             await interaction.response.send_message("Cette catégorie n'existe plus.", ephemeral=True)
             return
         with closing(sqlite3.connect(database_path(guild.id))) as conn, conn:
@@ -39,6 +41,7 @@ class TicketCategory(commands.Cog):
                 message = (f"**{row[0]}** n'est plus la catégorie pour les tickets, elle a été remplacée "
                            f"par **{channel.name}**" if row else
                            f"**{channel.name}** est désormais la catégorie de tickets")
+            conn.execute("UPDATE config SET ticket_parent = ?", (channel_id,))
         await interaction.response.send_message(message, ephemeral=True)
 
 

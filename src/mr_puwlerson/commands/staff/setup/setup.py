@@ -5,6 +5,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from mr_puwlerson.commands.staff.setup._server import ServerTypeSelect
 from mr_puwlerson.commands.staff.setup._shared import database_path, require_owner
 
 
@@ -52,6 +53,12 @@ class SetupTranslator(app_commands.Translator):
 
 
 class Setup(commands.Cog):
+    setup = app_commands.Group(
+        name="setup",
+        description=app_commands.locale_str("To setup the bot", fr="Pour configurer le bot"),
+        guild_only=True,
+    )
+
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
@@ -59,12 +66,8 @@ class Setup(commands.Cog):
         if self.bot.tree.translator is None:
             await self.bot.tree.set_translator(SetupTranslator())
 
-    @app_commands.command(
-        name="setup",
-        description=app_commands.locale_str("To setup the bot", fr="Pour configurer le bot"),
-    )
-    @app_commands.guild_only()
-    async def setup(self, interaction: discord.Interaction):
+    @setup.command(name="server", description="Permet de configurer les différents types de serveur.")
+    async def server(self, interaction: discord.Interaction):
         if not await require_owner(interaction):
             return
         guild = interaction.guild
@@ -106,8 +109,95 @@ class Setup(commands.Cog):
                 page2.add_field(name=label, value=str(status[0]) if status else "Inconnu")
 
         view = SetupPages([page1, page2], interaction.user.id)
+        view.add_item(ServerTypeSelect(self.bot))
         await interaction.response.send_message(embed=page1, view=view)
         view.message = await interaction.original_response()
+
+    @setup.command(name="roles", description="Permet de configurer les différents roles du serveur principal.")
+    async def roles(self, interaction: discord.Interaction):
+        if not await require_owner(interaction):
+            return
+        guild = interaction.guild
+        if guild is None:
+            return
+        with closing(sqlite3.connect(database_path(guild.id))) as conn, conn:
+            for role in guild.roles:
+                row = conn.execute("SELECT 1 FROM roles WHERE id = ?", (role.id,)).fetchone()
+                if row is None:
+                    conn.execute("INSERT INTO roles (name, id, type) VALUES (?, ?, NULL)", (role.name, role.id))
+                else:
+                    conn.execute("UPDATE roles SET name = ? WHERE id = ?", (role.name, role.id))
+        view = discord.ui.View()
+        view.add_item(discord.ui.RoleSelect(custom_id="default_menu", placeholder="Choisissez un rôle"))
+        await interaction.response.send_message("Quel role sera le role par default ?", view=view, ephemeral=True)
+
+    @setup.command(name="channels", description="Permet de configurer les différents channels du serveur principal.")
+    async def channels(self, interaction: discord.Interaction):
+        if not await require_owner(interaction):
+            return
+        guild = interaction.guild
+        if guild is None:
+            return
+        with closing(sqlite3.connect(database_path(guild.id))) as conn, conn:
+            for channel in guild.channels:
+                row = conn.execute("SELECT 1 FROM channels WHERE id = ?", (channel.id,)).fetchone()
+                if row is None:
+                    conn.execute("INSERT INTO channels (name, id, type, hidden) VALUES (?, ?, NULL, 0)",
+                                 (channel.name, channel.id))
+                else:
+                    conn.execute("UPDATE channels SET name = ? WHERE id = ?", (channel.name, channel.id))
+            row = conn.execute("SELECT 1 FROM channels WHERE id = ?", (guild.id,)).fetchone()
+            if row is None:
+                conn.execute("INSERT INTO channels (name, id, type, hidden) VALUES (?, ?, 'guild', 0)",
+                             (guild.name, guild.id))
+            else:
+                conn.execute("UPDATE channels SET name = ?, type = 'guild' WHERE id = ?", (guild.name, guild.id))
+        if not guild.channels:
+            await interaction.response.send_message("Aucun salon à configurer.", ephemeral=True)
+            return
+        view = discord.ui.View()
+        view.add_item(discord.ui.ChannelSelect(
+            custom_id="banned_channels", placeholder="Sélectionnez les channels qui seront cachés dans les logs.",
+            min_values=1, max_values=min(25, len(guild.channels)),
+        ))
+        await interaction.response.send_message(
+            "Sélectionnez les channels qui seront cachés dans les logs.", view=view, ephemeral=True
+        )
+
+    @setup.command(name="tickets", description="Permet de configurer les salons nécessaires aux tickets.")
+    async def tickets(self, interaction: discord.Interaction):
+        if not await require_owner(interaction):
+            return
+        guild = interaction.guild
+        if guild is None:
+            return
+        if not guild.categories:
+            await interaction.response.send_message("Aucune catégorie disponible pour les tickets.", ephemeral=True)
+            return
+        view = discord.ui.View()
+        view.add_item(discord.ui.ChannelSelect(
+            custom_id="ticket_category", placeholder="Sélectionnez la catégorie des tickets.",
+            channel_types=[discord.ChannelType.category],
+        ))
+        await interaction.response.send_message("Sélectionnez la catégorie des tickets.", view=view, ephemeral=True)
+
+    @setup.command(name="max_ticket", description="Permet de fixer une limite de ticket ouvert par utilisateur.")
+    @app_commands.describe(limit="Nombre de ticket maximum par utilisateur. (Par défaut 3)")
+    async def max_ticket(self, interaction: discord.Interaction, limit: int):
+        if not await require_owner(interaction):
+            return
+        if limit < 1:
+            await interaction.response.send_message("La limite doit être supérieure à zéro.", ephemeral=True)
+            return
+        guild = interaction.guild
+        if guild is None:
+            return
+        with closing(sqlite3.connect(database_path(guild.id))) as conn, conn:
+            conn.execute("UPDATE config SET ticket_limit = ?", (limit,))
+        await interaction.response.send_message(
+            f"Le nombre de ticket maximum par utilisateur a été mis à jour et est désormais de **{limit}**.",
+            ephemeral=True,
+        )
 
 
 async def setup(bot: commands.Bot):

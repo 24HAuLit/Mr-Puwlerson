@@ -46,6 +46,8 @@ async def handle_role_selection(
     guild = interaction.guild
     if guild is None or not interaction.data.get("values"):
         return
+    if not await require_owner(interaction):
+        return
     values = interaction.data.get("values")
     if not values:
         return
@@ -70,6 +72,10 @@ async def handle_role_selection(
             message = (f"**{row[0]}** n'est plus le role {description}, il a été remplacé "
                        f"par **{role.name}**." if row else
                        f"**{role.name}** est désormais le role {description}.")
+        column = {"Default": "default_role", "Staff": "staff_role", "Owner": "owner_role",
+                  "Admin": "admin_role"}.get(role_type)
+        if column is not None:
+            conn.execute(f"UPDATE config SET {column} = ?", (role.id,))
 
     await interaction.response.send_message(message, ephemeral=True)
     if next_menu is not None and next_prompt is not None:

@@ -32,6 +32,12 @@ class CommandRegistrationTests(unittest.IsolatedAsyncioTestCase):
             {command.name for command in mod.commands},
             {"clear", "timeout", "untimeout"},
         )
+        setup = bot.tree.get_command("setup")
+        assert isinstance(setup, app_commands.Group)
+        self.assertEqual(
+            {command.name for command in setup.commands},
+            {"server", "roles", "channels", "tickets", "max_ticket"},
+        )
         translator = bot.tree.translator
         assert isinstance(translator, app_commands.Translator)
         payloads = {
@@ -40,6 +46,12 @@ class CommandRegistrationTests(unittest.IsolatedAsyncioTestCase):
         }
         self.assertEqual(payloads["coinflip"]["name_localizations"]["fr"], "pileface")
         self.assertEqual(payloads["setup"]["description_localizations"]["fr"], "Pour configurer le bot")
+        self.assertEqual(
+            {option["name"] for option in payloads["setup"]["options"]},
+            {"server", "roles", "channels", "tickets", "max_ticket"},
+        )
+        limit_option = next(option for option in payloads["setup"]["options"] if option["name"] == "max_ticket")
+        self.assertEqual([option["name"] for option in limit_option["options"]], ["limit"])
         self.assertEqual(payloads["giveaway"]["description_localizations"]["fr"], "Lance un giveaway")
         report_options = payloads["report"]["options"]
         self.assertEqual([option["name"] for option in report_options], ["channel", "problem", "user"])
