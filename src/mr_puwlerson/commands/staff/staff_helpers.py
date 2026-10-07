@@ -90,33 +90,5 @@ async def plugin_ready(interaction: discord.Interaction, plugin: str) -> bool:
     return False
 
 
-class BannedChannels(commands.Cog):
-    def __init__(self, bot: commands.Bot):
-        self.bot = bot
-
-    @app_commands.command(name="banned_channels", description=localized("Allows you to add/ delete a 'banned channel'", "Permet d'ajouter/ supprimer un salon bannis"))
-    @app_commands.guild_only()
-    @app_commands.rename(channel=localized("channel", "salon"))
-    @app_commands.describe(channel=localized("Channel that will (not) have logs.", "Salon qui aura/ n'aura pas de logs."))
-    async def banned_channels(self, interaction: discord.Interaction, channel: discord.abc.GuildChannel):
-        if not await database_ready(interaction) or not await has_permission(interaction, "owner_role"):
-            return
-
-        guild = interaction.guild
-        if guild is None:
-            return
-        with sqlite3.connect(f"./Database/{guild.id}.db") as conn:
-            row = conn.execute("SELECT hidden FROM channels WHERE id = ?", (channel.id,)).fetchone()
-            if row is None:
-                await interaction.response.send_message("Ce salon n'est pas configuré.", ephemeral=True)
-                return
-            hidden = 0 if row[0] == 1 else 1
-            conn.execute("UPDATE channels SET hidden = ? WHERE id = ?", (hidden, channel.id))
-        message = (f"Le salon `{channel.name}` sera désormais affiché dans les logs."
-                   if hidden == 0 else f"Le salon `{channel.name}` ne sera plus affiché dans les logs.")
-        await interaction.response.send_message(message, ephemeral=True)
-
-
 async def setup(bot: commands.Bot):
     await install_translator(bot)
-    await bot.add_cog(BannedChannels(bot))
