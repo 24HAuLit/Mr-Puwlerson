@@ -4,7 +4,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from mr_puwlerson.commands.staff.banned_channel import (
+from mr_puwlerson.commands.staff.staff_helpers import (
     database_ready,
     has_permission,
     install_translator,

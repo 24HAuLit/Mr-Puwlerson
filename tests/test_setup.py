@@ -56,6 +56,52 @@ class SetupWorkflowTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(self.config("ticket_limit"), 5)
         self.assertEqual(self.interaction.response.send_message.await_count, 2)
 
+    async def test_hidden_channels_lists_only_existing_hidden_channels(self):
+        self.guild.get_channel = lambda channel_id: SimpleNamespace(id=channel_id) if channel_id in (10, 20) else None
+        with closing(sqlite3.connect(self.path)) as conn, conn:
+            conn.executemany(
+                "INSERT INTO channels (name, id, hidden) VALUES (?, ?, ?)",
+                [("visible", 10, 0), ("hidden", 20, 1), ("deleted", 30, 1)],
+            )
+        callback = cast(Any, Setup.hidden_channels.callback)
+        with patch.dict(callback.__globals__, {"database_path": lambda guild_id: self.path}):
+            await callback(Setup(Mock()), self.interaction)
+        self.interaction.response.send_message.assert_awaited_once_with(
+            "Salons exclus des logs :\n• <#20>", ephemeral=True,
+        )
+        self.interaction.followup.send.assert_not_awaited()
+
+    async def test_hidden_channels_empty_and_owner_only(self):
+        self.guild.get_channel = lambda channel_id: None
+        callback = cast(Any, Setup.hidden_channels.callback)
+        with patch.dict(callback.__globals__, {"database_path": lambda guild_id: self.path}):
+            await callback(Setup(Mock()), self.interaction)
+            self.interaction.response.send_message.assert_awaited_once_with(
+                "Aucun salon n'est exclu des logs.", ephemeral=True,
+            )
+            self.interaction.response.send_message.reset_mock()
+            self.interaction.user.id = 99
+            await callback(Setup(Mock()), self.interaction)
+        self.interaction.response.send_message.assert_awaited_once_with(
+            ":x: You don't have the permission to do this.", ephemeral=True,
+        )
+
+    async def test_hidden_channels_long_list_uses_followups(self):
+        self.guild.get_channel = lambda channel_id: SimpleNamespace(id=channel_id)
+        with closing(sqlite3.connect(self.path)) as conn, conn:
+            conn.executemany(
+                "INSERT INTO channels (name, id, hidden) VALUES (?, ?, 1)",
+                [(str(channel_id), channel_id) for channel_id in range(100, 400)],
+            )
+        callback = cast(Any, Setup.hidden_channels.callback)
+        with patch.dict(callback.__globals__, {"database_path": lambda guild_id: self.path}):
+            await callback(Setup(Mock()), self.interaction)
+        messages = [self.interaction.response.send_message.await_args.args[0]]
+        messages += [call.args[0] for call in self.interaction.followup.send.await_args_list]
+        self.assertGreater(len(messages), 1)
+        self.assertTrue(all(len(message) <= 2000 for message in messages))
+        self.assertEqual(sum(message.count("<#") for message in messages), 300)
+
     async def test_role_selection_updates_config_and_replaces_previous_role(self):
         old_role = SimpleNamespace(id=10, name="Old")
         role = SimpleNamespace(id=11, name="Staff")

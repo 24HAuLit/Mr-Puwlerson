@@ -164,6 +164,30 @@ class Setup(commands.Cog):
             "Sélectionnez les channels qui seront cachés dans les logs.", view=view, ephemeral=True
         )
 
+    @setup.command(name="hidden_channels", description="Affiche les salons exclus des logs.")
+    async def hidden_channels(self, interaction: discord.Interaction):
+        if not await require_owner(interaction):
+            return
+        guild = interaction.guild
+        if guild is None:
+            return
+        with closing(sqlite3.connect(database_path(guild.id))) as conn:
+            channel_ids = [row[0] for row in conn.execute("SELECT id FROM channels WHERE hidden = 1 ORDER BY name")]
+        channels = [f"<#{channel_id}>" for channel_id in channel_ids if guild.get_channel(channel_id) is not None]
+        if not channels:
+            await interaction.response.send_message("Aucun salon n'est exclu des logs.", ephemeral=True)
+            return
+
+        messages = ["Salons exclus des logs :"]
+        for channel in channels:
+            line = f"\n• {channel}"
+            if len(messages[-1]) + len(line) > 2000:
+                messages.append("Salons exclus des logs (suite) :")
+            messages[-1] += line
+        await interaction.response.send_message(messages[0], ephemeral=True)
+        for message in messages[1:]:
+            await interaction.followup.send(message, ephemeral=True)
+
     @setup.command(name="tickets", description="Permet de configurer les salons nécessaires aux tickets.")
     async def tickets(self, interaction: discord.Interaction):
         if not await require_owner(interaction):

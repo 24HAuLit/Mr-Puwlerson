@@ -16,7 +16,7 @@ class CommandRegistrationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(
             {command.name for command in bot.tree.get_commands()},
             {"coinflip", "help", "ping", "reload_ext", "report", "suggest",
-             "ticket", "remove", "rename", "banned_channels", "self_role",
+             "ticket", "remove", "rename", "self_role",
              "mod", "blacklist", "giveaway", "nuke", "unblacklist",
              "plugins", "locale", "setup", "update"},
         )
@@ -36,7 +36,7 @@ class CommandRegistrationTests(unittest.IsolatedAsyncioTestCase):
         assert isinstance(setup, app_commands.Group)
         self.assertEqual(
             {command.name for command in setup.commands},
-            {"server", "roles", "channels", "tickets", "max_ticket"},
+            {"server", "roles", "channels", "hidden_channels", "tickets", "max_ticket"},
         )
         translator = bot.tree.translator
         assert isinstance(translator, app_commands.Translator)
@@ -48,7 +48,7 @@ class CommandRegistrationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(payloads["setup"]["description_localizations"]["fr"], "Pour configurer le bot")
         self.assertEqual(
             {option["name"] for option in payloads["setup"]["options"]},
-            {"server", "roles", "channels", "tickets", "max_ticket"},
+            {"server", "roles", "channels", "hidden_channels", "tickets", "max_ticket"},
         )
         limit_option = next(option for option in payloads["setup"]["options"] if option["name"] == "max_ticket")
         self.assertEqual([option["name"] for option in limit_option["options"]], ["limit"])
